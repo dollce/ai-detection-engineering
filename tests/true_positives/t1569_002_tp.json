@@ -11,11 +11,11 @@
       "pid": 7412,
       "name": "sc.exe",
       "executable": "C:\\Windows\\System32\\sc.exe",
-      "command_line": "sc.exe create WindowsUpdateSvc binPath= \"C:\\ProgramData\\WindowsUpdate\\task_scheduler.exe\" start= auto DisplayName= \"Windows Update Service\"",
+      "command_line": "sc.exe start WindowsUpdateSvc",
       "parent": {
         "pid": 6880,
         "name": "cmd.exe",
-        "executable": "C:\\Windows\\System32\\cmd.exe"
+        "executable": "C:\\Users\\dkim\\AppData\\Local\\Temp\\cmd.exe"
       }
     },
     "user": {
@@ -36,7 +36,7 @@
       "technique": "T1569.002",
       "sequence_order": 1,
       "sequence_total": 3,
-      "description": "Adversary uses sc.exe to register malicious binary as a Windows service with auto-start, masquerading as a legitimate Windows Update service"
+      "description": "Adversary uses sc.exe to start a previously registered malicious service from a suspicious parent process"
     }
   }
 ]

@@ -16,6 +16,7 @@ references:
 tags:
   - attack.discovery
   - attack.t1033
+  - detection.fawkes
 logsource:
   category: process_creation
   product: windows

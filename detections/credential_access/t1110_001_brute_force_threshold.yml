@@ -17,7 +17,6 @@ tags:
   - attack.credential_access
   - attack.t1110.001
   - attack.t1110
-  - detection.fawkes
 logsource:
   product: windows
   service: security

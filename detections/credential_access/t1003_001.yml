@@ -5,10 +5,11 @@ description: >
   Detects LSASS credential dumping via three signals: suspicious process access to lsass.exe
   with memory-read access rights (Sysmon EID 10), creation of LSASS dump files (Sysmon EID 11),
   and processes referencing lsass in their command line from suspicious user-writable paths.
-  Covers Fawkes C2 credential dumping, Mimikatz, nanodump, and custom LSASS dumpers.
+  Covers Mimikatz, nanodump, and custom LSASS dumpers. Excludes PROCESS_DUP_HANDLE-only
+  codes (0x0040, 0x0140) which are covered by T1134.001 (token theft).
 author: Blue Team Detection Engineering Agent
 date: 2026/03/08
-modified: 2026/03/22
+modified: 2026/03/29
 references:
   - https://attack.mitre.org/techniques/T1003/001/
   - https://github.com/galoryber/fawkes
@@ -26,11 +27,10 @@ detection:
       - '0x1010'
       - '0x1410'
       - '0x1438'
-      - '0x143a'
-      - '0x1fffff'
+      - '0x143A'
+      - '0x1FFFFF'
       - '0x1F0FFF'
       - '0x1F1FFF'
-      - '0x40'
       - '0x1400'
       - '0x100000'
   selection_dump_file:

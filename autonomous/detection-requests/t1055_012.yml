@@ -1,12 +1,12 @@
 technique_id: T1055.012
 title: "Detection for T1055.012 \u2014 DLL function pointer overwrite (no new thread)"
-status: SCENARIO_BUILT
+status: AUTHORED
 priority: high
 requested_by: intel
 requested_date: '2026-03-21T13:04:56Z'
 intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
 scenario_file: simulator\scenarios\t1055_012.json
-sigma_rule: ''
+sigma_rule: detections/privilege_escalation/t1055_012.yml
 deployed_date: ''
 last_quality_review: ''
 quality_score: 0.0

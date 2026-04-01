@@ -1,0 +1,230 @@
+{
+  "technique_id": "T1087.001",
+  "technique_name": "Account Discovery: Local Account",
+  "description": "Simulates Fawkes C2 net-enum command enumerating local users and groups via net.exe and wmic.exe",
+  "mitre_tactic": "discovery",
+  "fawkes_command": "net-enum",
+  "data_sources": ["Sysmon EventID 1"],
+  "events": {
+    "attack_sequence": [
+      {
+        "@timestamp": "2026-03-29T10:22:14.337Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "action": "Process Create (rule: ProcessCreate)",
+          "code": "1"
+        },
+        "process": {
+          "pid": 5184,
+          "name": "net.exe",
+          "executable": "C:\\Windows\\System32\\net.exe",
+          "command_line": "net user /domain",
+          "parent": {
+            "pid": 3872,
+            "name": "fawkes_agent.exe",
+            "executable": "C:\\Users\\jsmith\\AppData\\Local\\Temp\\fawkes_agent.exe"
+          }
+        },
+        "user": {
+          "name": "jsmith",
+          "domain": "CORP"
+        },
+        "host": {
+          "name": "WS-FINANCE-01",
+          "os": {
+            "platform": "windows"
+          }
+        },
+        "agent": {
+          "type": "sysmon"
+        },
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1087.001",
+          "fawkes_command": "net-enum",
+          "sequence_order": 1,
+          "sequence_total": 3,
+          "description": "Fawkes C2 agent (fawkes_agent.exe in AppData Temp) executes net user /domain to enumerate local and domain accounts"
+        }
+      },
+      {
+        "@timestamp": "2026-03-29T10:22:16.814Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "action": "Process Create (rule: ProcessCreate)",
+          "code": "1"
+        },
+        "process": {
+          "pid": 5291,
+          "name": "net.exe",
+          "executable": "C:\\Windows\\System32\\net.exe",
+          "command_line": "net localgroup administrators",
+          "parent": {
+            "pid": 3872,
+            "name": "fawkes_agent.exe",
+            "executable": "C:\\Users\\jsmith\\AppData\\Local\\Temp\\fawkes_agent.exe"
+          }
+        },
+        "user": {
+          "name": "jsmith",
+          "domain": "CORP"
+        },
+        "host": {
+          "name": "WS-FINANCE-01",
+          "os": {
+            "platform": "windows"
+          }
+        },
+        "agent": {
+          "type": "sysmon"
+        },
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1087.001",
+          "fawkes_command": "net-enum",
+          "sequence_order": 2,
+          "sequence_total": 3,
+          "description": "Fawkes net-enum enumerates members of local Administrators group to identify privileged accounts for lateral movement planning"
+        }
+      },
+      {
+        "@timestamp": "2026-03-29T10:22:18.502Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "action": "Process Create (rule: ProcessCreate)",
+          "code": "1"
+        },
+        "process": {
+          "pid": 5377,
+          "name": "wmic.exe",
+          "executable": "C:\\Windows\\System32\\wbem\\wmic.exe",
+          "command_line": "wmic useraccount get Name,SID,Disabled,PasswordRequired",
+          "parent": {
+            "pid": 3872,
+            "name": "fawkes_agent.exe",
+            "executable": "C:\\Users\\jsmith\\AppData\\Local\\Temp\\fawkes_agent.exe"
+          }
+        },
+        "user": {
+          "name": "jsmith",
+          "domain": "CORP"
+        },
+        "host": {
+          "name": "WS-FINANCE-01",
+          "os": {
+            "platform": "windows"
+          }
+        },
+        "agent": {
+          "type": "sysmon"
+        },
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1087.001",
+          "fawkes_command": "net-enum",
+          "sequence_order": 3,
+          "sequence_total": 3,
+          "description": "Fawkes net-enum uses wmic useraccount to enumerate all local accounts with SID, disabled status and password requirements — richer data than net user"
+        }
+      }
+    ],
+    "benign_similar": [
+      {
+        "@timestamp": "2026-03-29T08:45:02.119Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "action": "Process Create (rule: ProcessCreate)",
+          "code": "1"
+        },
+        "process": {
+          "pid": 2104,
+          "name": "net.exe",
+          "executable": "C:\\Windows\\System32\\net.exe",
+          "command_line": "net user",
+          "parent": {
+            "pid": 876,
+            "name": "svchost.exe",
+            "executable": "C:\\Windows\\System32\\svchost.exe"
+          }
+        },
+        "user": {
+          "name": "SYSTEM",
+          "domain": "NT AUTHORITY"
+        },
+        "host": {
+          "name": "WS-FINANCE-01",
+          "os": {
+            "platform": "windows"
+          }
+        },
+        "agent": {
+          "type": "sysmon"
+        },
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1087.001",
+          "description": "net.exe invoked as SYSTEM from svchost.exe — legitimate Windows service performing routine account enumeration, excluded by system context filter"
+        }
+      },
+      {
+        "@timestamp": "2026-03-29T09:10:44.882Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "action": "Process Create (rule: ProcessCreate)",
+          "code": "1"
+        },
+        "process": {
+          "pid": 3308,
+          "name": "net.exe",
+          "executable": "C:\\Windows\\System32\\net.exe",
+          "command_line": "net localgroup administrators",
+          "parent": {
+            "pid": 1888,
+            "name": "CcmExec.exe",
+            "executable": "C:\\Windows\\CCM\\CcmExec.exe"
+          }
+        },
+        "user": {
+          "name": "SYSTEM",
+          "domain": "NT AUTHORITY"
+        },
+        "host": {
+          "name": "WS-FINANCE-01",
+          "os": {
+            "platform": "windows"
+          }
+        },
+        "agent": {
+          "type": "sysmon"
+        },
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1087.001",
+          "description": "SCCM client (CcmExec.exe) checks local Administrators group membership for compliance assessment — legitimate endpoint management, excluded by SCCM filter"
+        }
+      }
+    ]
+  },
+  "expected_detection": {
+    "should_alert_on": "attack_sequence",
+    "should_not_alert_on": "benign_similar",
+    "key_fields": [
+      "process.name",
+      "process.command_line",
+      "process.parent.executable",
+      "user.name"
+    ],
+    "notes": "Primary discriminator is parent process path — Fawkes agent in user-writable directories (AppData, Temp) is strongly anomalous vs. legitimate invocations from svchost.exe or CcmExec.exe running as SYSTEM. The combination of net user + net localgroup + wmic useraccount in rapid succession from the same parent PID is a reliable Fawkes net-enum signature. Filter on SYSTEM context + trusted parent paths covers the bulk of FP scenarios."
+  },
+  "log_sources_used": [
+    "sysmon_1"
+  ],
+  "platforms": [
+    "windows"
+  ]
+}

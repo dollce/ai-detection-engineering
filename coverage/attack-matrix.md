@@ -1,134 +1,110 @@
-# MITRE ATT&CK Coverage Matrix — Fawkes C2 Detections
+# MITRE ATT&CK Detection Coverage Matrix
 
-**Last updated**: 2026-03-17
-**Total detections**: 37 rules (30 Sigma + 3 EQL + 4 threshold)
-**Deployed to SIEM**: 11 (MONITORING state)
-**Validated (deploy-ready)**: 12 (F1 >= 0.75)
-**Needs rework**: 4 (F1 < 0.75)
-**Authored (pending validation)**: 10 (2 pre-Phase6 + 8 new Phase 6 rules)
-**Fawkes technique coverage**: 14 / 21 core techniques (67%)
-**Tactics covered**: 9 (Impact tactic added in Phase 6)
+**Last updated**: 2026-03-29 (auto-generated)
+**Total rules**: 53
+**Tactics covered**: 10
 
-Legend: ✅ Monitoring | ✓ Validated | 🔨 Authored | ❌ No coverage | ⚠️ Data gap
-Quality: 🟢 auto_deploy (F1>=0.90) | 🟡 validated (F1>=0.75) | 🔴 needs_rework (F1<0.75)
+## Collection (1 rules, 1 Fawkes-tagged)
 
----
+| File | Technique | Title | Severity | Fawkes |
+|------|-----------|-------|----------|--------|
+| t1056_001.yml | attack.t1056.001 | Potential Keylogger - Suspicious Process Loading user32.dll | high | Y |
 
-## Tactic Coverage Summary
+## Command And Control (1 rules, 0 Fawkes-tagged)
 
-| Tactic | Detections | Monitoring | Validated | Authored | Needs Rework |
-|---|---|---|---|---|---|
-| Initial Access (TA0001) | 2 | 2 | 0 | 0 | 0 |
-| Execution (TA0002) | 12 | 2 | 6 | 1 | 3 |
-| Persistence (TA0003) | 3 | 2 | 1 | 0 | 0 |
-| Privilege Escalation (TA0004) | 3 | 0 | 1 | 2 | 0 |
-| Defense Evasion (TA0005) | 7 | 3 | 3 | 1 | 0 |
-| Credential Access (TA0006) | 3 | 1 | 0 | 1 | 1 |
-| Discovery (TA0007) | 4 | 0 | 1 | 3 | 0 |
-| Impact (TA0040) | 2 | 0 | 0 | 2 | 0 |
-| Command & Control (TA0011) | 1 | 1 | 0 | 0 | 0 |
-| **Total** | **37** | **11** | **12** | **10** | **4** |
-<!-- Note: 11 MONITORING confirmed via quality report 2026-03-13; 8 new AUTHORED rules added Phase 6 (2026-03-17) -->
+| File | Technique | Title | Severity | Fawkes |
+|------|-----------|-------|----------|--------|
+| t1071_001.yml | attack.t1071.001 | C2 Beaconing via HTTP/HTTPS from Unusual Process [T1071.001] | high |   |
 
----
+## Credential Access (3 rules, 2 Fawkes-tagged)
 
-## All Detections — Current State
+| File | Technique | Title | Severity | Fawkes |
+|------|-----------|-------|----------|--------|
+| t1003_001.yml | attack.t1003.001 | LSASS Credential Dumping Activity Detected | high |   |
+| t1110_001_brute_force_threshold.yml | attack.t1110.001 | Brute Force Login - Failed Logon Threshold | medium | Y |
+| t1134_001_lsass_token_theft.yml | attack.t1134.001 | LSASS Process Access for Token Theft | critical | Y |
 
-| Technique | Title | Status | F1 | Tier | Rule File |
-|---|---|---|---|---|---|
-| T1003.001 | LSASS Credential Dump | 🔨 AUTHORED | 0.00 | 🔴 needs_rework | [t1003_001.yml](../detections/credential_access/t1003_001.yml) |
-| T1021.001 | Remote Desktop Protocol | 🔨 AUTHORED | 0.50 | 🔴 needs_rework | [t1021_001.yml](../detections/execution/t1021_001.yml) |
-| T1027 | Obfuscated Files or Information | ✓ VALIDATED | 1.00 | 🟢 auto_deploy | [t1027.yml](../detections/defense_evasion/t1027.yml) |
-| T1046 | Network Service Discovery | ✓ VALIDATED | 1.00 | 🟢 auto_deploy | [t1046.yml](../detections/discovery/t1046.yml) |
-| T1053.005 | Scheduled Task Persistence | ✅ MONITORING | 1.00 | 🟢 auto_deploy | [t1053_005.yml](../detections/persistence/t1053_005.yml) |
-| T1055.001 | CreateRemoteThread Injection | ✓ VALIDATED | 1.00 | 🟢 auto_deploy | [t1055_001.yml](../detections/privilege_escalation/t1055_001.yml) |
-| T1055.004 | APC Injection (QueueUserAPC) | 🔨 AUTHORED | — | pending | [t1055_004_apc_injection.yml](../detections/privilege_escalation/t1055_004_apc_injection.yml) |
-| T1055 | Process Injection Sequence (EQL) | 🔨 AUTHORED | — | pending | [t1055_sequence_eql.yml](../detections/privilege_escalation/t1055_sequence_eql.yml) |
-| T1059.001 | PowerShell Bypass Flags | ✅ MONITORING | 0.95 | 🟢 auto_deploy | [t1059_001_powershell_bypass.yml](../detections/execution/t1059_001_powershell_bypass.yml) |
-| T1059.001+T1547.001 | Persistence After Exec (EQL) | 🔨 AUTHORED | — | pending | [t1059_001_t1547_001_persistence_after_exec_eql.yml](../detections/execution/t1059_001_t1547_001_persistence_after_exec_eql.yml) |
-| T1059.003 | Windows Command Shell | ✓ VALIDATED | 0.75 | 🟡 validated | [t1059_003.yml](../detections/execution/t1059_003.yml) |
-| T1070.001 | Event Log Clearing | ✅ MONITORING | 1.00 | 🟢 auto_deploy | [t1070_001.yml](../detections/defense_evasion/t1070_001.yml) |
-| T1071.001 | C2 Beaconing HTTP/HTTPS | ✅ MONITORING | 1.00 | 🟢 auto_deploy | [t1071_001.yml](../detections/command_and_control/t1071_001.yml) |
-| T1078.004 | Cloud Account Abuse | ✅ MONITORING | 1.00 | 🟢 auto_deploy | [t1078_004.yml](../detections/defense_evasion/t1078_004.yml) |
-| T1082 | System Info Discovery | ✓ VALIDATED | 0.75 | 🟡 validated | [t1082.yml](../detections/execution/t1082.yml) |
-| T1083 | File/Directory Discovery | ✓ VALIDATED | 1.00 | 🟢 auto_deploy | [t1083.yml](../detections/discovery/t1083.yml) |
-| T1087.002 | Account Discovery Burst (EQL) | 🔨 AUTHORED | — | pending | [t1087_002_discovery_burst_eql.yml](../detections/discovery/t1087_002_discovery_burst_eql.yml) |
-| T1087.002 | Account Discovery Threshold | 🔨 AUTHORED | — | pending | [t1087_002_discovery_threshold.yml](../detections/discovery/t1087_002_discovery_threshold.yml) |
-| T1105 | Ingress Tool Transfer | 🔨 AUTHORED | 0.50 | 🔴 needs_rework | [t1105.yml](../detections/execution/t1105.yml) |
-| T1110.001 | Brute Force Login Threshold | 🔨 AUTHORED | — | pending | [t1110_001_brute_force_threshold.yml](../detections/credential_access/t1110_001_brute_force_threshold.yml) |
-| T1133 | External Remote Services | ✓ VALIDATED | 0.86 | 🟡 validated | [t1133.yml](../detections/execution/t1133.yml) |
-| T1134.001 | LSASS Token Theft | ✅ MONITORING | 1.00 | 🟢 auto_deploy | [t1134_001_lsass_token_theft.yml](../detections/credential_access/t1134_001_lsass_token_theft.yml) |
-| T1190 | Exploit Public-Facing App | ✓ VALIDATED | 0.75 | 🟡 validated | [t1190.yml](../detections/execution/t1190.yml) |
-| T1204.002 | Malicious File Execution | ✓ VALIDATED | 0.75 | 🟡 validated | [t1204_002.yml](../detections/execution/t1204_002.yml) |
-| T1219 | Remote Access Software | ✅ MONITORING | 1.00 | 🟢 auto_deploy | [t1219.yml](../detections/initial_access/t1219.yml) |
-| T1486 | Data Encrypted for Impact | ✅ MONITORING | 1.00 | 🟢 auto_deploy | [t1486.yml](../detections/execution/t1486.yml) |
-| T1486 | File Encryption Burst (threshold) | 🔨 AUTHORED | — | pending | [t1486_file_encryption_threshold.yml](../detections/impact/t1486_file_encryption_threshold.yml) |
-| T1489 | Mass Service Stop (threshold) | 🔨 AUTHORED | — | pending | [t1489_mass_service_stop_threshold.yml](../detections/impact/t1489_mass_service_stop_threshold.yml) |
-| T1490 | Inhibit System Recovery | ✓ VALIDATED | 1.00 | 🟢 auto_deploy | [t1490.yml](../detections/execution/t1490.yml) |
-| T1543.003 | Windows Service Persistence | ✓ VALIDATED | 0.86 | 🟡 validated | [t1543_003.yml](../detections/persistence/t1543_003.yml) |
-| T1547.001 | Registry Run Key Persistence | ✅ MONITORING | 1.00 | 🟢 auto_deploy | [t1547_001_registry_run_key.yml](../detections/persistence/t1547_001_registry_run_key.yml) |
-| T1562.001 | AMSI Bypass CLR Load | ✅ MONITORING | 1.00 | 🟢 auto_deploy | [t1562_001.yml](../detections/defense_evasion/t1562_001.yml) |
-| T1562.004 | Firewall Disable | ✓ VALIDATED | 0.86 | 🟡 validated | [t1562_004.yml](../detections/defense_evasion/t1562_004.yml) |
-| T1562.006 | Indicator Blocking (auditpol) | ✓ VALIDATED | 1.00 | 🟢 auto_deploy | [t1562_006.yml](../detections/defense_evasion/t1562_006.yml) |
-| T1562.006 | Indicator Blocking (registry) | ✓ VALIDATED | 1.00 | 🟢 auto_deploy | [t1562_006_registry.yml](../detections/defense_evasion/t1562_006_registry.yml) |
-| T1566.004 | Spearphishing Voice | ✅ MONITORING | 1.00 | 🟢 auto_deploy | [t1566_004.yml](../detections/initial_access/t1566_004.yml) |
-| T1569.002 | Service Execution | ✓ VALIDATED | 1.00 | 🟢 auto_deploy | [t1569_002.yml](../detections/execution/t1569_002.yml) |
+## Defense Evasion (9 rules, 4 Fawkes-tagged)
 
----
+| File | Technique | Title | Severity | Fawkes |
+|------|-----------|-------|----------|--------|
+| t1027.yml | attack.t1027 | Obfuscated PowerShell Execution With Encoded Command and Suspicious Indicators | high |   |
+| t1027_001.yml | attack.t1027.001 | Fawkes Binary Inflation via PowerShell WriteAllBytes Null Byte Padding | high |   |
+| t1070_001.yml | attack.t1070.001 | Clear Windows Event Logs [T1070.001] | high |   |
+| t1070_006.yml | attack.t1070.006 | Suspicious File Timestamp Modification (Timestomping) | high | Y |
+| t1078_004.yml | attack.t1078.004 | Cloud Account Abuse [T1078.004] | medium |   |
+| t1562_001.yml | attack.t1562.001 | AMSI Bypass via CLR Load in Unsigned Process [T1562.001] | high | Y |
+| t1562_004.yml | attack.t1562.004 | Windows Firewall Disabled via Netsh or Registry Modification | high |   |
+| t1562_006.yml | attack.t1562.006 | Indicator Blocking via Audit Policy Disable [T1562.006] | high | Y |
+| t1562_006_registry.yml | attack.t1562.006 | Indicator Blocking via Sysmon or ETW Registry Tampering [T1562.006] | critical | Y |
 
-## Detections Fixed in Phase 1 (2026-03-13)
+## Discovery (8 rules, 6 Fawkes-tagged)
 
-| Technique | Issue | Fix | Before | After |
-|---|---|---|---|---|
-| T1569.002 | Corrupted rule (rate-limit error stored as YAML) | Full rewrite from scenario | F1=N/A | F1=1.0 |
-| T1562.006 | Only covered 1/3 attack vectors (auditpol only) | Split into process + registry rules | F1=0.0 | F1=1.0 (both) |
-| T1562.001 | Hard-coded process name, wrong MITRE tag | Path-based patterns, tag fix | F1=1.0* | F1=1.0 |
-| T1046 | Backslash bug caused 0 matches | Re-validated + TP split | F1=0.0 | F1=1.0 |
+| File | Technique | Title | Severity | Fawkes |
+|------|-----------|-------|----------|--------|
+| t1046.yml | attack.t1046 | Network Service Discovery via Port Scanning from Suspicious Location | medium |   |
+| t1049.yml | attack.t1049 | Network Connection Enumeration from Suspicious Parent | medium | Y |
+| t1057.yml | attack.t1057 | Process Discovery via Tasklist/WMIC from Suspicious Parent | medium | Y |
+| t1083.yml | attack.t1083 | Recursive File and Directory Discovery via Suspicious Parent | medium |   |
+| t1087_001.yml | attack.t1087.001 | Local Account Discovery via Net/WMIC Commands | medium | Y |
+| t1087_002_discovery_burst_eql.yml | attack.t1087.002 | Rapid Reconnaissance Command Burst | high | Y |
+| t1087_002_discovery_threshold.yml | attack.t1087.002 | Discovery Command Burst - Recon Tool Threshold | high | Y |
+| t1518_001.yml | attack.t1518.001 | Security Software Discovery via WMI or Service Queries [T1518.001] | medium | Y |
 
-*T1562.001 had F1=1.0 because scenario used same hard-coded process name. Now detection is robust.
+## Execution (17 rules, 4 Fawkes-tagged)
 
----
+| File | Technique | Title | Severity | Fawkes |
+|------|-----------|-------|----------|--------|
+| t1016.yml | attack.t1016 | Network Configuration Discovery via Suspicious Parent Process | medium |   |
+| t1016_001.yml | attack.t1016.001 | ARP Cache Enumeration by Suspicious Parent Process | medium |   |
+| t1021_001.yml | attack.t1021.001 | RDP Client Lateral Movement Activity | high |   |
+| t1021_006.yml | attack.t1021.006 | Remote WMI Process Execution via WMIC /node and process call create | high |   |
+| t1033.yml | attack.t1033 | System Owner Discovery via Suspicious Parent Process | high |   |
+| t1047.yml | attack.t1047 | Remote WMI Process Creation via WMIC | critical | Y |
+| t1059_001_powershell_bypass.yml | attack.t1059.001 | PowerShell Execution with Bypass Flags | high | Y |
+| t1059_001_t1547_001_persistence_after_exec_eql.yml | attack.t1059.001 | PowerShell Execution Followed by Registry Persistence | high | Y |
+| t1059_003.yml | attack.t1059.003 | Suspicious CMD.exe Execution with Chained Reconnaissance Commands | medium |   |
+| t1082.yml | attack.t1082 | System Information Discovery Command Burst via Suspicious Parent | medium |   |
+| t1105.yml | attack.t1105 | Executable Dropped or C2 Network Activity from Suspicious Directory - Ingress Tool Transfer | high |   |
+| t1133.yml | attack.t1133 | Suspicious Remote Service Binary Launched From User Directory | high |   |
+| t1190.yml | attack.t1190 | Suspicious Child Process Spawned by Web Server Application | critical |   |
+| t1204_002.yml | attack.t1204.002 | Office Application Spawning Process from Suspicious Directory | high |   |
+| t1486.yml | attack.t1486 | Ransomware File Extension Modification Indicating Data Encryption for Impact | critical |   |
+| t1490.yml | attack.t1490 | Inhibit System Recovery via Shadow Copy Deletion or Recovery Disable | high |   |
+| t1569_002.yml | attack.t1569.002 | Service Execution via sc.exe with Suspicious Binary Path [T1569.002] | high | Y |
 
-## Remaining Gaps — Fawkes C2 Capabilities Not Yet Detected
+## Impact (2 rules, 2 Fawkes-tagged)
 
-| Technique | Name | Fawkes Command | Blocker |
-|---|---|---|---|
-| T1055.004 | APC Injection | `apc-injection` | ⚠️ AUTHORED (Phase 6) — awaiting validation |
-| T1055.012 | Threadless Injection | `threadless-inject` | Data gap — need ETW |
-| T1055.015 | PoolParty Injection | `poolparty-injection` | Data gap — need ETW |
-| T1056.001 | Keylogging | `keylog` | Data gap — need hook events |
-| T1115 | Clipboard Data | `clipboard` | Data gap |
-| T1113 | Screen Capture | `screenshot` | Data gap |
-| T1090.001 | SOCKS5 Proxy | `socks5` | Data gap — need network flow |
-| T1070.006 | Timestomping | `timestomp` | Data gap — no EID 2 |
+| File | Technique | Title | Severity | Fawkes |
+|------|-----------|-------|----------|--------|
+| t1486_file_encryption_threshold.yml | attack.t1486 | Rapid File Modification Burst - Ransomware Indicator | critical | Y |
+| t1489_mass_service_stop_threshold.yml | attack.t1489 | Mass Service Stop - Pre-Ransomware Indicator | high | Y |
 
-## Phase 6 Additions (2026-03-17)
+## Initial Access (2 rules, 0 Fawkes-tagged)
 
-New rule types added in Phase 6 (all AUTHORED, pending validation):
+| File | Technique | Title | Severity | Fawkes |
+|------|-----------|-------|----------|--------|
+| t1219.yml | attack.t1219 | Remote Access Software [T1219] | high |   |
+| t1566_004.yml | attack.t1566.004 | Spearphishing Voice (Vishing) [T1566.004] | medium |   |
 
-| Rule | Type | Technique(s) | Detects |
-|---|---|---|---|
-| t1055_004_apc_injection.yml | Sigma | T1055.004 | QueueUserAPC via Sysmon EID 8 |
-| t1055_sequence_eql.yml | EQL | T1055 | EID 10 (handle open) → EID 8 (thread create) in 10s |
-| t1059_001_t1547_001_persistence_after_exec_eql.yml | EQL | T1059.001+T1547.001 | PowerShell bypass → registry Run key in 5min |
-| t1087_002_discovery_burst_eql.yml | EQL | T1087.002 | 3+ recon tools in 60s sequence |
-| t1087_002_discovery_threshold.yml | Threshold | T1087.002 | Aggregation fallback for discovery burst |
-| t1110_001_brute_force_threshold.yml | Threshold | T1110.001 | 5+ EID 4625 failures from same source.ip in 10min |
-| t1486_file_encryption_threshold.yml | Threshold | T1486 | High-volume file writes (ransomware burst) |
-| t1489_mass_service_stop_threshold.yml | Threshold | T1489 | 5+ service stops in 60s (pre-ransomware) |
+## Persistence (4 rules, 3 Fawkes-tagged)
 
-Content packs created: 8 tactic-based packs + 1 process-injection pack (all in `detections/packs/`)
+| File | Technique | Title | Severity | Fawkes |
+|------|-----------|-------|----------|--------|
+| t1053_003.yml | attack.t1053.003 | Suspicious Crontab Modification with Persistence Indicators | high | Y |
+| t1053_005.yml | attack.t1053.005 | Scheduled Task Creation for Persistence [T1053.005] | high | Y |
+| t1543_003.yml | attack.t1543.003 | Suspicious Windows Service Creation via Sc.exe with User-Writable Binary Path | high |   |
+| t1547_001_registry_run_key.yml | attack.t1547.001 | Registry Run Key Persistence | high | Y |
 
----
+## Privilege Escalation (7 rules, 7 Fawkes-tagged)
 
-## Coverage Over Time
+| File | Technique | Title | Severity | Fawkes |
+|------|-----------|-------|----------|--------|
+| t1055_001.yml | attack.t1055.001 | CreateRemoteThread from Suspicious Process [T1055.001] | high | Y |
+| t1055_004_apc_injection.yml | attack.t1055.004 | APC Injection - Suspicious QueueUserAPC Pattern | high | Y |
+| t1055_012.yml | attack.t1055.012 | Threadless Process Injection - Suspicious Handle with Write Access | critical | Y |
+| t1055_013.yml | attack.t1055.013 | Opus Injection - Suspicious Full Access to Console Host Process | critical | Y |
+| t1055_015.yml | attack.t1055.015 | PoolParty Injection - Full Access to svchost from User-Writable Path | critical | Y |
+| t1055_sequence_eql.yml | attack.t1055.001 | Process Injection Sequence - Handle Open Then Remote Thread Creation | critical | Y |
+| t1068.yml | attack.t1068 | Suspicious Process Accessing Privileged System Process with Full Access | critical | Y |
 
-| Date | Deployed | Validated | Total Rules | Fawkes % | Notes |
-|---|---|---|---|---|---|
-| 2026-03-01 | 2 | 0 | 2 | 10% | Initial rules |
-| 2026-03-06 | 8 | 1 | 9 | 38% | Batch authoring |
-| 2026-03-07 | 8 | 1 | 9 | 43% | — |
-| 2026-03-08 | 9 | 12 | 28 | 43% | Bulk validation |
-| 2026-03-13 | 9 | 16 | 29 | 62% | Phase 1 (PR #52) |
-| 2026-03-15 | 11 | 12 | 29 | 62% | Phases 2-4 (PR #54, #58, #62) |
-| 2026-03-17 | 11 | 12 | 37 | 67% | Phase 6 (PR #65) — +8 rules, +Impact tactic |
