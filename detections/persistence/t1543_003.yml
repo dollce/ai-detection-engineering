@@ -57,4 +57,8 @@ falsepositives:
   - Legitimate software installers that place service binaries in ProgramData
   - Enterprise management agents with non-standard install paths
   - Developer tools that register services from user directories during testing
+related:
+  - id: 7a1b3c5d-9e2f-4d8a-b6c1-3e5f7a9b1d3e
+    type: similar
+    description: "T1569.002 covers sc.exe 'start' verb (execution tactic); this rule covers 'create' verb (persistence tactic)"
 level: high

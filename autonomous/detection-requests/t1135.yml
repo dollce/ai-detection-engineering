@@ -5,8 +5,8 @@ priority: high
 requested_by: intel
 requested_date: '2026-03-21T13:04:56Z'
 intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
-scenario_file: 'simulator/scenarios/t1135.json'
-sigma_rule: 'detections/discovery/t1135.yml'
+scenario_file: simulator/scenarios/t1135.json
+sigma_rule: detections/discovery/t1135.yml
 deployed_date: ''
 last_quality_review: ''
 quality_score: 0.0
@@ -28,7 +28,12 @@ changelog:
   agent: blue_team
   action: authored
   details: 'Sigma rule authored: detections/discovery/t1135.yml. Lucene compiled. TP/TN tests written. Scenario file created.'
+- date: '2026-04-01T13:03:39Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: compiled_lucene'
 threat_actors:
 - Fawkes C2 Agent
 fawkes_commands:
 - net-shares
+compiled_lucene: detections/discovery/compiled/t1135.lucene

@@ -24,7 +24,12 @@ changelog:
   agent: intel
   action: update
   details: 'Updated fields: threat_actors, fawkes_commands'
+- date: '2026-04-01T13:03:39Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: compiled_lucene'
 threat_actors:
 - Fawkes C2 Agent
 fawkes_commands:
 - av-detect
+compiled_lucene: detections/discovery/compiled/t1518_001.lucene
