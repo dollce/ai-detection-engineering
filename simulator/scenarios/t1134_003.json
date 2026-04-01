@@ -1,0 +1,120 @@
+{
+  "technique_id": "T1134.003",
+  "technique_name": "Make and Impersonate Token",
+  "description": "Simulates Fawkes make-token command creating a new token with provided credentials via LogonUser API, producing a Logon Type 9 (NewCredentials) Security Event 4624",
+  "mitre_tactic": "credential_access",
+  "fawkes_command": "make-token",
+  "data_sources": ["Windows Security Event 4624"],
+  "events": {
+    "attack_sequence": [
+      {
+        "@timestamp": "{{now}}",
+        "event": {
+          "category": "authentication",
+          "type": "start",
+          "action": "logged-in",
+          "code": "4624"
+        },
+        "winlog": {
+          "event_data": {
+            "LogonType": "9",
+            "TargetUserName": "jsmith",
+            "TargetDomainName": "CORP",
+            "LogonProcessName": "seclogo",
+            "AuthenticationPackageName": "Negotiate",
+            "IpAddress": "127.0.0.1",
+            "IpPort": "0"
+          }
+        },
+        "process": {
+          "name": "fawkes_agent.exe",
+          "executable": "C:\\Users\\agarcia\\AppData\\Local\\Temp\\fawkes_agent.exe",
+          "pid": 4872
+        },
+        "user": {
+          "name": "agarcia",
+          "domain": "CORP"
+        },
+        "host": {
+          "name": "WS-EXEC-01",
+          "os": {
+            "platform": "windows"
+          }
+        },
+        "agent": {
+          "type": "winlogbeat"
+        },
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1134.003",
+          "fawkes_command": "make-token",
+          "sequence_order": 1,
+          "sequence_total": 1,
+          "description": "Fawkes make-token calls LogonUser with LOGON32_LOGON_NEW_CREDENTIALS, generating a Logon Type 9 event from a process in a user-writable path"
+        }
+      }
+    ],
+    "benign_similar": [
+      {
+        "@timestamp": "{{now}}",
+        "event": {
+          "category": "authentication",
+          "type": "start",
+          "action": "logged-in",
+          "code": "4624"
+        },
+        "winlog": {
+          "event_data": {
+            "LogonType": "9",
+            "TargetUserName": "svc_backup",
+            "TargetDomainName": "CORP",
+            "LogonProcessName": "seclogo",
+            "AuthenticationPackageName": "Negotiate",
+            "IpAddress": "127.0.0.1",
+            "IpPort": "0"
+          }
+        },
+        "process": {
+          "name": "runas.exe",
+          "executable": "C:\\Windows\\System32\\runas.exe",
+          "pid": 6120
+        },
+        "user": {
+          "name": "jdoe",
+          "domain": "CORP"
+        },
+        "host": {
+          "name": "ADMIN-WS-01",
+          "os": {
+            "platform": "windows"
+          }
+        },
+        "agent": {
+          "type": "winlogbeat"
+        },
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1134.003",
+          "description": "Administrator using runas /netonly — legitimate NewCredentials logon from runas.exe, excluded by filter"
+        }
+      }
+    ]
+  },
+  "expected_detection": {
+    "should_alert_on": "attack_sequence",
+    "should_not_alert_on": "benign_similar",
+    "key_fields": [
+      "event.code",
+      "winlog.event_data.LogonType",
+      "winlog.event_data.TargetUserName",
+      "process.executable"
+    ],
+    "notes": "Detection fires on LogonType 9 from any process except runas.exe and machine accounts ($ suffix). Fawkes make-token runs from an agent process in a temp/user-writable path."
+  },
+  "log_sources_used": [
+    "windows_security_4624"
+  ],
+  "platforms": [
+    "windows"
+  ]
+}

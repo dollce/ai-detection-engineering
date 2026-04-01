@@ -2,20 +2,22 @@ title: Suspicious Windows Service Creation via Sc.exe with User-Writable Binary 
 id: 8a7b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d
 status: experimental
 description: |
-  Detects sc.exe creating or modifying a Windows service where the binary path points to
-  a user-writable directory (AppData, Temp, Public, ProgramData, Downloads). This is a
-  common pattern for Fawkes C2 service persistence and other malware that registers
-  services pointing to attacker-controlled executables outside of Program Files.
+  Detects sc.exe creating a new Windows service where the binary path points to a
+  user-writable directory (AppData, Temp, Public, ProgramData, Downloads). Scoped to
+  'create' verb only — service execution (start) is covered by T1569.002. This is a
+  common pattern for Fawkes C2 service persistence (service -action create) and other
+  malware that registers services pointing to attacker-controlled executables.
 references:
   - https://attack.mitre.org/techniques/T1543/003/
   - https://github.com/galoryber/fawkes
 author: Blue Team Detection Engineering Agent
 date: 2026-03-08
-modified: 2026-03-08
+modified: 2026-03-29
 tags:
   - attack.persistence
   - attack.privilege_escalation
   - attack.t1543.003
+  - detection.fawkes
 logsource:
   category: process_creation
   product: windows

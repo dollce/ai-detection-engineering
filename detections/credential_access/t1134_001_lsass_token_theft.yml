@@ -2,14 +2,15 @@ title: LSASS Process Access for Token Theft
 id: 69c68ad8-ab9c-4e1b-9cba-47a4f87392a2
 status: experimental
 description: |
-  Detects processes accessing LSASS (lsass.exe) with access rights that allow
-  token duplication (PROCESS_DUP_HANDLE = 0x0040). The Fawkes C2 agent uses
-  its 'steal-token' command to open LSASS and duplicate tokens for privilege
-  escalation. This is a high-fidelity detection because legitimate LSASS access
-  from non-system processes is rare.
+  Detects processes accessing LSASS (lsass.exe) with PROCESS_DUP_HANDLE (0x0040)
+  access right, used for token duplication. The Fawkes C2 agent uses its
+  'steal-token' command to open LSASS and duplicate tokens for privilege
+  escalation. Scoped to DUP_HANDLE-only codes to avoid overlap with T1003.001
+  (credential dumping), which covers broader memory-read access rights.
+  Codes: 0x0040 = PROCESS_DUP_HANDLE, 0x0140 = DUP_HANDLE + TERMINATE.
 author: blue-team-agent
 date: 2026-03-01
-modified: 2026-03-01
+modified: 2026-03-29
 references:
   - https://attack.mitre.org/techniques/T1134/001/
   - https://github.com/galoryber/fawkes
@@ -25,13 +26,9 @@ logsource:
 detection:
   selection:
     winlog.event_data.TargetImage|endswith: '\lsass.exe'
-    winlog.event_data.GrantedAccess|contains:
+    winlog.event_data.GrantedAccess:
       - '0x0040'
-      - '0x1FFFFF'
-      - '0x1010'
-      - '0x1410'
-      - '0x1438'
-      - '0x143a'
+      - '0x0140'
   filter_system_processes:
     process.executable|contains:
       - 'C:\Windows\System32\csrss.exe'

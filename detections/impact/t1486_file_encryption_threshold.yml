@@ -17,7 +17,6 @@ modified: 2026/03/15
 tags:
   - attack.impact
   - attack.t1486
-  - detection.fawkes
 logsource:
   product: windows
   service: sysmon

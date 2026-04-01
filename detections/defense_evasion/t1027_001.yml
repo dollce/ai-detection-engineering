@@ -19,6 +19,7 @@ modified: 2026-03-22
 tags:
   - attack.defense_evasion
   - attack.t1027.001
+  - detection.fawkes
 logsource:
   category: process_creation
   product: windows

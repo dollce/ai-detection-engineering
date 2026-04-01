@@ -1,12 +1,12 @@
 technique_id: T1055.013
 title: "Detection for T1055.013 \u2014 Ctrl-C handler chain / KernelCallbackTable hijack"
-status: SCENARIO_BUILT
+status: AUTHORED
 priority: high
 requested_by: intel
 requested_date: '2026-03-21T13:04:56Z'
 intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
 scenario_file: simulator\scenarios\t1055_013.json
-sigma_rule: ''
+sigma_rule: detections/privilege_escalation/t1055_013.yml
 deployed_date: ''
 last_quality_review: ''
 quality_score: 0.0

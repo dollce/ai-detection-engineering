@@ -1,1 +1,1 @@
-(process.executable:*\\sc.exe AND (process.command_line:(*create* OR *start*))) AND (process.command_line:(*ProgramData* OR *AppData* OR *Temp* OR *Users\\Public*)) AND (NOT (process.parent.executable:(*Program\ Files* OR *Program\ Files\ \(x86\)* OR *Windows\\System32\\svchost.exe*)))
+(process.executable:*\\sc.exe AND process.command_line:*start*) AND (NOT (process.parent.executable:(C\:\\Windows\\System32\\* OR C\:\\Windows\\SysWOW64\\* OR C\:\\Program\ Files\\* OR C\:\\Program\ Files\ \(x86\)\\*))) AND (NOT user.name:SYSTEM)

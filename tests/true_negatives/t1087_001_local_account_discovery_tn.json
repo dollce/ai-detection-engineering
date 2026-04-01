@@ -1,0 +1,43 @@
+[
+  {
+    "@timestamp": "2026-03-29T08:45:02.119Z",
+    "event": {
+      "category": "process",
+      "type": "start",
+      "action": "Process Create (rule: ProcessCreate)",
+      "code": "1"
+    },
+    "process": {
+      "pid": 2104,
+      "name": "net.exe",
+      "executable": "C:\\Windows\\System32\\net.exe",
+      "command_line": "net user",
+      "parent": {
+        "pid": 876,
+        "name": "svchost.exe",
+        "executable": "C:\\Windows\\System32\\svchost.exe"
+      }
+    },
+    "user": {
+      "name": "SYSTEM",
+      "domain": "NT AUTHORITY"
+    },
+    "host": {
+      "name": "WS-FINANCE-01",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "benign_similar",
+      "technique": "T1087.001",
+      "description": "net.exe invoked as SYSTEM from svchost.exe parent — legitimate Windows service or scheduled task performing routine account enumeration, filtered by system context filter"
+    },
+    "_description": "Benign: net user from svchost.exe parent running as SYSTEM — should be excluded by filter_system_context",
+    "_technique": "T1087.001",
+    "_expected_result": "NO_ALERT"
+  }
+]

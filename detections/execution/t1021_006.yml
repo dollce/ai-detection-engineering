@@ -18,6 +18,7 @@ tags:
   - attack.t1021.006
   - attack.execution
   - attack.t1047
+  - detection.fawkes
 logsource:
   product: windows
   category: process_creation

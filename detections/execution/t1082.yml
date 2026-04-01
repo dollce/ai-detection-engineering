@@ -15,6 +15,7 @@ references:
 tags:
   - attack.discovery
   - attack.t1082
+  - detection.fawkes
 logsource:
   category: process_creation
   product: windows

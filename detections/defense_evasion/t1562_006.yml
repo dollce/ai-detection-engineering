@@ -15,7 +15,6 @@ references:
 tags:
   - attack.defense_evasion
   - attack.t1562.006
-  - detection.fawkes
 logsource:
   product: windows
   category: process_creation

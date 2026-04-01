@@ -1,12 +1,12 @@
 technique_id: T1087.001
 title: "Detection for T1087.001 \u2014 Enumerate local/domain users and groups"
-status: REQUESTED
+status: AUTHORED
 priority: high
 requested_by: intel
 requested_date: '2026-03-21T13:04:56Z'
 intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
-scenario_file: ''
-sigma_rule: ''
+scenario_file: simulator/scenarios/t1087_001.json
+sigma_rule: detections/discovery/t1087_001.yml
 deployed_date: ''
 last_quality_review: ''
 quality_score: 0.0
@@ -24,6 +24,10 @@ changelog:
   agent: intel
   action: update
   details: 'Updated fields: threat_actors, fawkes_commands'
+- date: '2026-03-29T00:00:00Z'
+  agent: blue_team
+  action: authored
+  details: 'Sigma rule authored: detections/discovery/t1087_001.yml. Detection covers net user, net localgroup, wmic useraccount. Compiled to Lucene. TP/TN tests and scenario file created.'
 threat_actors:
 - Fawkes C2 Agent
 fawkes_commands:
