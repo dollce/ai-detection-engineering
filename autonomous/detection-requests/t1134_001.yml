@@ -8,7 +8,7 @@ requested_date: '2026-03-01T00:00:00Z'
 intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
 scenario_file: ''
 sigma_rule: detections/credential_access/t1134_001_lsass_token_theft.yml
-compiled_lucene: ''
+compiled_lucene: detections/credential_access/compiled/t1134_001_lsass_token_theft.lucene
 compiled_spl: ''
 deployed_date: '2026-03-01T00:00:00Z'
 elastic_rule_id: 69c68ad8-ab9c-4e1b-9cba-47a4f87392a2
@@ -83,3 +83,7 @@ changelog:
   agent: quality
   action: update
   details: 'Updated fields: alert_volume_24h, last_quality_review'
+- date: '2026-04-01T13:03:46Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: compiled_lucene'

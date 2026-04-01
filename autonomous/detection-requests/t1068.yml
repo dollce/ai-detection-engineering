@@ -32,4 +32,9 @@ changelog:
   agent: red-team
   action: transition:REQUESTED->SCENARIO_BUILT
   details: 'Scenario generated: 3 attack, 2 benign events'
+- date: '2026-04-01T13:03:38Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: compiled_lucene'
 threat_actors: []
+compiled_lucene: detections/privilege_escalation/compiled/t1068.lucene

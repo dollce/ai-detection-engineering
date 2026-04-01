@@ -39,8 +39,11 @@ changelog:
 - date: '2026-03-13T12:00:00Z'
   agent: blue-team
   action: transition:AUTHORED->VALIDATED
-  details: 'Phase 1 remediation: rule fixed/rewritten, F1=1.0 after TP split and manual
-    review'
-compiled_lucene: ''
+  details: 'Phase 1 remediation: rule fixed/rewritten, F1=1.0 after TP split and manual review'
+- date: '2026-04-01T13:03:46Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: compiled_lucene'
+compiled_lucene: detections/execution/compiled/t1569_002.lucene
 compiled_spl: ''
 mitre_tactic: execution

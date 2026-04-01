@@ -36,6 +36,10 @@ changelog:
   agent: red-team
   action: transition:REQUESTED->SCENARIO_BUILT
   details: 'Scenario generated: 3 attack, 2 benign events'
+- date: '2026-04-01T13:03:37Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: compiled_lucene'
 threat_actors:
 - Fawkes C2 Agent
 fawkes_commands:
@@ -47,3 +51,4 @@ data_source_requirements:
   fields:
   - process.name
   - process.command_line
+compiled_lucene: detections/persistence/compiled/t1053_003.lucene

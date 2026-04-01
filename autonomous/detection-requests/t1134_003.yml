@@ -32,6 +32,10 @@ changelog:
   agent: intel
   action: update
   details: 'Updated fields: data_source_gaps'
+- date: '2026-04-01T13:03:39Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: compiled_lucene'
 threat_actors:
 - Fawkes C2 Agent
 fawkes_commands:
@@ -46,3 +50,4 @@ data_source_requirements:
   - winlog.event_data.TargetImage
 data_source_gaps:
 - GAP-005
+compiled_lucene: detections/credential_access/compiled/t1134_003.lucene

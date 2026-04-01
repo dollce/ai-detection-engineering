@@ -1,0 +1,33 @@
+technique_id: T1562.006
+title: "Indicator Blocking via Sysmon/ETW Registry Tampering"
+status: AUTHORED
+priority: high
+mitre_tactic: defense_evasion
+rule_type: sigma
+requested_by: blue-team
+requested_date: '2026-04-01T00:00:00Z'
+intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
+scenario_file: ''
+sigma_rule: detections/defense_evasion/t1562_006_registry.yml
+compiled_lucene: detections/defense_evasion/compiled/t1562_006_registry.lucene
+compiled_spl: ''
+compiled_artifact: ''
+secondary_techniques: []
+deployed_date: ''
+elastic_rule_id: ''
+splunk_saved_search: ''
+last_quality_review: ''
+quality_score: 0.0
+fp_rate: 0.0
+tp_rate: 0.0
+alert_volume_24h: 0
+cost_estimate: low
+auto_deploy_eligible: false
+fawkes_commands:
+  - autopatch
+  - start-clr
+changelog:
+  - date: '2026-04-01T00:00:00Z'
+    agent: blue-team
+    action: created
+    details: "Registry variant of T1562.006 — detects Sysmon driver and ETW Security log registry tampering. Companion to process-based T1562.006 rule."
