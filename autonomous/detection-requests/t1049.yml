@@ -49,4 +49,4 @@ threat_actors:
 fawkes_commands:
 - net-stat
 compiled_lucene: detections/discovery/compiled/t1049.lucene
-compiled_splunk: detections/discovery/compiled/t1049.spl
+compiled_spl: detections/discovery/compiled/t1049.spl

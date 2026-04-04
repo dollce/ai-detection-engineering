@@ -67,4 +67,4 @@ data_source_requirements:
 data_source_gaps:
 - GAP-009
 compiled_lucene: detections/privilege_escalation/compiled/t1055_013.lucene
-compiled_splunk: detections/privilege_escalation/compiled/t1055_013.spl
+compiled_spl: detections/privilege_escalation/compiled/t1055_013.spl

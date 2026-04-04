@@ -69,4 +69,4 @@ data_source_requirements:
 data_source_gaps:
 - GAP-003
 compiled_lucene: detections/execution/compiled/t1047.lucene
-compiled_splunk: detections/execution/compiled/t1047.spl
+compiled_spl: detections/execution/compiled/t1047.spl

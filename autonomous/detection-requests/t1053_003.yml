@@ -60,4 +60,4 @@ data_source_requirements:
   - process.name
   - process.command_line
 compiled_lucene: detections/persistence/compiled/t1053_003.lucene
-compiled_splunk: detections/persistence/compiled/t1053_003.spl
+compiled_spl: detections/persistence/compiled/t1053_003.spl

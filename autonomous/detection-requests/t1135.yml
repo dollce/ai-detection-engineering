@@ -42,4 +42,4 @@ threat_actors:
 fawkes_commands:
 - net-shares
 compiled_lucene: detections/discovery/compiled/t1135.lucene
-compiled_splunk: detections/discovery/compiled/t1135.spl
+compiled_spl: detections/discovery/compiled/t1135.spl

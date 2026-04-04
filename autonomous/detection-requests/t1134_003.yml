@@ -55,4 +55,4 @@ data_source_requirements:
 data_source_gaps:
 - GAP-005
 compiled_lucene: detections/credential_access/compiled/t1134_003.lucene
-compiled_splunk: detections/credential_access/compiled/t1134_003.spl
+compiled_spl: detections/credential_access/compiled/t1134_003.spl

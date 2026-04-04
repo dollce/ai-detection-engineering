@@ -10,7 +10,7 @@ intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
 scenario_file: ''
 sigma_rule: detections/defense_evasion/t1562_006_registry.yml
 compiled_lucene: detections/defense_evasion/compiled/t1562_006_registry.lucene
-compiled_spl: ''
+compiled_spl: detections/defense_evasion/compiled/t1562_006_registry.spl
 compiled_artifact: ''
 secondary_techniques: []
 deployed_date: ''
