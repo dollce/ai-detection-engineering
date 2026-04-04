@@ -1,6 +1,6 @@
 {
   "technique_id": "T1055.013",
-  "date": "2026-04-04T14:05:27Z",
+  "date": "2026-04-04T14:17:13Z",
   "sigma_rule": "detections\\privilege_escalation\\t1055_013.yml",
   "metrics": {
     "tp": 1,
@@ -32,7 +32,7 @@
     "needs_rework": "F1 < 0.75"
   },
   "validation_details": {
-    "index": "sim-validation-372c1fb7",
+    "index": "sim-validation-cc18d824",
     "query": "(event.code:10 AND winlog.event_data.GrantedAccess:0x1FFFFF) AND winlog.event_data.TargetImage:*\\\\conhost.exe AND (process.executable:(*\\\\AppData\\\\* OR *\\\\Temp\\\\* OR *\\\\ProgramData\\\\* OR *\\\\Users\\\\Pub",
     "events_ingested": 3,
     "query_hits": 1,

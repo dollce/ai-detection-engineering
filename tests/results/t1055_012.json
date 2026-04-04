@@ -1,6 +1,6 @@
 {
   "technique_id": "T1055.012",
-  "date": "2026-04-04T14:05:26Z",
+  "date": "2026-04-04T14:17:13Z",
   "sigma_rule": "detections\\privilege_escalation\\t1055_012.yml",
   "metrics": {
     "tp": 1,
@@ -32,11 +32,11 @@
     "needs_rework": "F1 < 0.75"
   },
   "validation_details": {
-    "index": "sim-validation-b1783437",
+    "index": "sim-validation-c84487cd",
     "query": "(event.code:10 AND (winlog.event_data.GrantedAccess:(0x1438 OR 0x1430 OR 0x143a))) AND (winlog.event_data.TargetImage:(*\\\\svchost.exe OR *\\\\explorer.exe OR *\\\\RuntimeBroker.exe)) AND (process.executab",
     "events_ingested": 3,
     "query_hits": 1,
-    "query_time_ms": 31,
+    "query_time_ms": 6,
     "errors": []
   }
 }

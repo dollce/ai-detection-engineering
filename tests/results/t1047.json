@@ -1,6 +1,6 @@
 {
   "technique_id": "T1047",
-  "date": "2026-04-04T14:05:26Z",
+  "date": "2026-04-04T14:17:12Z",
   "sigma_rule": "detections\\execution\\t1047.yml",
   "metrics": {
     "tp": 1,
@@ -32,11 +32,11 @@
     "needs_rework": "F1 < 0.75"
   },
   "validation_details": {
-    "index": "sim-validation-d08104ca",
+    "index": "sim-validation-cd7134a4",
     "query": "(event.code:1 AND process.name:wmic.exe) AND (process.command_line:*\\/node\\:* AND process.command_line:*process\\ call\\ create*) AND (NOT (process.parent.name:(CcmExec.exe OR svchost.exe)))",
     "events_ingested": 3,
     "query_hits": 1,
-    "query_time_ms": 19,
+    "query_time_ms": 28,
     "errors": []
   }
 }

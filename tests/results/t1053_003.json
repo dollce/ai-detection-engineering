@@ -1,6 +1,6 @@
 {
   "technique_id": "T1053.003",
-  "date": "2026-04-04T14:05:26Z",
+  "date": "2026-04-04T14:17:12Z",
   "sigma_rule": "detections\\persistence\\t1053_003.yml",
   "metrics": {
     "tp": 3,
@@ -32,7 +32,7 @@
     "needs_rework": "F1 < 0.75"
   },
   "validation_details": {
-    "index": "sim-validation-0e80476e",
+    "index": "sim-validation-3be1cd10",
     "query": "process.name:crontab AND ((process.command_line:(*\\/tmp\\/* OR *\\/dev\\/shm\\/* OR *\\/var\\/tmp\\/*)) OR (process.parent.executable:(*\\/tmp\\/* OR *\\/dev\\/shm\\/* OR *\\/var\\/tmp\\/*))) AND (NOT (process.paren",
     "events_ingested": 5,
     "query_hits": 3,

@@ -1,6 +1,6 @@
 {
   "technique_id": "T1049",
-  "date": "2026-04-04T14:05:26Z",
+  "date": "2026-04-04T14:17:12Z",
   "sigma_rule": "detections\\discovery\\t1049.yml",
   "metrics": {
     "tp": 1,
@@ -32,11 +32,11 @@
     "needs_rework": "F1 < 0.75"
   },
   "validation_details": {
-    "index": "sim-validation-11914d3e",
+    "index": "sim-validation-4002c732",
     "query": "(event.code:1 AND process.name:netstat.exe) AND (process.parent.executable:(*\\\\AppData\\\\* OR *\\\\Temp\\\\* OR *\\\\ProgramData\\\\* OR *\\\\Users\\\\Public\\\\*)) AND (NOT (process.parent.name:(SolarWinds.Business",
     "events_ingested": 3,
     "query_hits": 1,
-    "query_time_ms": 23,
+    "query_time_ms": 29,
     "errors": []
   }
 }
