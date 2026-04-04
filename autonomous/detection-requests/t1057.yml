@@ -45,4 +45,4 @@ threat_actors:
 fawkes_commands:
 - ps
 compiled_lucene: detections/discovery/compiled/t1057.lucene
-compiled_splunk: detections/discovery/compiled/t1057.spl
+compiled_spl: detections/discovery/compiled/t1057.spl

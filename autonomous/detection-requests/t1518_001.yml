@@ -37,4 +37,4 @@ threat_actors:
 fawkes_commands:
 - av-detect
 compiled_lucene: detections/discovery/compiled/t1518_001.lucene
-compiled_splunk: detections/discovery/compiled/t1518_001.spl
+compiled_spl: detections/discovery/compiled/t1518_001.spl
