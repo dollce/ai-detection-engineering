@@ -1,13 +1,13 @@
 technique_id: T1049
 title: "Detection for T1049 \xE2\u20AC\u201D Active network connections (netstat)"
-status: VALIDATED
+status: DEPLOYED
 priority: high
 requested_by: intel
 requested_date: '2026-03-21T13:04:56Z'
 intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
 scenario_file: simulator\scenarios\t1049.json
 sigma_rule: detections/discovery/t1049.yml
-deployed_date: ''
+deployed_date: '2026-04-04T14:18:42Z'
 last_quality_review: ''
 quality_score: 1.0
 fp_rate: 0.0
@@ -56,9 +56,27 @@ changelog:
   agent: validation
   action: update
   details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-04T14:18:42Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-04T14:18:42Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-04T14:18:42Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-04T14:18:42Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
 threat_actors:
 - Fawkes C2 Agent
 fawkes_commands:
 - net-stat
 compiled_lucene: detections/discovery/compiled/t1049.lucene
 compiled_spl: detections/discovery/compiled/t1049.spl
+elastic_rule_id: 956a2110-670b-42f5-a6c3-ce01bcd48152
+splunk_saved_search: "Detection for T1049 \xE2\u20AC\u201D Active network connections (netstat) T1049"

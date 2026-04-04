@@ -1,6 +1,6 @@
 technique_id: T1055.001
 title: Process Injection via CreateRemoteThread
-status: VALIDATED
+status: DEPLOYED
 priority: critical
 mitre_tactic: privilege_escalation
 requested_by: intel_agent
@@ -10,9 +10,9 @@ scenario_file: simulator\scenarios\t1055_001.json
 sigma_rule: detections\privilege_escalation\t1055_001.yml
 compiled_lucene: detections\privilege_escalation\compiled\t1055_001.lucene
 compiled_spl: detections\privilege_escalation\compiled\t1055_001.spl
-deployed_date: ''
-elastic_rule_id: ''
-splunk_saved_search: ''
+deployed_date: '2026-04-04T14:18:46Z'
+elastic_rule_id: c2641694-134e-44e4-b21b-6bd6217c2b98
+splunk_saved_search: Process Injection via CreateRemoteThread T1055.001
 last_quality_review: ''
 quality_score: 1.0
 fp_rate: 0.0
@@ -44,3 +44,19 @@ changelog:
   agent: blue-team
   action: transition:AUTHORED->VALIDATED
   details: 'Reworked detection: EID 8 from suspicious paths, F1=1.0'
+- date: '2026-04-04T14:18:46Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-04T14:18:46Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-04T14:18:46Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-04T14:18:46Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
