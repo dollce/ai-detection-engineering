@@ -1,13 +1,13 @@
 technique_id: T1055.012
 title: "Detection for T1055.012 \xE2\u20AC\u201D DLL function pointer overwrite (no new thread)"
-status: VALIDATED
+status: DEPLOYED
 priority: high
 requested_by: intel
 requested_date: '2026-03-21T13:04:56Z'
 intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
 scenario_file: simulator\scenarios\t1055_012.json
 sigma_rule: detections/privilege_escalation/t1055_012.yml
-deployed_date: ''
+deployed_date: '2026-04-04T14:18:48Z'
 last_quality_review: ''
 quality_score: 1.0
 fp_rate: 0.0
@@ -64,6 +64,22 @@ changelog:
   agent: validation
   action: update
   details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-04T14:18:48Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-04T14:18:48Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-04T14:18:48Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-04T14:18:48Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
 threat_actors:
 - Fawkes C2 Agent
 fawkes_commands:
@@ -80,3 +96,5 @@ data_source_gaps:
 - GAP-009
 compiled_lucene: detections/privilege_escalation/compiled/t1055_012.lucene
 compiled_spl: detections/privilege_escalation/compiled/t1055_012.spl
+elastic_rule_id: c524fb98-0e29-452e-a2e4-d5c261eb102f
+splunk_saved_search: "Detection for T1055.012 \xE2\u20AC\u201D DLL function pointer overwrite (no new thread) T1055.012"

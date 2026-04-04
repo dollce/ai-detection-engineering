@@ -1,6 +1,6 @@
 # Detection Pipeline Status
 
-> Auto-generated from state machine on 2026-04-01 13:05 UTC
+> Auto-generated from state machine on 2026-04-04 14:18 UTC
 > Run `cd autonomous && python3 orchestration/cli.py export-status` to regenerate
 
 ## Summary
@@ -12,9 +12,9 @@
 | EQL | 3 |
 | Threshold | 4 |
 | MONITORING | 20 |
-| DEPLOYED | 0 |
-| VALIDATED | 13 |
-| AUTHORED | 23 |
+| DEPLOYED | 7 |
+| VALIDATED | 11 |
+| AUTHORED | 18 |
 | Needs rework | 0 |
 
 ## By State
@@ -42,13 +42,22 @@
 - T1562.006: Impair Defenses: Indicator Blocking (F1=1.0)
 - T1566.004: Spearphishing Voice (Vishing) (F1=1.0)
 
-### VALIDATED (13)
+### DEPLOYED (7)
+
+- T1047: Detection for T1047 â€” Remote/local WMI execution (F1=1.0)
+- T1049: Detection for T1049 â€” Active network connections (netstat) (F1=1.0)
+- T1053.003: Detection for T1053.003 â€” Add crontab entry (Linux) (F1=1.0)
+- T1055.001: Process Injection via CreateRemoteThread (F1=1.0)
+- T1055.012: Detection for T1055.012 â€” DLL function pointer overwrite (no new thread) (F1=1.0)
+- T1055.013: Detection for T1055.013 â€” Ctrl-C handler chain / KernelCallbackTable hijack (F1=1.0)
+- T1569.002: System Services: Service Execution (F1=1.0)
+
+### VALIDATED (11)
 
 - T1003.001: OS Credential Dumping: LSASS Memory (F1=0.8)
 - T1016.001: Detection for T1016.001 — ARP table (host discovery) (F1=0.8)
 - T1021.001: Remote Services: Remote Desktop Protocol (F1=0.857)
 - T1033: Detection for T1033 — Current user and privileges (F1=0.857)
-- T1055.001: Process Injection via CreateRemoteThread (F1=1.0)
 - T1059.003: Command and Scripting Interpreter: Windows Command Shell (F1=0.75)
 - T1082: System Information Discovery (F1=0.75)
 - T1133: External Remote Services (F1=0.857)
@@ -56,32 +65,26 @@
 - T1204.002: User Execution: Malicious File (F1=0.75)
 - T1543.003: Create or Modify System Process: Windows Service (F1=0.857)
 - T1562.004: Impair Defenses: Disable or Modify System Firewall (F1=0.857)
-- T1569.002: System Services: Service Execution (F1=1.0)
 
-### AUTHORED (23)
+### AUTHORED (18)
 
-- T1047: Detection for T1047 — Remote/local WMI execution
-- T1049: Detection for T1049 — Active network connections (netstat)
-- T1053.003: Detection for T1053.003 — Add crontab entry (Linux)
 - T1055.004: APC Injection - Suspicious QueueUserAPC Pattern
-- T1055.012: Detection for T1055.012 — DLL function pointer overwrite (no new thread)
-- T1055.013: Detection for T1055.013 — Ctrl-C handler chain / KernelCallbackTable hijack
-- T1055.015: Detection for T1055.015 — 8 variants abusing Windows thread pool internals
+- T1055.015: Detection for T1055.015 â€” 8 variants abusing Windows thread pool internals
 - T1055_EQL: Process Injection Sequence - Handle Open Then Remote Thread Creation (EQL)
-- T1056.001: Detection for T1056.001 — Low-level keyboard hook via SetWindowsHookEx
-- T1057: Detection for T1057 — List running processes (tasklist)
+- T1056.001: Detection for T1056.001 â€” Low-level keyboard hook via SetWindowsHookEx
+- T1057: Detection for T1057 â€” List running processes (tasklist)
 - T1059.001_T1547.001_EQL: PowerShell Execution Followed by Registry Persistence (EQL)
 - T1068: Exploitation for Privilege Escalation
-- T1070.006: Detection for T1070.006 — Modify file timestamps to hide activity
-- T1087.001: Detection for T1087.001 — Enumerate local/domain users and groups
+- T1070.006: Detection for T1070.006 â€” Modify file timestamps to hide activity
+- T1087.001: Detection for T1087.001 â€” Enumerate local/domain users and groups
 - T1087.002_EQL: Rapid Reconnaissance Command Burst (EQL)
 - T1087.002_THRESHOLD: Discovery Command Burst - Recon Tool Threshold
 - T1110.001: Brute Force Login - Failed Logon Threshold
-- T1134.003: Detection for T1134.003 — Create new token with provided credentials (LogonUser)
-- T1135: Detection for T1135 — Enumerate network shares
+- T1134.003: Detection for T1134.003 â€” Create new token with provided credentials (LogonUser)
+- T1135: Detection for T1135 â€” Enumerate network shares
 - T1486_THRESHOLD: Rapid File Modification Burst - Ransomware Indicator (Threshold)
 - T1489: Mass Service Stop - Pre-Ransomware Indicator
-- T1518.001: Detection for T1518.001 — Detect installed AV/EDR products
+- T1518.001: Detection for T1518.001 â€” Detect installed AV/EDR products
 - T1562.006: Impair Defenses: Indicator Blocking (F1=1.0)
 
 ### REQUESTED (39)
