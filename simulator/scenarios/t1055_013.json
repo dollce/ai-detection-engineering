@@ -1,50 +1,10 @@
 {
   "technique_id": "T1055.013",
-  "technique_name": "Detection for T1055.013 — Ctrl-C handler chain / KernelCallbackTable hijack",
-  "description": "Simulates Detection for T1055.013 — Ctrl-C handler chain / KernelCallbackTable hijack attack sequence",
+  "technique_name": "Detection for T1055.013 \u00e2\u20ac\u201d Ctrl-C handler chain / KernelCallbackTable hijack",
+  "description": "Simulates Detection for T1055.013 \u00e2\u20ac\u201d Ctrl-C handler chain / KernelCallbackTable hijack attack sequence",
   "mitre_tactic": "unknown",
   "events": {
     "attack_sequence": [
-      {
-        "@timestamp": "2026-03-22T09:14:22.441Z",
-        "event": {
-          "category": "process",
-          "type": "start",
-          "action": "Process Create (rule: ProcessCreate)",
-          "code": "1"
-        },
-        "process": {
-          "pid": 6312,
-          "name": "update_helper.exe",
-          "executable": "C:\\Users\\mjones\\AppData\\Roaming\\Microsoft\\update_helper.exe",
-          "command_line": "C:\\Users\\mjones\\AppData\\Roaming\\Microsoft\\update_helper.exe --silent",
-          "parent": {
-            "pid": 4988,
-            "name": "explorer.exe",
-            "executable": "C:\\Windows\\explorer.exe"
-          }
-        },
-        "user": {
-          "name": "mjones",
-          "domain": "CORP"
-        },
-        "host": {
-          "name": "WS-DEV-01",
-          "os": {
-            "platform": "windows"
-          }
-        },
-        "agent": {
-          "type": "sysmon"
-        },
-        "_simulation": {
-          "type": "attack",
-          "technique": "T1055.013",
-          "sequence_order": 1,
-          "sequence_total": 3,
-          "description": "Fawkes opus-injection stage 1: malicious update_helper.exe spawns from explorer.exe in user AppData — unusual executable path outside Program Files"
-        }
-      },
       {
         "@timestamp": "2026-03-22T09:14:22.819Z",
         "event": {
@@ -60,7 +20,7 @@
         },
         "winlog": {
           "event_data": {
-            "GrantedAccess": "0x1fffff",
+            "GrantedAccess": "0x1FFFFF",
             "TargetImage": "C:\\Windows\\System32\\conhost.exe"
           }
         },
@@ -82,46 +42,7 @@
           "technique": "T1055.013",
           "sequence_order": 2,
           "sequence_total": 3,
-          "description": "Fawkes opus-injection stage 2: update_helper.exe opens conhost.exe with PROCESS_ALL_ACCESS (0x1fffff) to locate and overwrite the KernelCallbackTable pointer in the PEB — prerequisite for KernelCallbackTable hijack"
-        }
-      },
-      {
-        "@timestamp": "2026-03-22T09:14:23.107Z",
-        "event": {
-          "category": "process",
-          "type": "change",
-          "action": "CreateRemoteThread (rule: CreateRemoteThread)",
-          "code": "8"
-        },
-        "process": {
-          "pid": 6312,
-          "name": "update_helper.exe",
-          "executable": "C:\\Users\\mjones\\AppData\\Roaming\\Microsoft\\update_helper.exe"
-        },
-        "winlog": {
-          "event_data": {
-            "TargetImage": "C:\\Windows\\System32\\conhost.exe"
-          }
-        },
-        "user": {
-          "name": "mjones",
-          "domain": "CORP"
-        },
-        "host": {
-          "name": "WS-DEV-01",
-          "os": {
-            "platform": "windows"
-          }
-        },
-        "agent": {
-          "type": "sysmon"
-        },
-        "_simulation": {
-          "type": "attack",
-          "technique": "T1055.013",
-          "sequence_order": 3,
-          "sequence_total": 3,
-          "description": "Fawkes opus-injection stage 3: CreateRemoteThread detected — shellcode execution triggered in conhost.exe via hijacked KernelCallbackTable or Ctrl-C handler chain after VirtualAllocEx+WriteProcessMemory; Fawkes C2 beacon now running in conhost.exe context"
+          "description": "Fawkes opus-injection stage 2: update_helper.exe opens conhost.exe with PROCESS_ALL_ACCESS (0x1fffff) to locate and overwrite the KernelCallbackTable pointer in the PEB \u00e2\u20ac\u201d prerequisite for KernelCallbackTable hijack"
         }
       }
     ],
@@ -161,7 +82,7 @@
         "_simulation": {
           "type": "benign_similar",
           "technique": "T1055.013",
-          "description": "Legitimate: Windows Defender (MsMpEng.exe) performing routine process inspection of conhost.exe — similar process access pattern but lower GrantedAccess (0x1400 = QUERY_INFORMATION + VM_READ only, no VM_WRITE), from a trusted signed path under ProgramData"
+          "description": "Legitimate: Windows Defender (MsMpEng.exe) performing routine process inspection of conhost.exe \u00e2\u20ac\u201d similar process access pattern but lower GrantedAccess (0x1400 = QUERY_INFORMATION + VM_READ only, no VM_WRITE), from a trusted signed path under ProgramData"
         }
       },
       {
@@ -199,7 +120,7 @@
         "_simulation": {
           "type": "benign_similar",
           "technique": "T1055.013",
-          "description": "Legitimate: Microsoft Edge scheduled update process — superficially similar update-named binary but launched from signed Program Files path by svchost.exe (scheduler), not from user AppData"
+          "description": "Legitimate: Microsoft Edge scheduled update process \u00e2\u20ac\u201d superficially similar update-named binary but launched from signed Program Files path by svchost.exe (scheduler), not from user AppData"
         }
       }
     ]

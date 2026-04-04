@@ -1,0 +1,1 @@
+event.code="2" process.executable IN ("*\\AppData\\*", "*\\Temp\\*", "*\\ProgramData\\*", "*\\Users\\Public\\*") file.extension IN ("exe", "dll", "bat", "ps1", "cmd", "vbs", "js") NOT (process.name IN ("robocopy.exe", "7z.exe", "winrar.exe", "peazip.exe", "tar.exe")) | table process.name,process.executable,file.path,file.extension,user.name,host.name

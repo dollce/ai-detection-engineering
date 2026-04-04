@@ -1,0 +1,1 @@
+event.code="4624" winlog.event_data.LogonType="9" NOT (winlog.event_data.TargetUserName="*$" OR process.executable="*\\runas.exe")

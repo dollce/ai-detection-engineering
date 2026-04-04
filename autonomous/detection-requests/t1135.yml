@@ -1,5 +1,5 @@
 technique_id: T1135
-title: "Detection for T1135 \u2014 Enumerate network shares"
+title: Detection for T1135 — Enumerate network shares
 status: AUTHORED
 priority: high
 requested_by: intel
@@ -27,13 +27,19 @@ changelog:
 - date: '2026-03-29T00:00:00Z'
   agent: blue_team
   action: authored
-  details: 'Sigma rule authored: detections/discovery/t1135.yml. Lucene compiled. TP/TN tests written. Scenario file created.'
+  details: 'Sigma rule authored: detections/discovery/t1135.yml. Lucene compiled.
+    TP/TN tests written. Scenario file created.'
 - date: '2026-04-01T13:03:39Z'
   agent: blue-team
   action: update
   details: 'Updated fields: compiled_lucene'
+- date: '2026-04-04T09:00:00Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: compiled_splunk'
 threat_actors:
 - Fawkes C2 Agent
 fawkes_commands:
 - net-shares
 compiled_lucene: detections/discovery/compiled/t1135.lucene
+compiled_splunk: detections/discovery/compiled/t1135.spl

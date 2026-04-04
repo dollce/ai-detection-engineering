@@ -1,5 +1,5 @@
 technique_id: T1049
-title: "Detection for T1049 \u2014 Active network connections (netstat)"
+title: Detection for T1049 — Active network connections (netstat)
 status: AUTHORED
 priority: high
 requested_by: intel
@@ -36,8 +36,13 @@ changelog:
   agent: blue-team
   action: update
   details: 'Updated fields: compiled_lucene'
+- date: '2026-04-04T09:00:00Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: compiled_splunk'
 threat_actors:
 - Fawkes C2 Agent
 fawkes_commands:
 - net-stat
 compiled_lucene: detections/discovery/compiled/t1049.lucene
+compiled_splunk: detections/discovery/compiled/t1049.spl

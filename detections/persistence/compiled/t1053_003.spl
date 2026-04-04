@@ -1,0 +1,1 @@
+process.name="crontab" process.command_line IN ("*/tmp/*", "*/dev/shm/*", "*/var/tmp/*") OR process.parent.executable IN ("*/tmp/*", "*/dev/shm/*", "*/var/tmp/*") NOT (process.parent.name IN ("ansible-playbook", "puppet", "chef-client", "salt-minion")) | table process.name,process.command_line,process.parent.name,user.name,host.name

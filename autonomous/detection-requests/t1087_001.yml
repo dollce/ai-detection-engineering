@@ -1,5 +1,5 @@
 technique_id: T1087.001
-title: "Detection for T1087.001 \u2014 Enumerate local/domain users and groups"
+title: Detection for T1087.001 — Enumerate local/domain users and groups
 status: AUTHORED
 priority: high
 requested_by: intel
@@ -27,14 +27,20 @@ changelog:
 - date: '2026-03-29T00:00:00Z'
   agent: blue_team
   action: authored
-  details: 'Sigma rule authored: detections/discovery/t1087_001.yml. Detection covers net user, net localgroup, wmic useraccount.
-    Compiled to Lucene. TP/TN tests and scenario file created.'
+  details: 'Sigma rule authored: detections/discovery/t1087_001.yml. Detection covers
+    net user, net localgroup, wmic useraccount. Compiled to Lucene. TP/TN tests and
+    scenario file created.'
 - date: '2026-04-01T13:03:39Z'
   agent: blue-team
   action: update
   details: 'Updated fields: compiled_lucene'
+- date: '2026-04-04T09:00:00Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: compiled_splunk'
 threat_actors:
 - Fawkes C2 Agent
 fawkes_commands:
 - net-enum
 compiled_lucene: detections/discovery/compiled/t1087_001.lucene
+compiled_splunk: detections/discovery/compiled/t1087_001.spl
