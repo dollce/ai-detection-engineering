@@ -1,6 +1,6 @@
 technique_id: T1047
 title: "Detection for T1047 \xE2\u20AC\u201D Remote/local WMI execution"
-status: AUTHORED
+status: VALIDATED
 priority: high
 requested_by: intel
 requested_date: '2026-03-21T13:04:56Z'
@@ -14,7 +14,7 @@ fp_rate: 0.0
 tp_rate: 1.0
 alert_volume_24h: 0
 cost_estimate: low
-auto_deploy_eligible: false
+auto_deploy_eligible: true
 changelog:
 - date: '2026-03-21T13:04:56Z'
   agent: intel
@@ -52,6 +52,18 @@ changelog:
   agent: validation
   action: update
   details: 'Updated fields: quality_score, fp_rate, tp_rate'
+- date: '2026-04-04T14:17:12Z'
+  agent: validation
+  action: update
+  details: 'Updated fields: quality_score, fp_rate, tp_rate'
+- date: '2026-04-04T14:17:12Z'
+  agent: validation
+  action: transition:AUTHORED->VALIDATED
+  details: F1=1.0, FP_rate=0.0, tier=auto_deploy
+- date: '2026-04-04T14:17:12Z'
+  agent: validation
+  action: update
+  details: 'Updated fields: auto_deploy_eligible'
 threat_actors:
 - Fawkes C2 Agent
 - LockBit 3.0 (Black)
