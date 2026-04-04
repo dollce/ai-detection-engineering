@@ -1,50 +1,10 @@
 {
   "technique_id": "T1049",
-  "technique_name": "Detection for T1049 — Active network connections (netstat)",
-  "description": "Simulates Detection for T1049 — Active network connections (netstat) attack sequence",
+  "technique_name": "Detection for T1049 \u00e2\u20ac\u201d Active network connections (netstat)",
+  "description": "Simulates Detection for T1049 \u00e2\u20ac\u201d Active network connections (netstat) attack sequence",
   "mitre_tactic": "unknown",
   "events": {
     "attack_sequence": [
-      {
-        "@timestamp": "2026-03-22T09:14:33.221Z",
-        "event": {
-          "category": "process",
-          "type": "start",
-          "action": "Process Create (rule: ProcessCreate)",
-          "code": "1"
-        },
-        "process": {
-          "pid": 7832,
-          "name": "runtime_host.exe",
-          "executable": "C:\\Users\\jsmith\\AppData\\Roaming\\Microsoft\\runtime_host.exe",
-          "command_line": "runtime_host.exe",
-          "parent": {
-            "pid": 4412,
-            "name": "explorer.exe",
-            "executable": "C:\\Windows\\explorer.exe"
-          }
-        },
-        "user": {
-          "name": "jsmith",
-          "domain": "CORP"
-        },
-        "host": {
-          "name": "WS-FINANCE-01",
-          "os": {
-            "platform": "windows"
-          }
-        },
-        "agent": {
-          "type": "sysmon"
-        },
-        "_simulation": {
-          "type": "attack",
-          "technique": "T1049",
-          "sequence_order": 1,
-          "sequence_total": 3,
-          "description": "Fawkes C2 agent runtime_host.exe launched from user AppData — anomalous parent/path for a network enumeration host process"
-        }
-      },
       {
         "@timestamp": "2026-03-22T09:14:35.104Z",
         "event": {
@@ -82,53 +42,7 @@
           "technique": "T1049",
           "sequence_order": 2,
           "sequence_total": 3,
-          "description": "Fawkes net-stat command executed — netstat.exe -ano spawned directly by C2 agent to enumerate all active TCP/UDP connections and listening ports with owning PIDs"
-        }
-      },
-      {
-        "@timestamp": "2026-03-22T09:14:37.889Z",
-        "event": {
-          "category": "network",
-          "type": "connection",
-          "action": "Network connection detected (rule: NetworkConnect)",
-          "code": "3"
-        },
-        "process": {
-          "pid": 7832,
-          "name": "runtime_host.exe",
-          "executable": "C:\\Users\\jsmith\\AppData\\Roaming\\Microsoft\\runtime_host.exe"
-        },
-        "destination": {
-          "ip": "185.220.101.47",
-          "port": 443
-        },
-        "source": {
-          "ip": "10.10.20.55",
-          "port": 52341
-        },
-        "network": {
-          "direction": "egress",
-          "transport": "tcp"
-        },
-        "user": {
-          "name": "jsmith",
-          "domain": "CORP"
-        },
-        "host": {
-          "name": "WS-FINANCE-01",
-          "os": {
-            "platform": "windows"
-          }
-        },
-        "agent": {
-          "type": "sysmon"
-        },
-        "_simulation": {
-          "type": "attack",
-          "technique": "T1049",
-          "sequence_order": 3,
-          "sequence_total": 3,
-          "description": "C2 beacon outbound TCP/443 from runtime_host.exe to suspicious external IP — after network discovery, agent phones home with connection topology data"
+          "description": "Fawkes net-stat command executed \u00e2\u20ac\u201d netstat.exe -ano spawned directly by C2 agent to enumerate all active TCP/UDP connections and listening ports with owning PIDs"
         }
       }
     ],
@@ -168,7 +82,7 @@
         "_simulation": {
           "type": "benign_similar",
           "technique": "T1049",
-          "description": "Legitimate IT administrator running netstat -ano from an interactive cmd.exe session to troubleshoot a VPN connectivity issue — identical command line but benign parent and context"
+          "description": "Legitimate IT administrator running netstat -ano from an interactive cmd.exe session to troubleshoot a VPN connectivity issue \u00e2\u20ac\u201d identical command line but benign parent and context"
         }
       },
       {
@@ -206,7 +120,7 @@
         "_simulation": {
           "type": "benign_similar",
           "technique": "T1049",
-          "description": "SolarWinds Orion monitoring agent periodically spawning netstat.exe to collect network topology data for IPAM/network performance monitoring — expected scheduled behaviour from a known monitoring tool"
+          "description": "SolarWinds Orion monitoring agent periodically spawning netstat.exe to collect network topology data for IPAM/network performance monitoring \u00e2\u20ac\u201d expected scheduled behaviour from a known monitoring tool"
         }
       }
     ]
@@ -221,7 +135,7 @@
       "process.parent.executable",
       "process.executable"
     ],
-    "notes": "Detection should focus on netstat.exe (or equivalent: net-stat Fawkes command) spawned by a non-standard parent — specifically any parent executable residing under AppData, Temp, or other user-writable paths. The parent path C:\\Users\\*\\AppData\\Roaming\\* combined with a child process of netstat.exe, net.exe, or ipconfig.exe is a high-fidelity signal. Benign cases typically show cmd.exe, powershell.exe, or known monitoring agents (SolarWinds, SCCM, etc.) as parents. The accompanying outbound C2 beacon from the same PID post-enumeration is a strong corroborating signal for kill-chain correlation."
+    "notes": "Detection should focus on netstat.exe (or equivalent: net-stat Fawkes command) spawned by a non-standard parent \u00e2\u20ac\u201d specifically any parent executable residing under AppData, Temp, or other user-writable paths. The parent path C:\\Users\\*\\AppData\\Roaming\\* combined with a child process of netstat.exe, net.exe, or ipconfig.exe is a high-fidelity signal. Benign cases typically show cmd.exe, powershell.exe, or known monitoring agents (SolarWinds, SCCM, etc.) as parents. The accompanying outbound C2 beacon from the same PID post-enumeration is a strong corroborating signal for kill-chain correlation."
   },
   "log_sources_used": [
     "sysmon_1",

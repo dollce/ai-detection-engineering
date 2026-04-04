@@ -1,5 +1,5 @@
 technique_id: T1518.001
-title: "Detection for T1518.001 \u2014 Detect installed AV/EDR products"
+title: Detection for T1518.001 — Detect installed AV/EDR products
 status: AUTHORED
 priority: high
 requested_by: intel
@@ -28,8 +28,13 @@ changelog:
   agent: blue-team
   action: update
   details: 'Updated fields: compiled_lucene'
+- date: '2026-04-04T09:00:00Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: compiled_splunk'
 threat_actors:
 - Fawkes C2 Agent
 fawkes_commands:
 - av-detect
 compiled_lucene: detections/discovery/compiled/t1518_001.lucene
+compiled_splunk: detections/discovery/compiled/t1518_001.spl

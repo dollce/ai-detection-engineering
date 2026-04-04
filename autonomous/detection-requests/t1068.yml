@@ -36,5 +36,10 @@ changelog:
   agent: blue-team
   action: update
   details: 'Updated fields: compiled_lucene'
+- date: '2026-04-04T09:00:00Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: compiled_splunk'
 threat_actors: []
 compiled_lucene: detections/privilege_escalation/compiled/t1068.lucene
+compiled_splunk: detections/privilege_escalation/compiled/t1068.spl

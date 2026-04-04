@@ -1,0 +1,1 @@
+event.code="1" process.name="netstat.exe" process.parent.executable IN ("*\\AppData\\*", "*\\Temp\\*", "*\\ProgramData\\*", "*\\Users\\Public\\*") NOT (process.parent.name IN ("SolarWinds.BusinessLayerHost.exe", "CcmExec.exe", "NSClient++.exe")) | table process.name,process.command_line,process.parent.name,process.parent.executable,user.name,host.name
