@@ -1,0 +1,225 @@
+{
+  "technique_id": "T1018",
+  "technique_name": "Remote System Discovery",
+  "description": "Simulates Remote System Discovery attack sequence",
+  "mitre_tactic": "unknown",
+  "events": {
+    "attack_sequence": [
+      {
+        "@timestamp": "2026-04-11T09:14:22.341Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "action": "Process Create (rule: ProcessCreate)",
+          "code": "1"
+        },
+        "process": {
+          "pid": 7832,
+          "name": "net.exe",
+          "executable": "C:\\Windows\\System32\\net.exe",
+          "command_line": "net.exe view /domain:CORP",
+          "parent": {
+            "pid": 4416,
+            "name": "update_helper.exe",
+            "executable": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"
+          }
+        },
+        "user": {
+          "name": "mjones",
+          "domain": "CORP"
+        },
+        "host": {
+          "name": "SRV-DC-01",
+          "os": {
+            "platform": "windows"
+          }
+        },
+        "agent": {
+          "type": "sysmon"
+        },
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1018",
+          "sequence_order": 1,
+          "sequence_total": 3,
+          "description": "Fawkes net-enum: update_helper.exe spawns net.exe to enumerate domain-joined hosts via net view /domain"
+        }
+      },
+      {
+        "@timestamp": "2026-04-11T09:14:24.118Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "action": "Process Create (rule: ProcessCreate)",
+          "code": "1"
+        },
+        "process": {
+          "pid": 7904,
+          "name": "nltest.exe",
+          "executable": "C:\\Windows\\System32\\nltest.exe",
+          "command_line": "nltest.exe /dclist:CORP",
+          "parent": {
+            "pid": 4416,
+            "name": "update_helper.exe",
+            "executable": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"
+          }
+        },
+        "user": {
+          "name": "mjones",
+          "domain": "CORP"
+        },
+        "host": {
+          "name": "SRV-DC-01",
+          "os": {
+            "platform": "windows"
+          }
+        },
+        "agent": {
+          "type": "sysmon"
+        },
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1018",
+          "sequence_order": 2,
+          "sequence_total": 3,
+          "description": "Fawkes net-enum: update_helper.exe spawns nltest.exe to enumerate domain controllers in CORP domain"
+        }
+      },
+      {
+        "@timestamp": "2026-04-11T09:14:26.755Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "action": "Process Create (rule: ProcessCreate)",
+          "code": "1"
+        },
+        "process": {
+          "pid": 7961,
+          "name": "net.exe",
+          "executable": "C:\\Windows\\System32\\net.exe",
+          "command_line": "net.exe group \"Domain Computers\" /domain",
+          "parent": {
+            "pid": 4416,
+            "name": "update_helper.exe",
+            "executable": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"
+          }
+        },
+        "user": {
+          "name": "mjones",
+          "domain": "CORP"
+        },
+        "host": {
+          "name": "SRV-DC-01",
+          "os": {
+            "platform": "windows"
+          }
+        },
+        "agent": {
+          "type": "sysmon"
+        },
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1018",
+          "sequence_order": 3,
+          "sequence_total": 3,
+          "description": "Fawkes net-enum: update_helper.exe queries Domain Computers group to build full host inventory for lateral movement targeting"
+        }
+      }
+    ],
+    "benign_similar": [
+      {
+        "@timestamp": "2026-04-11T08:02:11.504Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "action": "Process Create (rule: ProcessCreate)",
+          "code": "1"
+        },
+        "process": {
+          "pid": 3120,
+          "name": "net.exe",
+          "executable": "C:\\Windows\\System32\\net.exe",
+          "command_line": "net.exe view /domain:CORP",
+          "parent": {
+            "pid": 2288,
+            "name": "cmd.exe",
+            "executable": "C:\\Windows\\System32\\cmd.exe"
+          }
+        },
+        "user": {
+          "name": "mjones",
+          "domain": "CORP"
+        },
+        "host": {
+          "name": "SRV-DC-01",
+          "os": {
+            "platform": "windows"
+          }
+        },
+        "agent": {
+          "type": "sysmon"
+        },
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1018",
+          "description": "IT admin mjones running net view manually from an interactive cmd.exe session during routine inventory check — identical command line but parent is cmd.exe, not an unsigned ProgramData binary"
+        }
+      },
+      {
+        "@timestamp": "2026-04-11T07:30:00.012Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "action": "Process Create (rule: ProcessCreate)",
+          "code": "1"
+        },
+        "process": {
+          "pid": 1644,
+          "name": "nltest.exe",
+          "executable": "C:\\Windows\\System32\\nltest.exe",
+          "command_line": "nltest.exe /dclist:CORP",
+          "parent": {
+            "pid": 980,
+            "name": "CcmExec.exe",
+            "executable": "C:\\Windows\\CCM\\CcmExec.exe"
+          }
+        },
+        "user": {
+          "name": "SYSTEM",
+          "domain": "NT AUTHORITY"
+        },
+        "host": {
+          "name": "SRV-DC-01",
+          "os": {
+            "platform": "windows"
+          }
+        },
+        "agent": {
+          "type": "sysmon"
+        },
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1018",
+          "description": "SCCM client (CcmExec.exe) running scheduled nltest DC discovery as SYSTEM during morning policy refresh — same command but trusted parent path, SYSTEM context, and predictable scheduled cadence"
+        }
+      }
+    ]
+  },
+  "expected_detection": {
+    "should_alert_on": "attack_sequence",
+    "should_not_alert_on": "benign_similar",
+    "key_fields": [
+      "process.name",
+      "process.command_line",
+      "process.parent.name",
+      "process.parent.executable"
+    ],
+    "notes": "Detection signal for T1018: focus on net.exe or nltest.exe with discovery arguments (view /domain, /dclist, group 'Domain Computers') where process.parent.executable originates outside system32/program files — specifically paths under C:\\ProgramData\\ or user-writable directories. A burst of 3+ discovery commands from the same parent PID within a short window (< 10 seconds) is a high-confidence indicator of automated C2 enumeration. False positives arise from SCCM/MECM (CcmExec.exe), Lansweeper, and interactive admin sessions (cmd.exe / powershell.exe parents). Tune by excluding parent executables matching known management tools signed by Microsoft or known vendors."
+  },
+  "log_sources_used": [
+    "sysmon_1"
+  ],
+  "platforms": [
+    "windows"
+  ]
+}
