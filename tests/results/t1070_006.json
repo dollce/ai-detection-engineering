@@ -1,0 +1,42 @@
+{
+  "technique_id": "T1070.006",
+  "date": "2026-04-11T14:04:55Z",
+  "sigma_rule": "detections\\defense_evasion\\t1070_006.yml",
+  "metrics": {
+    "tp": 3,
+    "fp": 0,
+    "fn": 0,
+    "tn": 2,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "fp_rate": 0.0,
+    "tp_rate": 1.0,
+    "total_attack": 3,
+    "total_benign": 2
+  },
+  "quality_tier": "auto_deploy",
+  "validation_method": "elasticsearch",
+  "validated_by": "validation-agent",
+  "siem_targets": [
+    "elasticsearch",
+    "splunk"
+  ],
+  "sigma_rule_path": "detections\\defense_evasion\\t1070_006.yml",
+  "scenario_path": "simulator\\scenarios\\t1070_006.json",
+  "attack_event_count": 3,
+  "benign_event_count": 2,
+  "quality_tier_criteria": {
+    "auto_deploy": "F1 >= 0.90 AND FP_rate <= 0.05",
+    "validated": "F1 >= 0.75",
+    "needs_rework": "F1 < 0.75"
+  },
+  "validation_details": {
+    "index": "sim-validation-0d7a75f9",
+    "query": "((event.code:2 AND (process.executable:(*\\\\AppData\\\\* OR *\\\\Temp\\\\* OR *\\\\ProgramData\\\\* OR *\\\\Users\\\\Public\\\\*)) AND (file.path:(*.exe OR *.dll OR *.bat OR *.ps1 OR *.cmd OR *.vbs OR *.js))) OR (even",
+    "events_ingested": 5,
+    "query_hits": 3,
+    "query_time_ms": 7,
+    "errors": []
+  }
+}
