@@ -8,7 +8,7 @@ description: |
   operations outside of runas /netonly scenarios.
 author: Blue Team Detection Engineering Agent
 date: 2026/03/29
-modified: 2026/03/29
+modified: 2026/04/11
 references:
   - https://attack.mitre.org/techniques/T1134/003/
   - https://github.com/galoryber/fawkes
