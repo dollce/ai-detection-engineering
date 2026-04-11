@@ -238,6 +238,7 @@ def transpile_sigma(rule_path: Path) -> tuple[str, str]:
     Transpile Sigma rule to Lucene and SPL.
     Returns (lucene_query, spl_query).
     """
+    import re as _re
     lucene = ""
     spl = ""
 
@@ -251,6 +252,10 @@ def transpile_sigma(rule_path: Path) -> tuple[str, str]:
         else:
             print(f"    [author] Lucene transpile warning: {result.stderr.strip()[:200]}")
             lucene = result.stdout.strip()
+        # Strip sigma-cli preamble lines ("Parsing Sigma rules...")
+        lucene = "\n".join(l for l in lucene.splitlines() if not l.startswith("Parsing Sigma"))
+        # Strip winlog.channel prefix added by ecs_windows pipeline (field absent in sim-* indices)
+        lucene = _re.sub(r"^winlog\.channel:\S+ AND ", "", lucene.strip())
     except Exception as e:
         print(f"    [author] Lucene transpile failed: {e}")
 
