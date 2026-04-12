@@ -1,0 +1,41 @@
+{
+  "technique_id": "T1110.001",
+  "date": "2026-04-12T14:52:52Z",
+  "sigma_rule": "detections\\credential_access\\t1110_001_brute_force_threshold.yml",
+  "metrics": {
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "tn": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "fp_rate": 0.0,
+    "tp_rate": 1.0,
+    "total_attack": 6,
+    "total_benign": 2
+  },
+  "quality_tier": "auto_deploy",
+  "validation_method": "elasticsearch_threshold",
+  "validated_by": "validation-agent",
+  "siem_targets": [
+    "elasticsearch",
+    "splunk"
+  ],
+  "sigma_rule_path": "detections\\credential_access\\t1110_001_brute_force_threshold.yml",
+  "scenario_path": "simulator/scenarios/t1110_001.json",
+  "attack_event_count": 6,
+  "benign_event_count": 2,
+  "quality_tier_criteria": {
+    "auto_deploy": "F1 >= 0.90 AND FP_rate <= 0.05",
+    "validated": "F1 >= 0.75",
+    "needs_rework": "F1 < 0.75"
+  },
+  "validation_details": {
+    "index": "sim-validation-979f3ad5",
+    "query": "event.code: \"4625\" AND NOT winlog.event_data.SubStatus: \"0xC000006D\"",
+    "events_ingested": 8,
+    "threshold_breaches": 1,
+    "errors": []
+  }
+}
