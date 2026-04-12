@@ -1,1 +1,0 @@
-event.code="1" process.executable="*svc_updater.exe*" process.name="svc_updater.exe" process.parent.name="explorer.exe" user.name="bwilson" user.domain="CORP" NOT (process.name IN ("MicrosoftEdgeUpdate.exe", "wuauclt.exe"))

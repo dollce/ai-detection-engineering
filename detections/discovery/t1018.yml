@@ -5,10 +5,10 @@ description: >
   Detects net.exe and nltest.exe used for remote system and domain controller discovery
   when spawned from a non-standard parent process. The Fawkes C2 net-enum command
   executes these utilities from implant processes located in non-system directories
-  (e.g., C:\ProgramData\) to enumerate domain-joined hosts and domain controllers.
-  Trusted administrative parents such as interactive shells, SCCM, and MMC are filtered
-  to reduce noise from routine IT operations while preserving detection of C2-spawned
-  enumeration.
+  (e.g., C:\ProgramData\) to enumerate domain-joined hosts, domain controllers, and
+  domain group membership. Trusted administrative parents such as interactive shells,
+  SCCM, and MMC are filtered to reduce noise from routine IT operations while
+  preserving detection of C2-spawned enumeration.
 author: Detection Engineering Agent
 date: 2026-04-12
 modified: 2026-04-12
@@ -25,9 +25,7 @@ logsource:
 detection:
   selection_net:
     process.name|endswith: 'net.exe'
-    process.command_line|contains|all:
-      - 'view'
-      - '/domain'
+    process.command_line|contains: '/domain'
   selection_nltest:
     process.name|endswith: 'nltest.exe'
     process.command_line|contains: '/dclist'
@@ -44,8 +42,15 @@ detection:
       - '\wt.exe'
   condition: (selection_net or selection_nltest) and not filter_trusted_parents
 falsepositives:
-  - IT administrators running net view or nltest interactively from cmd.exe or PowerShell — filtered by parent
-  - SCCM client (CcmExec.exe) performing scheduled domain controller discovery — filtered by parent
+  - IT administrators running net view or nltest interactively from cmd.exe or PowerShell (filtered by parent)
+  - SCCM client (CcmExec.exe) performing scheduled domain controller discovery (filtered by parent)
   - Domain-joined RMM tools or monitoring agents spawning these utilities from non-standard parents; verify parent executable path and signing status
   - Security scanners and vulnerability assessment tools performing domain enumeration
 level: medium
+fields:
+  - process.name
+  - process.command_line
+  - process.parent.name
+  - process.parent.executable
+  - user.name
+  - host.name

@@ -1,1 +1,0 @@
-event.code="1" process.executable="*sync_agent.exe*" file.path="C:\\ProgramData\\WindowsUpdate\\staging\\Q1_2026_Revenue_Projections.xlsx" destination.port="445" network.transport="tcp" NOT process.name="robocopy.exe"

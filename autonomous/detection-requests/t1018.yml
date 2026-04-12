@@ -6,7 +6,7 @@ requested_by: intel
 requested_date: '2026-03-23T06:57:50Z'
 intel_report: threat-intel/reports/2026-03-22-blurring-the-lines-intrusion-shows-connection-with.yml
 scenario_file: simulator\scenarios\t1018.json
-sigma_rule: detections\execution\t1018.yml
+sigma_rule: detections\discovery\t1018.yml
 deployed_date: ''
 last_quality_review: ''
 quality_score: 0.0
@@ -41,6 +41,6 @@ changelog:
   action: transition:SCENARIO_BUILT->AUTHORED
   details: Sigma rule authored, transpiled to Lucene + SPL
 threat_actors: []
-compiled_lucene: detections\execution\compiled\t1018.lucene
-compiled_spl: detections\execution\compiled\t1018.spl
-mitre_tactic: execution
+compiled_lucene: detections\discovery\compiled\t1018.lucene
+compiled_spl: detections\discovery\compiled\t1018.spl
+mitre_tactic: discovery

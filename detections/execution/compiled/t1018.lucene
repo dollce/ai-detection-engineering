@@ -1,1 +1,0 @@
-((process.name:*net.exe AND (process.command_line:*view* AND process.command_line:*\/domain*)) OR (process.name:*nltest.exe AND process.command_line:*\/dclist*)) AND (NOT (process.parent.executable:(*\\cmd.exe OR *\\powershell.exe OR *\\pwsh.exe OR *\\explorer.exe OR *\\CcmExec.exe OR *\\svchost.exe OR *\\mmc.exe OR *\\conhost.exe OR *\\wt.exe)))

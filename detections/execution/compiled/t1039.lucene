@@ -1,1 +1,0 @@
-(event.code:1 AND process.executable:*sync_agent.exe* AND file.path:C\:\\ProgramData\\WindowsUpdate\\staging\\Q1_2026_Revenue_Projections.xlsx AND destination.port:445 AND network.transport:tcp) AND (NOT process.name:robocopy.exe)
