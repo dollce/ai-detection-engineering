@@ -1,13 +1,13 @@
 technique_id: T1087.001
 title: "Detection for T1087.001 \xE2\u20AC\u201D Enumerate local/domain users and groups"
-status: VALIDATED
+status: DEPLOYED
 priority: high
 requested_by: intel
 requested_date: '2026-03-21T13:04:56Z'
 intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
 scenario_file: simulator/scenarios/t1087_001.json
 sigma_rule: detections/discovery/t1087_001.yml
-deployed_date: ''
+deployed_date: '2026-04-12T21:24:45Z'
 last_quality_review: ''
 quality_score: 1.0
 fp_rate: 0.0
@@ -49,9 +49,27 @@ changelog:
   agent: validation
   action: update
   details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:24:45Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:24:45Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:24:45Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:24:45Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
 threat_actors:
 - Fawkes C2 Agent
 fawkes_commands:
 - net-enum
 compiled_lucene: detections/discovery/compiled/t1087_001.lucene
 compiled_spl: detections/discovery/compiled/t1087_001.spl
+elastic_rule_id: fdaaeae3-1549-4dc4-a617-855592d65148
+splunk_saved_search: "Detection for T1087.001 \xE2\u20AC\u201D Enumerate local/domain users and groups T1087.001"

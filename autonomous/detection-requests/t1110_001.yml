@@ -1,6 +1,6 @@
 technique_id: T1110.001
 title: Brute Force Login - Failed Logon Threshold
-status: VALIDATED
+status: DEPLOYED
 priority: high
 mitre_tactic: credential_access
 rule_type: threshold
@@ -13,9 +13,9 @@ compiled_lucene: ''
 compiled_spl: detections/credential_access/compiled/t1110_001_brute_force_threshold.spl
 compiled_artifact: detections/credential_access/compiled/t1110_001_brute_force_threshold_elastic.json
 secondary_techniques: []
-deployed_date: ''
-elastic_rule_id: ''
-splunk_saved_search: ''
+deployed_date: '2026-04-12T21:26:09Z'
+elastic_rule_id: 1d6f4b5c-7e8a-9b0c-1d2e-3f4a5b6c7d8e
+splunk_saved_search: Brute Force Login - Failed Logon Threshold T1110.001
 last_quality_review: ''
 quality_score: 1.0
 fp_rate: 0.0
@@ -46,3 +46,19 @@ changelog:
   agent: validation
   action: update
   details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:26:09Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:26:09Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:26:09Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:26:09Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'

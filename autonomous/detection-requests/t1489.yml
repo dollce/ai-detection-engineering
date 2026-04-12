@@ -1,6 +1,6 @@
 technique_id: T1489
 title: Mass Service Stop - Pre-Ransomware Indicator
-status: VALIDATED
+status: DEPLOYED
 priority: critical
 mitre_tactic: impact
 rule_type: threshold
@@ -14,9 +14,9 @@ compiled_spl: detections/impact/compiled/t1489_mass_service_stop_threshold.spl
 compiled_artifact: detections/impact/compiled/t1489_mass_service_stop_threshold_elastic.json
 secondary_techniques:
 - T1486
-deployed_date: ''
-elastic_rule_id: ''
-splunk_saved_search: ''
+deployed_date: '2026-04-12T21:26:13Z'
+elastic_rule_id: 4a9c7e8f-0b1d-2e3f-4a5b-6c7d8e9f0a1b
+splunk_saved_search: Mass Service Stop - Pre-Ransomware Indicator T1489
 last_quality_review: ''
 quality_score: 1.0
 fp_rate: 0.0
@@ -46,3 +46,19 @@ changelog:
   agent: validation
   action: update
   details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:26:13Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:26:13Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:26:13Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:26:13Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'

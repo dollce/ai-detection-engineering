@@ -1,13 +1,13 @@
 technique_id: T1057
 title: "Detection for T1057 \xE2\u20AC\u201D List running processes (tasklist)"
-status: VALIDATED
+status: DEPLOYED
 priority: high
 requested_by: intel
 requested_date: '2026-03-21T13:04:56Z'
 intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
 scenario_file: simulator\scenarios\t1057.json
 sigma_rule: detections/discovery/t1057.yml
-deployed_date: ''
+deployed_date: '2026-04-12T21:24:39Z'
 last_quality_review: ''
 quality_score: 1.0
 fp_rate: 0.0
@@ -52,9 +52,27 @@ changelog:
   agent: validation
   action: update
   details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:24:39Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:24:39Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:24:39Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:24:39Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
 threat_actors:
 - Fawkes C2 Agent
 fawkes_commands:
 - ps
 compiled_lucene: detections/discovery/compiled/t1057.lucene
 compiled_spl: detections/discovery/compiled/t1057.spl
+elastic_rule_id: 485c8075-2873-45dc-9fc3-b45600d47f55
+splunk_saved_search: "Detection for T1057 \xE2\u20AC\u201D List running processes (tasklist) T1057"

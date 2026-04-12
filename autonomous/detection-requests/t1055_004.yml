@@ -1,6 +1,6 @@
 technique_id: T1055.004
 title: APC Injection - Suspicious QueueUserAPC Pattern
-status: VALIDATED
+status: DEPLOYED
 priority: critical
 mitre_tactic: privilege_escalation
 rule_type: sigma
@@ -13,9 +13,9 @@ compiled_lucene: detections/privilege_escalation/compiled/t1055_004_apc_injectio
 compiled_spl: detections/privilege_escalation/compiled/t1055_004_apc_injection.spl
 compiled_artifact: detections/privilege_escalation/compiled/t1055_004_apc_injection_elastic.json
 secondary_techniques: []
-deployed_date: ''
-elastic_rule_id: ''
-splunk_saved_search: ''
+deployed_date: '2026-04-12T21:24:35Z'
+elastic_rule_id: 0a8df76b-2af4-4c72-b5d0-de6a830ac222
+splunk_saved_search: APC Injection - Suspicious QueueUserAPC Pattern T1055.004
 last_quality_review: ''
 quality_score: 1.0
 fp_rate: 0.0
@@ -46,3 +46,19 @@ changelog:
   agent: validation
   action: update
   details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:24:35Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:24:35Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:24:35Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:24:35Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'

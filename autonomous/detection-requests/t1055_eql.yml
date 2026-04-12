@@ -1,6 +1,6 @@
 technique_id: T1055_EQL
 title: Process Injection Sequence - Handle Open Then Remote Thread Creation (EQL)
-status: VALIDATED
+status: DEPLOYED
 priority: critical
 mitre_tactic: privilege_escalation
 rule_type: eql
@@ -15,9 +15,9 @@ compiled_artifact: detections/privilege_escalation/compiled/t1055_sequence_eql_e
 secondary_techniques:
 - T1055.001
 - T1055.004
-deployed_date: ''
-elastic_rule_id: ''
-splunk_saved_search: ''
+deployed_date: '2026-04-12T21:26:01Z'
+elastic_rule_id: 9b4d2a3f-5c6e-7f8a-9b0c-1d2e3f4a5b6c
+splunk_saved_search: Process Injection Sequence - Handle Open Then Remote Thread Creation (EQL) T1055_EQL
 last_quality_review: ''
 quality_score: 1.0
 fp_rate: 0.0
@@ -49,3 +49,19 @@ changelog:
   agent: validation
   action: update
   details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:26:01Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:26:01Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:26:01Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:26:01Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'

@@ -1,13 +1,13 @@
 technique_id: T1039
 title: Data from Network Shared Drive
-status: VALIDATED
+status: DEPLOYED
 priority: high
 requested_by: intel
 requested_date: '2026-03-23T06:57:50Z'
 intel_report: threat-intel/reports/2026-03-22-blurring-the-lines-intrusion-shows-connection-with.yml
 scenario_file: simulator\scenarios\t1039.json
 sigma_rule: detections\collection\t1039.yml
-deployed_date: ''
+deployed_date: '2026-04-12T21:24:33Z'
 last_quality_review: ''
 quality_score: 1.0
 fp_rate: 0.0
@@ -52,7 +52,25 @@ changelog:
   agent: validation
   action: update
   details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:24:33Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:24:33Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:24:33Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:24:33Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
 threat_actors: []
 compiled_lucene: detections\collection\compiled\t1039.lucene
 compiled_spl: detections\collection\compiled\t1039.spl
 mitre_tactic: collection
+elastic_rule_id: 58971019-0e1d-4cf9-824a-6cd7d370e9a1
+splunk_saved_search: Data from Network Shared Drive T1039
