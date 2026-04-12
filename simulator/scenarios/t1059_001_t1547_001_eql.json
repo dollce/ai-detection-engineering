@@ -1,0 +1,128 @@
+{
+  "technique_id": "T1059.001+T1547.001",
+  "technique_name": "PowerShell Execution Followed by Registry Persistence",
+  "description": "PowerShell with execution policy bypass followed within 5 min by registry Run key write on same host",
+  "mitre_tactic": "execution",
+  "events": {
+    "attack_sequence": [
+      {
+        "@timestamp": "2026-04-12T10:00:00.000Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "code": "1",
+          "action": "Process Create (rule: ProcessCreate)"
+        },
+        "process": {
+          "pid": 6200,
+          "name": "powershell.exe",
+          "executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+          "command_line": "powershell.exe -ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -File C:\\ProgramData\\update.ps1",
+          "parent": {
+            "pid": 4416,
+            "name": "update_helper.exe",
+            "executable": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"
+          }
+        },
+        "user": {"name": "mjones", "domain": "CORP"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1059.001",
+          "sequence_order": 1,
+          "sequence_total": 2,
+          "description": "Fawkes powershell: C2 implant launches PowerShell with execution policy bypass to run malicious script"
+        }
+      },
+      {
+        "@timestamp": "2026-04-12T10:01:30.000Z",
+        "event": {
+          "category": "registry",
+          "type": "change",
+          "code": "13",
+          "action": "Registry value set (rule: RegistryValueSet)"
+        },
+        "process": {
+          "pid": 6200,
+          "name": "powershell.exe",
+          "executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
+        },
+        "registry": {
+          "path": "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\WindowsUpdateHelper",
+          "value": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"
+        },
+        "user": {"name": "mjones", "domain": "CORP"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1547.001",
+          "sequence_order": 2,
+          "sequence_total": 2,
+          "description": "Fawkes persist (registry): C2 script writes implant to HKCU Run key 90 seconds after bypass PowerShell execution"
+        }
+      }
+    ],
+    "benign_similar": [
+      {
+        "@timestamp": "2026-04-12T09:00:00.000Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "code": "1",
+          "action": "Process Create (rule: ProcessCreate)"
+        },
+        "process": {
+          "pid": 5500,
+          "name": "powershell.exe",
+          "executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+          "command_line": "powershell.exe -File C:\\Scripts\\backup.ps1",
+          "parent": {"pid": 2000, "name": "TaskEng.exe",
+                     "executable": "C:\\Windows\\System32\\TaskEng.exe"}
+        },
+        "user": {"name": "SYSTEM", "domain": "NT AUTHORITY"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1059.001",
+          "description": "Scheduled task runs PowerShell backup script without -ExecutionPolicy Bypass -- no bypass flag, no registry follow-up"
+        }
+      },
+      {
+        "@timestamp": "2026-04-12T08:00:00.000Z",
+        "event": {
+          "category": "registry",
+          "type": "change",
+          "code": "13",
+          "action": "Registry value set (rule: RegistryValueSet)"
+        },
+        "process": {
+          "pid": 4000,
+          "name": "msiexec.exe",
+          "executable": "C:\\Windows\\System32\\msiexec.exe"
+        },
+        "registry": {
+          "path": "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\SomeApp",
+          "value": "C:\\Program Files\\SomeApp\\app.exe"
+        },
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1547.001",
+          "description": "MSI installer sets Run key -- no preceding bypass PowerShell in the 5 min window"
+        }
+      }
+    ]
+  },
+  "expected_detection": {
+    "should_alert_on": "attack_sequence",
+    "should_not_alert_on": "benign_similar",
+    "key_fields": ["process.name", "process.command_line", "registry.path", "host.name"],
+    "notes": "EQL sequence: PowerShell with bypass flags (EID 1) followed within 300s by registry CurrentVersion\\Run write (EID 13) on same host. Benign: PowerShell without bypass flag, and registry write from msiexec 2h earlier (outside window)."
+  },
+  "log_sources_used": ["sysmon_1", "sysmon_13"],
+  "platforms": ["windows"]
+}

@@ -9,7 +9,7 @@ requested_by: "blue-team"
 requested_date: "2026-03-15T00:00:00Z"
 intel_report: "threat-intel/fawkes/fawkes-ttp-mapping.md"
 
-scenario_file: ""
+scenario_file: 'simulator/scenarios/t1087_002_eql.json'
 sigma_rule: "detections/discovery/t1087_002_discovery_burst_eql.yml"
 compiled_lucene: ""
 compiled_spl: "detections/discovery/compiled/t1087_002_discovery_burst_eql.spl"

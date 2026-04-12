@@ -1,0 +1,155 @@
+{
+  "technique_id": "T1486",
+  "technique_name": "Data Encrypted for Impact (Threshold)",
+  "description": "12 EID 11 file-create events from same non-system process within 30s, triggering ransomware threshold rule",
+  "mitre_tactic": "impact",
+  "events": {
+    "attack_sequence": [
+      {
+        "@timestamp": "2026-04-12T10:00:00.000Z",
+        "event": {"category": "file", "type": "creation", "code": "11", "action": "File created (rule: FileCreate)"},
+        "process": {"pid": 8800, "name": "locker.exe", "executable": "C:\\Users\\mjones\\AppData\\Local\\Temp\\locker.exe"},
+        "file": {"name": "report_2026_01.xlsx.enc", "path": "C:\\Users\\mjones\\Documents\\report_2026_01.xlsx.enc"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {"type": "attack", "technique": "T1486", "sequence_order": 1, "sequence_total": 12,
+                         "description": "Ransomware encrypts file 1/12"}
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:02.000Z",
+        "event": {"category": "file", "type": "creation", "code": "11", "action": "File created (rule: FileCreate)"},
+        "process": {"pid": 8800, "name": "locker.exe", "executable": "C:\\Users\\mjones\\AppData\\Local\\Temp\\locker.exe"},
+        "file": {"name": "budget_q1.xlsx.enc", "path": "C:\\Users\\mjones\\Documents\\budget_q1.xlsx.enc"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {"type": "attack", "technique": "T1486", "sequence_order": 2, "sequence_total": 12}
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:04.000Z",
+        "event": {"category": "file", "type": "creation", "code": "11", "action": "File created (rule: FileCreate)"},
+        "process": {"pid": 8800, "name": "locker.exe", "executable": "C:\\Users\\mjones\\AppData\\Local\\Temp\\locker.exe"},
+        "file": {"name": "presentation.pptx.enc", "path": "C:\\Users\\mjones\\Desktop\\presentation.pptx.enc"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {"type": "attack", "technique": "T1486", "sequence_order": 3, "sequence_total": 12}
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:06.000Z",
+        "event": {"category": "file", "type": "creation", "code": "11", "action": "File created (rule: FileCreate)"},
+        "process": {"pid": 8800, "name": "locker.exe", "executable": "C:\\Users\\mjones\\AppData\\Local\\Temp\\locker.exe"},
+        "file": {"name": "contracts_2025.docx.enc", "path": "C:\\Users\\mjones\\Documents\\contracts_2025.docx.enc"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {"type": "attack", "technique": "T1486", "sequence_order": 4, "sequence_total": 12}
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:08.000Z",
+        "event": {"category": "file", "type": "creation", "code": "11", "action": "File created (rule: FileCreate)"},
+        "process": {"pid": 8800, "name": "locker.exe", "executable": "C:\\Users\\mjones\\AppData\\Local\\Temp\\locker.exe"},
+        "file": {"name": "invoice_jan.pdf.enc", "path": "C:\\Users\\mjones\\Documents\\Finance\\invoice_jan.pdf.enc"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {"type": "attack", "technique": "T1486", "sequence_order": 5, "sequence_total": 12}
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:10.000Z",
+        "event": {"category": "file", "type": "creation", "code": "11", "action": "File created (rule: FileCreate)"},
+        "process": {"pid": 8800, "name": "locker.exe", "executable": "C:\\Users\\mjones\\AppData\\Local\\Temp\\locker.exe"},
+        "file": {"name": "invoice_feb.pdf.enc", "path": "C:\\Users\\mjones\\Documents\\Finance\\invoice_feb.pdf.enc"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {"type": "attack", "technique": "T1486", "sequence_order": 6, "sequence_total": 12}
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:12.000Z",
+        "event": {"category": "file", "type": "creation", "code": "11", "action": "File created (rule: FileCreate)"},
+        "process": {"pid": 8800, "name": "locker.exe", "executable": "C:\\Users\\mjones\\AppData\\Local\\Temp\\locker.exe"},
+        "file": {"name": "source_code.zip.enc", "path": "C:\\Users\\mjones\\Dev\\source_code.zip.enc"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {"type": "attack", "technique": "T1486", "sequence_order": 7, "sequence_total": 12}
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:14.000Z",
+        "event": {"category": "file", "type": "creation", "code": "11", "action": "File created (rule: FileCreate)"},
+        "process": {"pid": 8800, "name": "locker.exe", "executable": "C:\\Users\\mjones\\AppData\\Local\\Temp\\locker.exe"},
+        "file": {"name": "db_backup.sql.enc", "path": "C:\\Users\\mjones\\Backups\\db_backup.sql.enc"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {"type": "attack", "technique": "T1486", "sequence_order": 8, "sequence_total": 12}
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:16.000Z",
+        "event": {"category": "file", "type": "creation", "code": "11", "action": "File created (rule: FileCreate)"},
+        "process": {"pid": 8800, "name": "locker.exe", "executable": "C:\\Users\\mjones\\AppData\\Local\\Temp\\locker.exe"},
+        "file": {"name": "config.ini.enc", "path": "C:\\Users\\mjones\\AppData\\Roaming\\App\\config.ini.enc"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {"type": "attack", "technique": "T1486", "sequence_order": 9, "sequence_total": 12}
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:18.000Z",
+        "event": {"category": "file", "type": "creation", "code": "11", "action": "File created (rule: FileCreate)"},
+        "process": {"pid": 8800, "name": "locker.exe", "executable": "C:\\Users\\mjones\\AppData\\Local\\Temp\\locker.exe"},
+        "file": {"name": "photos_2025.zip.enc", "path": "C:\\Users\\mjones\\Pictures\\photos_2025.zip.enc"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {"type": "attack", "technique": "T1486", "sequence_order": 10, "sequence_total": 12}
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:20.000Z",
+        "event": {"category": "file", "type": "creation", "code": "11", "action": "File created (rule: FileCreate)"},
+        "process": {"pid": 8800, "name": "locker.exe", "executable": "C:\\Users\\mjones\\AppData\\Local\\Temp\\locker.exe"},
+        "file": {"name": "notes.txt.enc", "path": "C:\\Users\\mjones\\Desktop\\notes.txt.enc"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {"type": "attack", "technique": "T1486", "sequence_order": 11, "sequence_total": 12}
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:22.000Z",
+        "event": {"category": "file", "type": "creation", "code": "11", "action": "File created (rule: FileCreate)"},
+        "process": {"pid": 8800, "name": "locker.exe", "executable": "C:\\Users\\mjones\\AppData\\Local\\Temp\\locker.exe"},
+        "file": {"name": "README_DECRYPT.txt", "path": "C:\\Users\\mjones\\Documents\\README_DECRYPT.txt"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {"type": "attack", "technique": "T1486", "sequence_order": 12, "sequence_total": 12,
+                         "description": "12th file event from same process in 22 seconds -- far exceeds threshold of 10"}
+      }
+    ],
+    "benign_similar": [
+      {
+        "@timestamp": "2026-04-12T09:00:00.000Z",
+        "event": {"category": "file", "type": "creation", "code": "11", "action": "File created (rule: FileCreate)"},
+        "process": {"pid": 1800, "name": "MsMpEng.exe",
+                     "executable": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2311.5-0\\MsMpEng.exe"},
+        "file": {"name": "mplog-04122026.log", "path": "C:\\ProgramData\\Microsoft\\Windows Defender\\Logs\\mplog-04122026.log"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1486",
+          "description": "Windows Defender creating log files -- filtered by process.executable exclusion for Windows Defender path"
+        }
+      },
+      {
+        "@timestamp": "2026-04-12T09:01:00.000Z",
+        "event": {"category": "file", "type": "creation", "code": "11", "action": "File created (rule: FileCreate)"},
+        "process": {"pid": 1800, "name": "MsMpEng.exe",
+                     "executable": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2311.5-0\\MsMpEng.exe"},
+        "file": {"name": "mplog-04122026-2.log", "path": "C:\\ProgramData\\Microsoft\\Windows Defender\\Logs\\mplog-04122026-2.log"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {"type": "benign_similar", "technique": "T1486",
+                         "description": "Defender log file 2 -- also filtered, and only 2 events total (below threshold)"}
+      }
+    ]
+  },
+  "expected_detection": {
+    "should_alert_on": "attack_sequence",
+    "should_not_alert_on": "benign_similar",
+    "key_fields": ["process.name", "event.code", "file.path"],
+    "notes": "Threshold: 10+ EID 11 events grouped by process.name within 30s. Attack: 12 events from locker.exe in 22s. Benign: MsMpEng.exe (filtered by process.executable exclusion) with only 2 events."
+  },
+  "log_sources_used": ["sysmon_11"],
+  "platforms": ["windows"]
+}

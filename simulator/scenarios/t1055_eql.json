@@ -1,0 +1,108 @@
+{
+  "technique_id": "T1055",
+  "technique_name": "Process Injection Sequence (EQL)",
+  "description": "EID 10 process access with full rights followed within 10s by EID 8 CreateRemoteThread on same host",
+  "mitre_tactic": "privilege_escalation",
+  "events": {
+    "attack_sequence": [
+      {
+        "@timestamp": "2026-04-12T10:00:00.000Z",
+        "event": {
+          "category": "process",
+          "type": "access",
+          "code": "10",
+          "action": "Process accessed (rule: ProcessAccess)"
+        },
+        "process": {
+          "pid": 4416,
+          "name": "update_helper.exe",
+          "executable": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"
+        },
+        "winlog": {
+          "event_data": {
+            "GrantedAccess": "0x1F0FFF",
+            "TargetImage": "C:\\Windows\\System32\\svchost.exe"
+          }
+        },
+        "user": {"name": "mjones", "domain": "CORP"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1055.001",
+          "sequence_order": 1,
+          "sequence_total": 2,
+          "description": "Fawkes vanilla-injection step 1: OpenProcess(PROCESS_ALL_ACCESS) on svchost.exe to prepare for injection"
+        }
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:05.000Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "code": "8",
+          "action": "CreateRemoteThread detected (rule: CreateRemoteThread)"
+        },
+        "process": {
+          "pid": 4416,
+          "name": "update_helper.exe",
+          "executable": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"
+        },
+        "winlog": {
+          "event_data": {
+            "TargetImage": "C:\\Windows\\System32\\svchost.exe",
+            "TargetProcessId": "1234",
+            "StartAddress": "0x7ff8a1b2c3d4"
+          }
+        },
+        "user": {"name": "mjones", "domain": "CORP"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1055.001",
+          "sequence_order": 2,
+          "sequence_total": 2,
+          "description": "Fawkes vanilla-injection step 2: CreateRemoteThread in svchost.exe 5 seconds after OpenProcess"
+        }
+      }
+    ],
+    "benign_similar": [
+      {
+        "@timestamp": "2026-04-12T09:00:00.000Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "code": "8",
+          "action": "CreateRemoteThread detected (rule: CreateRemoteThread)"
+        },
+        "process": {
+          "pid": 1800,
+          "name": "MsMpEng.exe",
+          "executable": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2311.5-0\\MsMpEng.exe"
+        },
+        "winlog": {
+          "event_data": {
+            "TargetImage": "C:\\Windows\\System32\\svchost.exe",
+            "TargetProcessId": "880"
+          }
+        },
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1055",
+          "description": "Windows Defender (MsMpEng.exe) creates remote thread in svchost for memory scanning -- filtered by process.executable exclusion"
+        }
+      }
+    ]
+  },
+  "expected_detection": {
+    "should_alert_on": "attack_sequence",
+    "should_not_alert_on": "benign_similar",
+    "key_fields": ["process.executable", "winlog.event_data.GrantedAccess", "event.code", "host.name"],
+    "notes": "EQL sequence: EID 10 with 0x1F0FFF GrantedAccess from non-system process, then EID 8 within 10s on same host. Benign: EID 8 from MsMpEng.exe (in filter list), no EID 10 sequence."
+  },
+  "log_sources_used": ["sysmon_8", "sysmon_10"],
+  "platforms": ["windows"]
+}
