@@ -1,0 +1,83 @@
+[
+  {
+    "@timestamp": "2026-04-11T08:45:10.119Z",
+    "event": {
+      "category": "network",
+      "type": "connection",
+      "action": "Network connection detected (rule: NetworkConnect)",
+      "code": "3"
+    },
+    "process": {
+      "pid": 3312,
+      "name": "robocopy.exe",
+      "executable": "C:\\Windows\\System32\\robocopy.exe"
+    },
+    "destination": {
+      "ip": "10.10.1.45",
+      "port": 445
+    },
+    "source": {
+      "ip": "10.10.2.88",
+      "port": 49620
+    },
+    "network": {
+      "direction": "egress",
+      "transport": "tcp"
+    },
+    "user": {
+      "name": "clee",
+      "domain": "CORP"
+    },
+    "host": {
+      "name": "WS-FINANCE-02",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "benign_similar",
+      "technique": "T1039",
+      "description": "Legitimate robocopy.exe SMB connection to file server \u2014 scheduled backup task initiated by the same user copying Finance reports to a local archive folder"
+    }
+  },
+  {
+    "@timestamp": "2026-04-11T08:52:04.773Z",
+    "event": {
+      "category": "file",
+      "type": "creation",
+      "action": "File created (rule: FileCreate)",
+      "code": "11"
+    },
+    "process": {
+      "pid": 3312,
+      "name": "robocopy.exe",
+      "executable": "C:\\Windows\\System32\\robocopy.exe"
+    },
+    "file": {
+      "name": "Q1_2026_Revenue_Projections.xlsx",
+      "path": "C:\\Users\\clee\\Documents\\Finance-Archive\\Q1_2026_Revenue_Projections.xlsx",
+      "extension": "xlsx"
+    },
+    "user": {
+      "name": "clee",
+      "domain": "CORP"
+    },
+    "host": {
+      "name": "WS-FINANCE-02",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "benign_similar",
+      "technique": "T1039",
+      "description": "Same Finance file written by robocopy to a user-owned Documents subfolder \u2014 consistent with a scheduled local backup, not staging under ProgramData"
+    }
+  }
+]

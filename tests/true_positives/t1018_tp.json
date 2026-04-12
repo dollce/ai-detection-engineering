@@ -1,0 +1,122 @@
+[
+  {
+    "@timestamp": "2026-04-11T09:14:22.341Z",
+    "event": {
+      "category": "process",
+      "type": "start",
+      "action": "Process Create (rule: ProcessCreate)",
+      "code": "1"
+    },
+    "process": {
+      "pid": 7832,
+      "name": "net.exe",
+      "executable": "C:\\Windows\\System32\\net.exe",
+      "command_line": "net.exe view /domain:CORP",
+      "parent": {
+        "pid": 4416,
+        "name": "update_helper.exe",
+        "executable": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"
+      }
+    },
+    "user": {
+      "name": "mjones",
+      "domain": "CORP"
+    },
+    "host": {
+      "name": "SRV-DC-01",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "attack",
+      "technique": "T1018",
+      "sequence_order": 1,
+      "sequence_total": 3,
+      "description": "Fawkes net-enum: update_helper.exe spawns net.exe to enumerate domain-joined hosts via net view /domain"
+    }
+  },
+  {
+    "@timestamp": "2026-04-11T09:14:24.118Z",
+    "event": {
+      "category": "process",
+      "type": "start",
+      "action": "Process Create (rule: ProcessCreate)",
+      "code": "1"
+    },
+    "process": {
+      "pid": 7904,
+      "name": "nltest.exe",
+      "executable": "C:\\Windows\\System32\\nltest.exe",
+      "command_line": "nltest.exe /dclist:CORP",
+      "parent": {
+        "pid": 4416,
+        "name": "update_helper.exe",
+        "executable": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"
+      }
+    },
+    "user": {
+      "name": "mjones",
+      "domain": "CORP"
+    },
+    "host": {
+      "name": "SRV-DC-01",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "attack",
+      "technique": "T1018",
+      "sequence_order": 2,
+      "sequence_total": 3,
+      "description": "Fawkes net-enum: update_helper.exe spawns nltest.exe to enumerate domain controllers in CORP domain"
+    }
+  },
+  {
+    "@timestamp": "2026-04-11T09:14:26.755Z",
+    "event": {
+      "category": "process",
+      "type": "start",
+      "action": "Process Create (rule: ProcessCreate)",
+      "code": "1"
+    },
+    "process": {
+      "pid": 7961,
+      "name": "net.exe",
+      "executable": "C:\\Windows\\System32\\net.exe",
+      "command_line": "net.exe group \"Domain Computers\" /domain",
+      "parent": {
+        "pid": 4416,
+        "name": "update_helper.exe",
+        "executable": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"
+      }
+    },
+    "user": {
+      "name": "mjones",
+      "domain": "CORP"
+    },
+    "host": {
+      "name": "SRV-DC-01",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "attack",
+      "technique": "T1018",
+      "sequence_order": 3,
+      "sequence_total": 3,
+      "description": "Fawkes net-enum: update_helper.exe queries Domain Computers group to build full host inventory for lateral movement targeting"
+    }
+  }
+]

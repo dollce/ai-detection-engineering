@@ -1,0 +1,127 @@
+[
+  {
+    "@timestamp": "2026-04-11T09:14:22.311Z",
+    "event": {
+      "category": "process",
+      "type": "start",
+      "action": "Process Create (rule: ProcessCreate)",
+      "code": "1"
+    },
+    "process": {
+      "pid": 7832,
+      "name": "sync_agent.exe",
+      "executable": "C:\\ProgramData\\WindowsUpdate\\sync_agent.exe",
+      "command_line": "sync_agent.exe --collect \\\\CORP-FS01\\Finance$\\Reports --out C:\\ProgramData\\WindowsUpdate\\staging\\",
+      "parent": {
+        "pid": 1204,
+        "name": "svchost.exe",
+        "executable": "C:\\Windows\\System32\\svchost.exe"
+      }
+    },
+    "user": {
+      "name": "clee",
+      "domain": "CORP"
+    },
+    "host": {
+      "name": "WS-FINANCE-02",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "attack",
+      "technique": "T1039",
+      "sequence_order": 1,
+      "sequence_total": 3,
+      "description": "Malicious sync_agent.exe launched with UNC path argument targeting Finance share \u2014 unusual executable path under ProgramData\\WindowsUpdate"
+    }
+  },
+  {
+    "@timestamp": "2026-04-11T09:14:23.847Z",
+    "event": {
+      "category": "network",
+      "type": "connection",
+      "action": "Network connection detected (rule: NetworkConnect)",
+      "code": "3"
+    },
+    "process": {
+      "pid": 7832,
+      "name": "sync_agent.exe",
+      "executable": "C:\\ProgramData\\WindowsUpdate\\sync_agent.exe"
+    },
+    "destination": {
+      "ip": "10.10.1.45",
+      "port": 445
+    },
+    "source": {
+      "ip": "10.10.2.88",
+      "port": 49731
+    },
+    "network": {
+      "direction": "egress",
+      "transport": "tcp"
+    },
+    "user": {
+      "name": "clee",
+      "domain": "CORP"
+    },
+    "host": {
+      "name": "WS-FINANCE-02",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "attack",
+      "technique": "T1039",
+      "sequence_order": 2,
+      "sequence_total": 3,
+      "description": "sync_agent.exe opens SMB connection (port 445) to internal file server CORP-FS01 to enumerate and exfiltrate Finance share contents"
+    }
+  },
+  {
+    "@timestamp": "2026-04-11T09:14:31.502Z",
+    "event": {
+      "category": "file",
+      "type": "creation",
+      "action": "File created (rule: FileCreate)",
+      "code": "11"
+    },
+    "process": {
+      "pid": 7832,
+      "name": "sync_agent.exe",
+      "executable": "C:\\ProgramData\\WindowsUpdate\\sync_agent.exe"
+    },
+    "file": {
+      "name": "Q1_2026_Revenue_Projections.xlsx",
+      "path": "C:\\ProgramData\\WindowsUpdate\\staging\\Q1_2026_Revenue_Projections.xlsx",
+      "extension": "xlsx"
+    },
+    "user": {
+      "name": "clee",
+      "domain": "CORP"
+    },
+    "host": {
+      "name": "WS-FINANCE-02",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "attack",
+      "technique": "T1039",
+      "sequence_order": 3,
+      "sequence_total": 3,
+      "description": "Sensitive Finance share file staged locally under ProgramData\\WindowsUpdate\\staging by sync_agent.exe \u2014 consistent with collection prior to exfiltration"
+    }
+  }
+]

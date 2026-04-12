@@ -1,0 +1,54 @@
+title: Suspicious Service-Named Binary Executing from User-Writable Path
+id: f1b516d4-9636-45d7-9358-8297575a9e6e
+status: experimental
+description: >
+  Detects binaries with service-like naming conventions (svc*, *service*, *updater*, *helper*)
+  executing from user-writable directories such as AppData or Temp. The Fawkes C2 agent
+  masquerades as a Windows service updater by naming the implant svc_updater.exe and launching
+  it from AppData\Local\Temp via a user session (explorer.exe parent). Legitimate Windows
+  service update binaries (wuauclt.exe, MicrosoftEdgeUpdate.exe) execute from signed vendor
+  paths under System32 or Program Files, always via services.exe or svchost.exe, never from
+  user Temp directories via interactive parents.
+author: Detection Engineering Agent
+date: 2026-04-12
+modified: 2026-04-12
+references:
+  - https://attack.mitre.org/techniques/T1036/005/
+  - https://github.com/galoryber/fawkes
+tags:
+  - attack.defense_evasion
+  - attack.t1036.005
+  - detection.fawkes
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_suspicious_path:
+    process.executable|contains:
+      - '\AppData\Local\Temp\'
+      - '\AppData\Roaming\'
+      - '\Users\Public\'
+  selection_service_name:
+    process.name|contains:
+      - 'svc'
+      - 'service'
+      - 'update'
+      - 'helper'
+  filter_known_updaters:
+    process.name:
+      - 'MicrosoftEdgeUpdate.exe'
+      - 'MicrosoftEdgeUpdateSetup.exe'
+      - 'wuauclt.exe'
+      - 'SgrmBroker.exe'
+  condition: selection_suspicious_path and selection_service_name and not filter_known_updaters
+falsepositives:
+  - Third-party installers that extract service-named helpers to Temp during setup (short-lived; tune with parent process or duration context)
+  - Portable software packages that bundle service-like components in AppData
+level: high
+fields:
+  - process.name
+  - process.executable
+  - process.command_line
+  - process.parent.name
+  - process.parent.executable
+  - user.name

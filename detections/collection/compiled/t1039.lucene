@@ -1,0 +1,1 @@
+(process.executable:(*\\ProgramData\\* OR *\\AppData\\Local\\* OR *\\AppData\\Roaming\\* OR *\\Users\\Public\\*)) AND (process.command_line:(*\-\-collect* OR *\-\-out* OR *\-\-sync* OR *\-\-copy*)) AND (NOT (process.executable:(*\\ProgramData\\Microsoft\\* OR *\\ProgramData\\Windows\\*)))
