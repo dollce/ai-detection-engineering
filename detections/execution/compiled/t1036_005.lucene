@@ -1,0 +1,1 @@
+(event.code:1 AND process.executable:*svc_updater.exe* AND process.name:svc_updater.exe AND process.parent.name:explorer.exe AND user.name:bwilson AND user.domain:CORP) AND (NOT (process.name:(MicrosoftEdgeUpdate.exe OR wuauclt.exe)))

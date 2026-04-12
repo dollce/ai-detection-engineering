@@ -1,0 +1,43 @@
+title: 'Masquerading: Match Legitimate Name or Location [T1036.005]'
+id: 050d062a-9efc-41e7-89ed-e7702b573273
+status: experimental
+description: "Detects masquerading: match legitimate name or location. Detection focus: process.executable path anomaly \u2014\
+  \ a service-named binary (svc*.exe, *updater.exe) executing from C:\\Users\\*\\AppData\\Local\\Temp\\ instead of System32\
+  \ or Program Files. Key discriminators: (1) process.executable contains \\AppData\\Local\\Temp\\ for a service-like binary\
+  \ name, (2) process.parent.name is explorer.exe rather than services.exe or svchost.exe, (3) user.name is an interactive\
+  \ domain user rather than SYSTEM or NT AUTHORITY. Benign update binaries run from Program Files or System32, are spawned\
+  \ by services.exe or svchost.exe, and run under SYSTEM. Sigma wildcard: process.executable matches *\\AppData\\Local\\Temp\\\
+  * AND (process.name matches svc*.exe OR *updater*.exe OR *service*.exe) AND NOT process.parent.name in (services.exe, svchost.exe)."
+author: author-agent
+date: '2026-04-12'
+modified: '2026-04-12'
+references:
+- https://attack.mitre.org/techniques/T1036/005/
+tags:
+- attack.execution
+- attack.t1036.005
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection:
+    event.code: '1'
+    process.executable|contains: svc_updater.exe
+    process.name: svc_updater.exe
+    process.parent.name: explorer.exe
+    user.name: bwilson
+    user.domain: CORP
+  condition: selection and not filter_legitimate
+  filter_legitimate:
+    process.name:
+    - MicrosoftEdgeUpdate.exe
+    - wuauclt.exe
+falsepositives:
+- "Detection focus: process.executable path anomaly \u2014 a service-named binary (svc*.exe, *updater.exe) executing from\
+  \ C:\\Users\\*\\AppData\\Local\\Temp\\ instead of System32 or Program Files. Key discriminators: (1) process.executable\
+  \ contains \\AppData\\Local\\Temp\\ for a service-like binary name, (2) process.parent.name is explorer.exe rather than\
+  \ services.exe or svchost.exe, (3) user.name is an interactive domain user rather than SYSTEM or NT AUTHORITY. Benign update\
+  \ binaries run from Program Files or System32, are spawned by services.exe or svchost.exe, and run under SYSTEM. Sigma wildcard:\
+  \ process.executable matches *\\AppData\\Local\\Temp\\* AND (process.name matches svc*.exe OR *updater*.exe OR *service*.exe)\
+  \ AND NOT process.parent.name in (services.exe, svchost.exe)."
+level: high
