@@ -1,0 +1,1 @@
+(event.code="10" winlog.event_data.GrantedAccess IN ("0x1F0FFF", "0x1F3FFF", "0x001F0FFF", "0x143A", "0x40", "0x1410")) OR event.code="8" NOT (process.executable IN ("*\\MsMpEng.exe", "*\\csrss.exe", "*\\svchost.exe", "*\\lsass.exe", "*\\WerFault.exe", "*\\SearchIndexer.exe", "*\\WUDFHost.exe"))
