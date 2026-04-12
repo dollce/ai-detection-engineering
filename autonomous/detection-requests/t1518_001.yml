@@ -1,13 +1,13 @@
 technique_id: T1518.001
 title: "Detection for T1518.001 \xE2\u20AC\u201D Detect installed AV/EDR products"
-status: VALIDATED
+status: DEPLOYED
 priority: high
 requested_by: intel
 requested_date: '2026-03-21T13:04:56Z'
 intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
 scenario_file: simulator/scenarios/t1518_001.json
 sigma_rule: detections/discovery/t1518_001.yml
-deployed_date: ''
+deployed_date: '2026-04-12T21:24:51Z'
 last_quality_review: ''
 quality_score: 1.0
 fp_rate: 0.0
@@ -44,9 +44,27 @@ changelog:
   agent: validation
   action: update
   details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:24:51Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:24:51Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:24:51Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:24:51Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
 threat_actors:
 - Fawkes C2 Agent
 fawkes_commands:
 - av-detect
 compiled_lucene: detections/discovery/compiled/t1518_001.lucene
 compiled_spl: detections/discovery/compiled/t1518_001.spl
+elastic_rule_id: a922db82-acc5-41ea-962f-28834f2e99d5
+splunk_saved_search: "Detection for T1518.001 \xE2\u20AC\u201D Detect installed AV/EDR products T1518.001"

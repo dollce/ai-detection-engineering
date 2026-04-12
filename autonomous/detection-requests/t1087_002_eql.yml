@@ -1,6 +1,6 @@
 technique_id: T1087.002_EQL
 title: Rapid Reconnaissance Command Burst (EQL)
-status: VALIDATED
+status: DEPLOYED
 priority: high
 mitre_tactic: discovery
 rule_type: eql
@@ -14,9 +14,9 @@ compiled_spl: detections/discovery/compiled/t1087_002_discovery_burst_eql.spl
 compiled_artifact: detections/discovery/compiled/t1087_002_discovery_burst_eql_elastic.json
 secondary_techniques:
 - T1082
-deployed_date: ''
-elastic_rule_id: ''
-splunk_saved_search: ''
+deployed_date: '2026-04-12T21:26:05Z'
+elastic_rule_id: 8a3c1f2e-4b5d-6e7f-8a9b-0c1d2e3f4a5b
+splunk_saved_search: Rapid Reconnaissance Command Burst (EQL) T1087.002_EQL
 last_quality_review: ''
 quality_score: 1.0
 fp_rate: 0.0
@@ -52,3 +52,19 @@ changelog:
   agent: validation
   action: update
   details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:26:05Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:26:05Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:26:05Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:26:05Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'

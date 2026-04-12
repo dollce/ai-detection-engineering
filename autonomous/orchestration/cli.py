@@ -168,29 +168,51 @@ def cmd_deploy(args):
 
     for request in eligible:
         tid = request["technique_id"]
+        rule_type = request.get("rule_type", "sigma")
         sigma_path = request.get("sigma_rule", "")
         lucene_path = request.get("compiled_lucene", "")
         spl_path = request.get("compiled_spl", "")
+        artifact_path = request.get("compiled_artifact", "")
 
-        if not sigma_path or not lucene_path:
-            print(f"  Skipping {tid} — missing artifacts")
-            continue
+        # EQL and threshold rules deploy via compiled_artifact, not compiled_lucene
+        is_prebuilt = rule_type in ("eql", "threshold")
+
+        if is_prebuilt:
+            if not sigma_path or not artifact_path:
+                print(f"  Skipping {tid} — missing artifacts")
+                continue
+        else:
+            if not sigma_path or not lucene_path:
+                print(f"  Skipping {tid} — missing artifacts")
+                continue
 
         sigma_full = repo_root / sigma_path
-        lucene_full = repo_root / lucene_path
+        lucene_full = repo_root / lucene_path if lucene_path else None
         spl_full = repo_root / spl_path if spl_path else None
+        artifact_full = repo_root / artifact_path if artifact_path else None
 
-        if not sigma_full.exists() or not lucene_full.exists():
-            print(f"  Skipping {tid} — files not found")
+        if not sigma_full.exists():
+            print(f"  Skipping {tid} — sigma file not found")
+            continue
+        if not is_prebuilt and (lucene_full is None or not lucene_full.exists()):
+            print(f"  Skipping {tid} — lucene file not found")
+            continue
+        if is_prebuilt and (artifact_full is None or not artifact_full.exists()):
+            print(f"  Skipping {tid} — elastic artifact not found")
             continue
 
         with open(sigma_full, encoding="utf-8") as f:
             sigma_data = yaml.safe_load(f)
-        lucene = lucene_full.read_text(encoding="utf-8").strip()
+        lucene = lucene_full.read_text(encoding="utf-8").strip() if lucene_full and lucene_full.exists() else ""
         spl = spl_full.read_text(encoding="utf-8").strip() if spl_full and spl_full.exists() else ""
+        elastic_payload = None
+        if is_prebuilt and artifact_full and artifact_full.exists():
+            with open(artifact_full, encoding="utf-8") as f:
+                elastic_payload = json.load(f)
 
         print(f"\n  Deploying {tid} — {request.get('title', '')}")
-        deploy_results = deploy_to_siems(request, lucene, spl, sigma_data)
+        deploy_results = deploy_to_siems(request, lucene, spl, sigma_data,
+                                         elastic_payload=elastic_payload)
 
         if deploy_results:
             deploy_details = []
