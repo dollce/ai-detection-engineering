@@ -1,0 +1,1 @@
+(event.code:1 AND (process.name:(whoami.exe OR net.exe OR net1.exe OR ipconfig.exe OR systeminfo.exe OR tasklist.exe OR nltest.exe OR netstat.exe OR arp.exe OR nslookup.exe))) AND (NOT ((process.parent.name:(cmd.exe OR powershell.exe OR pwsh.exe OR explorer.exe)) AND (process.parent.executable:(*\\Windows\\System32\\* OR *\\Windows\\SysWOW64\\* OR *\\Windows\\explorer.exe*))))
