@@ -1,0 +1,1 @@
+event.code="7036" winlog.event_data.param2.keyword="stopped" NOT (winlog.event_data.param1.keyword IN ("Windows Update", "Background Intelligent Transfer Service", "Windows Defender Advanced Threat Protection Service"))

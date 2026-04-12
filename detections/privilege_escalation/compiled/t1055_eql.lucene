@@ -1,0 +1,1 @@
+(((event.code:10 AND (winlog.event_data.GrantedAccess:(0x1F0FFF OR 0x1F3FFF OR 0x001F0FFF OR 0x143A OR 0x40 OR 0x1410))) OR event.code:8) AND (NOT (process.executable:(*\\MsMpEng.exe OR *\\csrss.exe OR *\\svchost.exe OR *\\lsass.exe OR *\\WerFault.exe OR *\\SearchIndexer.exe OR *\\WUDFHost.exe))))

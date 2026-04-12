@@ -12,7 +12,7 @@ references:
   - https://attack.mitre.org/techniques/T1486/
 author: blue-team-agent
 date: 2026/03/15
-modified: 2026/03/15
+modified: 2026/04/12
 tags:
   - attack.impact
   - attack.t1489
@@ -23,9 +23,9 @@ detection_type: threshold
 detection:
   selection:
     event.code: "7036"
-    winlog.event_data.param2: "stopped"
+    winlog.event_data.param2.keyword: "stopped"
   filter_normal:
-    winlog.event_data.param1:
+    winlog.event_data.param1.keyword:
       - Windows Update
       - Background Intelligent Transfer Service
       - Windows Defender Advanced Threat Protection Service
@@ -34,7 +34,7 @@ threshold:
   field: host.name
   value: 3
   window: "5m"
-  cardinality_field: winlog.event_data.param1
+  cardinality_field: winlog.event_data.param1.keyword
   cardinality_value: 3
 spl_query: |
   index=wineventlog EventCode=7036 param2=stopped
