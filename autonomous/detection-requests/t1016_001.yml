@@ -1,20 +1,20 @@
 technique_id: T1016.001
 title: "Detection for T1016.001 \u2014 ARP table (host discovery)"
-status: VALIDATED
+status: DEPLOYED
 priority: high
 requested_by: intel
 requested_date: '2026-03-21T13:04:56Z'
 intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
 scenario_file: simulator\scenarios\t1016_001.json
 sigma_rule: detections\execution\t1016_001.yml
-deployed_date: ''
+deployed_date: '2026-04-12T21:34:18Z'
 last_quality_review: ''
 quality_score: 0.8
 fp_rate: 0.0
 tp_rate: 0.667
 alert_volume_24h: 0
 cost_estimate: low
-auto_deploy_eligible: false
+auto_deploy_eligible: true
 changelog:
 - date: '2026-03-21T13:04:56Z'
   agent: intel
@@ -48,6 +48,26 @@ changelog:
   agent: validation
   action: transition:AUTHORED->VALIDATED
   details: F1=0.8, FP_rate=0.0, tier=human_review
+- date: '2026-04-12T21:34:09Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:34:18Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:34:18Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:34:18Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:34:18Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
 threat_actors:
 - Fawkes C2 Agent
 fawkes_commands:
@@ -55,3 +75,5 @@ fawkes_commands:
 compiled_lucene: detections\execution\compiled\t1016_001.lucene
 compiled_spl: detections\execution\compiled\t1016_001.spl
 mitre_tactic: execution
+elastic_rule_id: ae5af605-4935-4278-ab80-53bf1fe5dd02
+splunk_saved_search: "Detection for T1016.001 \u2014 ARP table (host discovery) T1016.001"

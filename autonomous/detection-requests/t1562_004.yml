@@ -1,20 +1,20 @@
 technique_id: T1562.004
 title: 'Impair Defenses: Disable or Modify System Firewall'
-status: VALIDATED
+status: DEPLOYED
 priority: medium
 requested_by: intel
 requested_date: '2026-03-08T14:12:14Z'
 intel_report: threat-intel\reports\2026-03-08-apache-activemq-exploit-leads-to-lockbit-ransomwar.yml
 scenario_file: simulator\scenarios\t1562_004.json
 sigma_rule: detections\defense_evasion\t1562_004.yml
-deployed_date: ''
+deployed_date: '2026-04-12T21:34:38Z'
 last_quality_review: ''
 quality_score: 0.857
 fp_rate: 0.5
 tp_rate: 1.0
 alert_volume_24h: 0
 cost_estimate: low
-auto_deploy_eligible: false
+auto_deploy_eligible: true
 changelog:
 - date: '2026-03-08T14:12:14Z'
   agent: intel
@@ -44,6 +44,28 @@ changelog:
   agent: blue-team
   action: transition:AUTHORED->VALIDATED
   details: F1=0.857, FP_rate=0.5, tier=human_review
+- date: '2026-04-12T21:34:10Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:34:38Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:34:38Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:34:38Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:34:38Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
 compiled_lucene: detections\defense_evasion\compiled\t1562_004.lucene
 compiled_spl: detections\defense_evasion\compiled\t1562_004.spl
 mitre_tactic: defense_evasion
+elastic_rule_id: ad4a538c-faf3-4cd3-9f75-f39b4cf9b7ad
+splunk_saved_search: 'Impair Defenses: Disable or Modify System Firewall T1562.004'

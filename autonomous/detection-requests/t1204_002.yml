@@ -1,20 +1,20 @@
 technique_id: T1204.002
 title: 'User Execution: Malicious File'
-status: VALIDATED
+status: DEPLOYED
 priority: high
 requested_by: intel
 requested_date: '2026-03-08T14:12:14Z'
 intel_report: threat-intel\reports\2026-03-08-from-bing-search-to-ransomware-bumblebee-and-adapt.yml
 scenario_file: simulator\scenarios\t1204_002.json
 sigma_rule: detections\execution\t1204_002.yml
-deployed_date: ''
+deployed_date: '2026-04-12T21:34:34Z'
 last_quality_review: ''
 quality_score: 0.75
 fp_rate: 1.0
 tp_rate: 1.0
 alert_volume_24h: 0
 cost_estimate: low
-auto_deploy_eligible: false
+auto_deploy_eligible: true
 changelog:
 - date: '2026-03-08T14:12:14Z'
   agent: intel
@@ -44,6 +44,28 @@ changelog:
   agent: blue-team
   action: transition:AUTHORED->VALIDATED
   details: F1=0.75, FP_rate=1.0, tier=human_review
+- date: '2026-04-12T21:34:10Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:34:34Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:34:34Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:34:34Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:34:34Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
 compiled_lucene: detections\execution\compiled\t1204_002.lucene
 compiled_spl: detections\execution\compiled\t1204_002.spl
 mitre_tactic: execution
+elastic_rule_id: 8be8d5cd-5de4-4322-9979-8591a6b58e3a
+splunk_saved_search: 'User Execution: Malicious File T1204.002'
