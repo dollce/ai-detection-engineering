@@ -1,0 +1,128 @@
+{
+  "technique_id": "T1562.006",
+  "technique_name": "Indicator Blocking via Sysmon/ETW Registry Tampering",
+  "description": "Registry writes to SysmonDrv Parameters (blinding Sysmon) or ETW EventLog-Security autologger disable from non-system process",
+  "mitre_tactic": "defense_evasion",
+  "events": {
+    "attack_sequence": [
+      {
+        "@timestamp": "2026-04-12T10:00:00.000Z",
+        "event": {
+          "category": "registry",
+          "type": "change",
+          "code": "13",
+          "action": "Registry value set (rule: RegistryValueSet)"
+        },
+        "process": {
+          "pid": 4416,
+          "name": "update_helper.exe",
+          "executable": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"
+        },
+        "registry": {
+          "path": "HKLM\\SYSTEM\\CurrentControlSet\\Services\\SysmonDrv\\Parameters\\ProcessExclude",
+          "value": "update_helper.exe"
+        },
+        "user": {"name": "mjones", "domain": "CORP"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1562.006",
+          "sequence_order": 1,
+          "sequence_total": 2,
+          "description": "Fawkes autopatch variant: implant adds itself to Sysmon ProcessExclude to blind process telemetry for its own PID"
+        }
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:05.000Z",
+        "event": {
+          "category": "registry",
+          "type": "change",
+          "code": "13",
+          "action": "Registry value set (rule: RegistryValueSet)"
+        },
+        "process": {
+          "pid": 4416,
+          "name": "update_helper.exe",
+          "executable": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"
+        },
+        "registry": {
+          "path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\WMI\\Autologger\\EventLog-Security\\Enable",
+          "value": "0"
+        },
+        "user": {"name": "mjones", "domain": "CORP"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1562.006",
+          "sequence_order": 2,
+          "sequence_total": 2,
+          "description": "Fawkes ETW suppression: implant disables EventLog-Security autologger to stop Security channel event collection at kernel level"
+        }
+      }
+    ],
+    "benign_similar": [
+      {
+        "@timestamp": "2026-04-12T09:00:00.000Z",
+        "event": {
+          "category": "registry",
+          "type": "change",
+          "code": "13",
+          "action": "Registry value set (rule: RegistryValueSet)"
+        },
+        "process": {
+          "pid": 620,
+          "name": "services.exe",
+          "executable": "C:\\Windows\\System32\\services.exe"
+        },
+        "registry": {
+          "path": "HKLM\\SYSTEM\\CurrentControlSet\\Services\\SysmonDrv\\Parameters\\HashAlgorithm",
+          "value": "SHA256"
+        },
+        "user": {"name": "SYSTEM", "domain": "NT AUTHORITY"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1562.006",
+          "description": "services.exe writing to SysmonDrv Parameters during legitimate Sysmon configuration update -- filtered by filter_system_services (services.exe from System32)"
+        }
+      },
+      {
+        "@timestamp": "2026-04-12T09:30:00.000Z",
+        "event": {
+          "category": "registry",
+          "type": "change",
+          "code": "13",
+          "action": "Registry value set (rule: RegistryValueSet)"
+        },
+        "process": {
+          "pid": 620,
+          "name": "services.exe",
+          "executable": "C:\\Windows\\System32\\services.exe"
+        },
+        "registry": {
+          "path": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\WMI\\Autologger\\EventLog-Security\\BufferSize",
+          "value": "64"
+        },
+        "user": {"name": "SYSTEM", "domain": "NT AUTHORITY"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1562.006",
+          "description": "services.exe adjusting ETW autologger buffer size via GPO -- touches Autologger path but not Enable=0, and process is filtered services.exe"
+        }
+      }
+    ]
+  },
+  "expected_detection": {
+    "should_alert_on": "attack_sequence",
+    "should_not_alert_on": "benign_similar",
+    "key_fields": ["registry.path", "registry.value", "process.executable"],
+    "notes": "Rule targets EID 13 writes to SysmonDrv\\Parameters OR Autologger\\EventLog-Security with value=0, from non-services.exe processes. Attack: update_helper.exe from ProgramData (not filtered). Benign: services.exe from System32 (filtered by filter_system_services)."
+  },
+  "log_sources_used": ["sysmon_13"],
+  "platforms": ["windows"]
+}
