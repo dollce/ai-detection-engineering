@@ -1,6 +1,6 @@
 # Detection Pipeline Status
 
-> Auto-generated from state machine on 2026-04-04 14:18 UTC
+> Auto-generated from state machine on 2026-04-12 21:37 UTC
 > Run `cd autonomous && python3 orchestration/cli.py export-status` to regenerate
 
 ## Summary
@@ -12,9 +12,9 @@
 | EQL | 3 |
 | Threshold | 4 |
 | MONITORING | 20 |
-| DEPLOYED | 7 |
-| VALIDATED | 11 |
-| AUTHORED | 18 |
+| DEPLOYED | 39 |
+| VALIDATED | 0 |
+| AUTHORED | 0 |
 | Needs rework | 0 |
 
 ## By State
@@ -42,60 +42,54 @@
 - T1562.006: Impair Defenses: Indicator Blocking (F1=1.0)
 - T1566.004: Spearphishing Voice (Vishing) (F1=1.0)
 
-### DEPLOYED (7)
+### DEPLOYED (39)
 
+- T1003.001: OS Credential Dumping: LSASS Memory (F1=0.8)
+- T1016.001: Detection for T1016.001 — ARP table (host discovery) (F1=0.8)
+- T1018: Remote System Discovery (F1=1.0)
+- T1021.001: Remote Services: Remote Desktop Protocol (F1=0.857)
+- T1033: Detection for T1033 — Current user and privileges (F1=0.857)
+- T1036.005: Masquerading: Match Legitimate Name or Location (F1=1.0)
+- T1039: Data from Network Shared Drive (F1=1.0)
 - T1047: Detection for T1047 â€” Remote/local WMI execution (F1=1.0)
 - T1049: Detection for T1049 â€” Active network connections (netstat) (F1=1.0)
 - T1053.003: Detection for T1053.003 â€” Add crontab entry (Linux) (F1=1.0)
 - T1055.001: Process Injection via CreateRemoteThread (F1=1.0)
+- T1055.004: APC Injection - Suspicious QueueUserAPC Pattern (F1=1.0)
 - T1055.012: Detection for T1055.012 â€” DLL function pointer overwrite (no new thread) (F1=1.0)
 - T1055.013: Detection for T1055.013 â€” Ctrl-C handler chain / KernelCallbackTable hijack (F1=1.0)
-- T1569.002: System Services: Service Execution (F1=1.0)
-
-### VALIDATED (11)
-
-- T1003.001: OS Credential Dumping: LSASS Memory (F1=0.8)
-- T1016.001: Detection for T1016.001 — ARP table (host discovery) (F1=0.8)
-- T1021.001: Remote Services: Remote Desktop Protocol (F1=0.857)
-- T1033: Detection for T1033 — Current user and privileges (F1=0.857)
+- T1055.015: Detection for T1055.015 â€” 8 variants abusing Windows thread pool internals (F1=1.0)
+- T1055_EQL: Process Injection Sequence - Handle Open Then Remote Thread Creation (EQL) (F1=1.0)
+- T1056.001: Detection for T1056.001 â€” Low-level keyboard hook via SetWindowsHookEx (F1=0.8)
+- T1057: Detection for T1057 â€” List running processes (tasklist) (F1=1.0)
+- T1059.001_T1547.001_EQL: PowerShell Execution Followed by Registry Persistence (EQL) (F1=1.0)
 - T1059.003: Command and Scripting Interpreter: Windows Command Shell (F1=0.75)
+- T1068: Exploitation for Privilege Escalation (F1=1.0)
+- T1070.006: Detection for T1070.006 â€” Modify file timestamps to hide activity (F1=1.0)
 - T1082: System Information Discovery (F1=0.75)
+- T1087.001: Detection for T1087.001 â€” Enumerate local/domain users and groups (F1=1.0)
+- T1087.002_EQL: Rapid Reconnaissance Command Burst (EQL) (F1=1.0)
+- T1087.002_THRESHOLD: Discovery Command Burst - Recon Tool Threshold (F1=1.0)
+- T1110.001: Brute Force Login - Failed Logon Threshold (F1=1.0)
 - T1133: External Remote Services (F1=0.857)
+- T1134.003: Detection for T1134.003 â€” Create new token with provided credentials (LogonUser) (F1=1.0)
+- T1135: Detection for T1135 â€” Enumerate network shares (F1=1.0)
 - T1190: Exploit Public-Facing Application (F1=0.75)
 - T1204.002: User Execution: Malicious File (F1=0.75)
+- T1486_THRESHOLD: Rapid File Modification Burst - Ransomware Indicator (Threshold) (F1=1.0)
+- T1489: Mass Service Stop - Pre-Ransomware Indicator (F1=1.0)
+- T1518.001: Detection for T1518.001 â€” Detect installed AV/EDR products (F1=1.0)
 - T1543.003: Create or Modify System Process: Windows Service (F1=0.857)
 - T1562.004: Impair Defenses: Disable or Modify System Firewall (F1=0.857)
+- T1562.006_REGISTRY: Indicator Blocking via Sysmon/ETW Registry Tampering (F1=1.0)
+- T1569.002: System Services: Service Execution (F1=1.0)
 
-### AUTHORED (18)
-
-- T1055.004: APC Injection - Suspicious QueueUserAPC Pattern
-- T1055.015: Detection for T1055.015 â€” 8 variants abusing Windows thread pool internals
-- T1055_EQL: Process Injection Sequence - Handle Open Then Remote Thread Creation (EQL)
-- T1056.001: Detection for T1056.001 â€” Low-level keyboard hook via SetWindowsHookEx
-- T1057: Detection for T1057 â€” List running processes (tasklist)
-- T1059.001_T1547.001_EQL: PowerShell Execution Followed by Registry Persistence (EQL)
-- T1068: Exploitation for Privilege Escalation
-- T1070.006: Detection for T1070.006 â€” Modify file timestamps to hide activity
-- T1087.001: Detection for T1087.001 â€” Enumerate local/domain users and groups
-- T1087.002_EQL: Rapid Reconnaissance Command Burst (EQL)
-- T1087.002_THRESHOLD: Discovery Command Burst - Recon Tool Threshold
-- T1110.001: Brute Force Login - Failed Logon Threshold
-- T1134.003: Detection for T1134.003 â€” Create new token with provided credentials (LogonUser)
-- T1135: Detection for T1135 â€” Enumerate network shares
-- T1486_THRESHOLD: Rapid File Modification Burst - Ransomware Indicator (Threshold)
-- T1489: Mass Service Stop - Pre-Ransomware Indicator
-- T1518.001: Detection for T1518.001 â€” Detect installed AV/EDR products
-- T1562.006: Impair Defenses: Indicator Blocking (F1=1.0)
-
-### REQUESTED (39)
+### REQUESTED (36)
 
 - T1003.003: OS Credential Dumping: NTDS
 - T1003.006: OS Credential Dumping: DCSync
-- T1018: Remote System Discovery
 - T1021.002: Remote Services: SMB/Windows Admin Shares
 - T1036.003: Masquerading: Rename System Utilities
-- T1036.005: Masquerading: Match Legitimate Name or Location
-- T1039: Data from Network Shared Drive
 - T1048: Exfiltration Over Alternative Protocol
 - T1048.003: Exfiltration Over Unencrypted Non-C2 Protocol
 - T1069.002: Permission Groups Discovery: Domain Groups

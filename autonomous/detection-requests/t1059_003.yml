@@ -1,20 +1,20 @@
 technique_id: T1059.003
 title: 'Command and Scripting Interpreter: Windows Command Shell'
-status: VALIDATED
+status: DEPLOYED
 priority: critical
 requested_by: intel
 requested_date: '2026-03-08T14:12:14Z'
 intel_report: threat-intel\reports\2026-03-08-from-bing-search-to-ransomware-bumblebee-and-adapt.yml
 scenario_file: simulator\scenarios\t1059_003.json
 sigma_rule: detections\execution\t1059_003.yml
-deployed_date: ''
+deployed_date: '2026-04-12T21:34:26Z'
 last_quality_review: ''
 quality_score: 0.75
 fp_rate: 1.0
 tp_rate: 1.0
 alert_volume_24h: 0
 cost_estimate: low
-auto_deploy_eligible: false
+auto_deploy_eligible: true
 changelog:
 - date: '2026-03-08T14:12:14Z'
   agent: intel
@@ -48,6 +48,26 @@ changelog:
   agent: blue-team
   action: transition:AUTHORED->VALIDATED
   details: F1=0.75, FP_rate=1.0, tier=human_review
+- date: '2026-04-12T21:34:10Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:34:26Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:34:26Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:34:26Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:34:26Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
 fawkes_commands:
 - run
 - inline-execute
@@ -56,3 +76,5 @@ fawkes_commands:
 compiled_lucene: detections\execution\compiled\t1059_003.lucene
 compiled_spl: detections\execution\compiled\t1059_003.spl
 mitre_tactic: execution
+elastic_rule_id: f287d510-5392-426a-a3d4-b466c7c01a7e
+splunk_saved_search: 'Command and Scripting Interpreter: Windows Command Shell T1059.003'

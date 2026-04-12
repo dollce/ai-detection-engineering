@@ -392,19 +392,20 @@ cd autonomous && python3 orchestration/cli.py status
 cd autonomous && python3 orchestration/cli.py deploy --validated
 ```
 
-### Current Detection State (2026-03-17)
+### Current Detection State (2026-04-12)
 
-- **37 rules** across 9 MITRE tactics: 30 Sigma + 3 EQL + 4 threshold (all compiled)
-- **11 MONITORING** (deployed to Elastic + Splunk, all healthy)
-- **12 VALIDATED** (F1 >= 0.75, deploy-ready)
-- **10 AUTHORED** (pending validation: 2 pre-Phase6 + 8 new from Phase 6)
-- **4 needs rework** (F1 < 0.75: T1003.001, T1021.001, T1105, T1059.003/T1082/T1190/T1204.002 are borderline)
-- **Threat actors**: 1 (Fawkes) — target: 4+ after Phase 4
-- **Fawkes coverage**: 14/21 core techniques (67%) — T1055.004 APC injection now covered
-- **Platforms**: Windows only — target: Win/Linux/Cloud/Network after Phase 5
+- **95 detection requests** tracked across 9 MITRE tactics
+- **59 rules LIVE** in both Elastic Security and Splunk: 39 DEPLOYED + 20 MONITORING
+- **0 VALIDATED** (pipeline fully deployed — no backlog)
+- **0 AUTHORED** (no pending validation work)
+- **36 REQUESTED** (backlog for future authoring cycles)
+- **Threat actors**: 1 (Fawkes) — target: 4+ after Phase 8
+- **Fawkes coverage**: ~20/21 core techniques (95%)
+- **Platforms**: Windows primary; Linux/macOS partial (T1053.003, T1021.006)
 - **Validation method**: ES-based (Phase 2) + Cribl streaming path (Phase 3); local JSON fallback for CI
-- **Phase 6 additions**: 9 content packs, 3 EQL rules, 4 threshold rules, 1 Sigma rule, 5 evasion tests,
-  continuous-validation CI (#7 workflow), EQL/threshold/evasion/perf Python modules, 2 new templates
+- **Rule types deployed**: 88 Sigma + 3 EQL + 4 threshold (all compiled, Lucene + SPL)
+- **State machine bug fixed** (2026-04-12): variant rules with shared technique_id must use
+  unique suffix (e.g. T1562.006_REGISTRY) to avoid StateManager._request_path() collision
 
 See `coverage/attack-matrix.md` for the full matrix and `STATUS.md` for deployed detection health.
 
@@ -418,7 +419,7 @@ See `coverage/attack-matrix.md` for the full matrix and `STATUS.md` for deployed
 | Phase 4 | COMPLETED (PR #62, 2026-03-15) | 10 specialized agents, threat model registry, coordinator, log source registry |
 | Phase 5 | COMPLETED (PR #63, 2026-03-15) | Multi-platform simulation, data quality engine, schema versioning, per-source Cribl pipelines |
 | Phase 6 | COMPLETED (PR #65, 2026-03-17) | Content packs, EQL/threshold rules, evasion testing, perf profiling |
-| Phase 7 | NOT STARTED | Operational excellence: feedback loops, regression testing, SLAs, dashboards |
+| Phase 7 | COMPLETED (PR #68, 2026-03-18) | Operational excellence: feedback loops, regression testing, SLAs, dashboards |
 | Phase 8 | NOT STARTED | Advanced capabilities: Agent SDK, live C2, behavioral analytics, marketplace |
 
 See `ROADMAP.md` for details and `plans/` for step-by-step instructions.

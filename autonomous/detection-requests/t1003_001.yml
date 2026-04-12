@@ -1,20 +1,20 @@
 technique_id: T1003.001
 title: 'OS Credential Dumping: LSASS Memory'
-status: VALIDATED
+status: DEPLOYED
 priority: critical
 requested_by: intel
 requested_date: '2026-03-08T14:12:14Z'
 intel_report: threat-intel\reports\2026-03-08-apache-activemq-exploit-leads-to-lockbit-ransomwar.yml
 scenario_file: simulator\scenarios\t1003_001.json
 sigma_rule: detections\credential_access\t1003_001.yml
-deployed_date: ''
+deployed_date: '2026-04-12T21:34:16Z'
 last_quality_review: ''
 quality_score: 0.8
 fp_rate: 0.0
 tp_rate: 0.667
 alert_volume_24h: 0
 cost_estimate: low
-auto_deploy_eligible: false
+auto_deploy_eligible: true
 changelog:
 - date: '2026-03-08T14:12:14Z'
   agent: intel
@@ -48,6 +48,28 @@ changelog:
   agent: validation
   action: transition:AUTHORED->VALIDATED
   details: F1=0.8, FP_rate=0.0, tier=human_review
+- date: '2026-04-12T21:34:09Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:34:16Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:34:16Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:34:16Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:34:16Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
 compiled_lucene: detections\credential_access\compiled\t1003_001.lucene
 compiled_spl: detections\credential_access\compiled\t1003_001.spl
 mitre_tactic: credential_access
+elastic_rule_id: 0c353e7b-d338-4371-b655-02a47b091c74
+splunk_saved_search: 'OS Credential Dumping: LSASS Memory T1003.001'

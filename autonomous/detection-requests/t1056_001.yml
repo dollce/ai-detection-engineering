@@ -1,20 +1,20 @@
 technique_id: T1056.001
 title: "Detection for T1056.001 \xE2\u20AC\u201D Low-level keyboard hook via SetWindowsHookEx"
-status: VALIDATED
+status: DEPLOYED
 priority: high
 requested_by: intel
 requested_date: '2026-03-21T13:04:56Z'
 intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
 scenario_file: simulator\scenarios\t1056_001.json
 sigma_rule: detections/collection/t1056_001.yml
-deployed_date: ''
+deployed_date: '2026-04-12T21:34:24Z'
 last_quality_review: ''
 quality_score: 0.8
 fp_rate: 0.0
 tp_rate: 0.667
 alert_volume_24h: 0
 cost_estimate: low
-auto_deploy_eligible: false
+auto_deploy_eligible: true
 changelog:
 - date: '2026-03-21T13:04:56Z'
   agent: intel
@@ -56,6 +56,26 @@ changelog:
   agent: validation
   action: transition:AUTHORED->VALIDATED
   details: F1=0.8, FP_rate=0.0, tier=human_review
+- date: '2026-04-12T21:34:09Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:34:24Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:34:24Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:34:24Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:34:24Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
 threat_actors:
 - Fawkes C2 Agent
 - Generic Remote Access Trojan
@@ -70,3 +90,5 @@ data_source_gaps:
 - GAP-008
 compiled_lucene: detections/collection/compiled/t1056_001.lucene
 compiled_spl: detections/collection/compiled/t1056_001.spl
+elastic_rule_id: 77750ecc-3e67-49ee-8173-575ef8e5519e
+splunk_saved_search: "Detection for T1056.001 \xE2\u20AC\u201D Low-level keyboard hook via SetWindowsHookEx T1056.001"

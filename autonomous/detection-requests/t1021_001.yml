@@ -1,20 +1,20 @@
 technique_id: T1021.001
 title: 'Remote Services: Remote Desktop Protocol'
-status: VALIDATED
+status: DEPLOYED
 priority: high
 requested_by: intel
 requested_date: '2026-03-08T14:12:14Z'
 intel_report: threat-intel\reports\2026-03-08-apache-activemq-exploit-leads-to-lockbit-ransomwar.yml
 scenario_file: simulator\scenarios\t1021_001.json
 sigma_rule: detections\execution\t1021_001.yml
-deployed_date: ''
+deployed_date: '2026-04-12T21:34:20Z'
 last_quality_review: ''
 quality_score: 0.857
 fp_rate: 0.5
 tp_rate: 1.0
 alert_volume_24h: 0
 cost_estimate: low
-auto_deploy_eligible: false
+auto_deploy_eligible: true
 changelog:
 - date: '2026-03-08T14:12:14Z'
   agent: intel
@@ -48,6 +48,28 @@ changelog:
   agent: validation
   action: transition:AUTHORED->VALIDATED
   details: F1=0.857, FP_rate=0.5, tier=human_review
+- date: '2026-04-12T21:34:09Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:34:20Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:34:20Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:34:20Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:34:20Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
 compiled_lucene: detections\execution\compiled\t1021_001.lucene
 compiled_spl: detections\execution\compiled\t1021_001.spl
 mitre_tactic: execution
+elastic_rule_id: 18c91ee2-c9da-4817-bce8-9b0a93898730
+splunk_saved_search: 'Remote Services: Remote Desktop Protocol T1021.001'
