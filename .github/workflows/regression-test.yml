@@ -54,7 +54,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const reportPath = 'tests/results/regression-report.md';
+            const reportPath = 'tests/results/regression/regression-report.md';
 
             let body;
             if (fs.existsSync(reportPath)) {

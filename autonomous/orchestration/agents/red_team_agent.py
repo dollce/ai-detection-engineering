@@ -815,10 +815,27 @@ def build_scenario(technique_id: str, request: dict) -> dict | None:
 
 
 def save_scenario(scenario: dict) -> Path:
-    """Write scenario JSON to simulator/scenarios/."""
-    SCENARIOS_DIR.mkdir(parents=True, exist_ok=True)
+    """Write scenario JSON to the platform-appropriate subdirectory.
+
+    Routing logic:
+      platforms == ['linux']          → simulator/scenarios/linux/
+      platforms == ['macos']          → simulator/scenarios/macos/
+      platforms includes 'cloud'      → simulator/scenarios/cloud/
+      anything else (Windows default) → simulator/scenarios/windows/
+    """
+    platforms = scenario.get("platforms", ["windows"])
+    if platforms == ["linux"] or platforms == ["linux", "macos"]:
+        subdir = SCENARIOS_DIR / "linux"
+    elif platforms == ["macos"]:
+        subdir = SCENARIOS_DIR / "macos"
+    elif any("cloud" in p for p in platforms):
+        subdir = SCENARIOS_DIR / "cloud"
+    else:
+        subdir = SCENARIOS_DIR / "windows"
+
+    subdir.mkdir(parents=True, exist_ok=True)
     tid = scenario["technique_id"].lower().replace(".", "_")
-    path = SCENARIOS_DIR / f"{tid}.json"
+    path = subdir / f"{tid}.json"
     with open(path, "w", encoding="utf-8") as f:
         json.dump(scenario, f, indent=2, ensure_ascii=False)
     return path

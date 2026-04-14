@@ -7,7 +7,7 @@ rule_type: sigma
 requested_by: intel_agent
 requested_date: '2026-03-15T00:00:00Z'
 intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
-scenario_file: simulator/scenarios/t1055_004.json
+scenario_file: simulator/scenarios/windows/t1055_004.json
 sigma_rule: detections/privilege_escalation/t1055_004_apc_injection.yml
 compiled_lucene: detections/privilege_escalation/compiled/t1055_004_apc_injection.lucene
 compiled_spl: detections/privilege_escalation/compiled/t1055_004_apc_injection.spl

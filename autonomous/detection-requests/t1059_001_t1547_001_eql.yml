@@ -7,7 +7,7 @@ rule_type: eql
 requested_by: blue-team
 requested_date: '2026-03-15T00:00:00Z'
 intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
-scenario_file: simulator/scenarios/t1059_001_t1547_001_eql.json
+scenario_file: simulator/scenarios/windows/t1059_001_t1547_001_eql.json
 sigma_rule: detections/execution/t1059_001_t1547_001_persistence_after_exec_eql.yml
 compiled_lucene: ''
 compiled_spl: detections/execution/compiled/t1059_001_t1547_001_persistence_after_exec_eql.spl
