@@ -8,12 +8,12 @@ Copy-paste these into Claude Code to kick off different workflows.
 
 The complete workflow — from raw logs through Cribl normalization to deployed, validated, tuned detections. This is the primary prompt for the lab.
 
-> **Note**: Phases 2-3 (Cribl pipeline) are optional — skip them if you're not running with `--cribl` or `--full`. Jump from Phase 1 straight to Phase 4.
+> **Note**: Steps 2-3 (Cribl pipeline) are optional — skip them if you're not running with `--cribl` or `--full`. Jump from Step 1 straight to Step 4.
 
 ```
 Read CLAUDE.md and templates/detection-authoring-rules.md, then run the full detection engineering lifecycle:
 
-=== PHASE 1: SETUP VERIFICATION ===
+=== STEP 1: SETUP VERIFICATION ===
 
 1. Check all services are healthy:
    - Elasticsearch: curl -u elastic:changeme http://localhost:9200/_cluster/health
@@ -30,7 +30,7 @@ Read CLAUDE.md and templates/detection-authoring-rules.md, then run the full det
    - cribl_get_metrics → check events_in > 0
    - cribl_test_output for each configured output
 
-=== PHASE 2: LOG ONBOARDING — REVIEW INCOMING DATA (SKIP if no Cribl) ===
+=== STEP 2: LOG ONBOARDING — REVIEW INCOMING DATA (SKIP if no Cribl) ===
 
 4. Pull 10 live sample events from the Cribl HEC input:
    - cribl_get_input_samples(input_id='lab_hec_in', count=10)
@@ -52,7 +52,7 @@ Read CLAUDE.md and templates/detection-authoring-rules.md, then run the full det
    Required Splunk CIM fields (for SPL detections):
    - src_ip, dest_ip, dest_port, user, host, process, CommandLine, EventCode
 
-=== PHASE 3: WRITE CRIBL PARSERS — CIM COMPLIANCE & LOG REDUCTION (SKIP if no Cribl) ===
+=== STEP 3: WRITE CRIBL PARSERS — CIM COMPLIANCE & LOG REDUCTION (SKIP if no Cribl) ===
 
 7. For each field gap found in Phase 2, add a pipeline function. Always test with
    cribl_preview_pipeline BEFORE applying to the live pipeline.
@@ -87,7 +87,7 @@ Read CLAUDE.md and templates/detection-authoring-rules.md, then run the full det
    - Document: bytes_in, bytes_out, reduction_pct per pipeline
    - Target: 20-50% reduction without dropping attack-relevant events
 
-=== PHASE 4: ANALYZE NORMALIZED LOGS IN SIEM ===
+=== STEP 4: ANALYZE NORMALIZED LOGS IN SIEM ===
 
 10. Query Elasticsearch for attack events (confirm field normalization worked):
     GET sim-attack/_search with aggregation on _simulation.technique
@@ -99,7 +99,7 @@ Read CLAUDE.md and templates/detection-authoring-rules.md, then run the full det
 
 12. Note any remaining field normalization issues for a second Cribl tuning pass.
 
-=== PHASE 5: THREAT INTEL REVIEW ===
+=== STEP 5: THREAT INTEL REVIEW ===
 
 13. Read threat-intel/fawkes/fawkes-ttp-mapping.md — understand the full Fawkes capability set.
 
@@ -112,7 +112,7 @@ Read CLAUDE.md and templates/detection-authoring-rules.md, then run the full det
     - No existing detection in detections/
     - Required fields confirmed present after Phase 3 normalization
 
-=== PHASE 6: BUILD DETECTIONS ===
+=== STEP 6: BUILD DETECTIONS ===
 
 17. Create a feature branch: git checkout -b detection/t<ID>-<short-name>
 
@@ -125,15 +125,15 @@ Read CLAUDE.md and templates/detection-authoring-rules.md, then run the full det
     - False positive section documenting known benign patterns
     - Save to detections/<tactic>/<rule>.yml
 
-19. Transpile to KQL:
+19. Transpile to Lucene:
     sigma convert -t lucene -p ecs_windows detections/<tactic>/<rule>.yml
-    Save output to detections/<tactic>/compiled/<rule>.kql
+    Save output to detections/<tactic>/compiled/<rule>.lucene
 
 20. If Splunk is running, also transpile to SPL:
     sigma convert -t splunk --without-pipeline detections/<tactic>/<rule>.yml
     Save to detections/<tactic>/compiled/<rule>.spl
 
-=== PHASE 7: VALIDATE DETECTIONS ===
+=== STEP 7: VALIDATE DETECTIONS ===
 
 21. Validate KQL against Elastic attack data:
     POST sim-attack/_search with the KQL query scoped to _simulation.technique
@@ -151,7 +151,7 @@ Read CLAUDE.md and templates/detection-authoring-rules.md, then run the full det
     - FP count, sample FP event (if any)
     - TP rate = TP/(TP+FN), FP rate = FP/(FP+TN)
 
-=== PHASE 8: DEPLOY ===
+=== STEP 8: DEPLOY ===
 
 25. Deploy to Elastic Security (create scheduled rule):
     POST -u elastic:changeme http://localhost:5601/api/detection_engine/rules
@@ -163,7 +163,7 @@ Read CLAUDE.md and templates/detection-authoring-rules.md, then run the full det
 
 27. Confirm rule is active and running. Check for any syntax errors.
 
-=== PHASE 9: TUNE ===
+=== STEP 9: TUNE ===
 
 28. Wait 5-10 minutes for the rule to run against accumulating data.
     Check alert volume: GET .alerts-security.alerts-default/_search (ES)
@@ -192,7 +192,7 @@ Read CLAUDE.md and templates/detection-authoring-rules.md, then run the full det
        Labels: tuning, needs-review
     d) DO NOT MERGE — leave for human review and approval
 
-=== PHASE 10: COVERAGE UPDATE & ITERATE ===
+=== STEP 10: COVERAGE UPDATE & ITERATE ===
 
 32. Update coverage/attack-matrix.md — mark technique as detected
 33. Update tuning/changelog/<rule>.md with tuning decisions
@@ -392,8 +392,7 @@ Read templates/detection-authoring-rules.md first. Build a detection for T1053.0
 6. Create true positive and true negative test cases in tests/
 7. Validate: TP > 0 in sim-attack, FP = 0 in sim-baseline
 8. Deploy to Kibana Detection Engine
-9. Write triage playbook: detections/persistence/playbooks/t1053_005_triage.md
-10. Update coverage/attack-matrix.md
+9. Update coverage/attack-matrix.md
 11. Commit all (rule + tests + playbook + coverage) with conventional commit message
 12. Push branch, create GitHub PR:
     Title: [Detection] Scheduled Task Persistence (T1053.005)
@@ -412,7 +411,7 @@ Analyze a threat intelligence source (blog post, report URL, or pasted text) and
 ```
 Read CLAUDE.md and templates/detection-authoring-rules.md, then analyze the threat intel I provide.
 
-=== PHASE 1: INTEL INGESTION ===
+=== STEP 1: INTEL INGESTION ===
 
 I will provide one of:
 - A URL to a blog post, threat report, or advisory
@@ -422,7 +421,7 @@ I will provide one of:
 If given a URL, fetch the content and extract all relevant technical details.
 If given a name, search the web for recent threat reports and TTPs.
 
-=== PHASE 2: TTP EXTRACTION ===
+=== STEP 2: TTP EXTRACTION ===
 
 From the intel source, extract and organize:
 
@@ -451,7 +450,7 @@ From the intel source, extract and organize:
    - File creation (EID 11)
    - Image loads (EID 7)
 
-=== PHASE 3: CROSS-REFERENCE WITH OUR ENVIRONMENT ===
+=== STEP 3: CROSS-REFERENCE WITH OUR ENVIRONMENT ===
 
 5. Read coverage/attack-matrix.md — check which extracted techniques we already detect
 
@@ -470,7 +469,7 @@ From the intel source, extract and organize:
    - Techniques that appear in MULTIPLE intel sources get highest priority
    - Note: the "Intel Sources" table in detection-backlog.md tracks all analyzed sources
 
-=== PHASE 4: DETECTION FEASIBILITY REPORT ===
+=== STEP 4: DETECTION FEASIBILITY REPORT ===
 
 Generate a structured report with three sections:
 
@@ -495,7 +494,7 @@ For each, specify what's missing and what would need to change.
 ### C. Already Covered
 Techniques we already detect — note if our existing rules would catch the specific variant described in the intel.
 
-=== PHASE 5: ACTIONABLE OUTPUT ===
+=== STEP 5: ACTIONABLE OUTPUT ===
 
 9. Create a prioritized detection plan:
    - Rank by: (a) overlap with report TTPs, (b) data availability, (c) FP risk
@@ -513,7 +512,7 @@ Techniques we already detect — note if our existing rules would catch the spec
     - Add the intel source to the "Intel Sources" table at the bottom
     - Bump priority for techniques that now appear in multiple intel sources
 
-13. If data gaps were found, update TODO-log-onboarding.md:
+13. If data gaps were found, update gaps/data-source-gaps.md:
     - Add new BACKLOG items for missing log sources
     - Note which detections each log source would unlock
 

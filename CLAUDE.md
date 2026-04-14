@@ -235,7 +235,7 @@ ai-detection-engineering/
 ├── setup.sh                           # One-command setup (--elastic/--splunk/--both/--cribl/--full)
 ├── Makefile                           # Quick commands (make setup, make agent, etc.)
 ├── mcp-config.example.json            # MCP server configuration template
-├── detections/                        # Detection-as-Code rules (37 rules: 30 Sigma + 3 EQL + 4 threshold)
+├── detections/                        # Detection-as-Code rules (95 rules: 88 Sigma + 3 EQL + 4 threshold)
 │   ├── <tactic>/                      # One directory per MITRE tactic
 │   │   ├── <technique>.yml            # Sigma rule
 │   │   └── compiled/                  # Transpiled outputs

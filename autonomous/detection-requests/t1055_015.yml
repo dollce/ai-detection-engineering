@@ -1,5 +1,5 @@
 technique_id: T1055.015
-title: "Detection for T1055.015 \xE2\u20AC\u201D 8 variants abusing Windows thread pool internals"
+title: "Detection for T1055.015 -- 8 variants abusing Windows thread pool internals"
 status: DEPLOYED
 priority: high
 requested_by: intel
@@ -97,4 +97,4 @@ data_source_gaps:
 compiled_lucene: detections/privilege_escalation/compiled/t1055_015.lucene
 compiled_spl: detections/privilege_escalation/compiled/t1055_015.spl
 elastic_rule_id: f6f0dc15-5363-4ada-9d1e-dc9150b7c4a9
-splunk_saved_search: "Detection for T1055.015 \xE2\u20AC\u201D 8 variants abusing Windows thread pool internals T1055.015"
+splunk_saved_search: "Detection for T1055.015 -- 8 variants abusing Windows thread pool internals T1055.015"

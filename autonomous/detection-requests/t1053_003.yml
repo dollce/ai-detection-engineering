@@ -1,5 +1,5 @@
 technique_id: T1053.003
-title: "Detection for T1053.003 \xE2\u20AC\u201D Add crontab entry (Linux)"
+title: "Detection for T1053.003 -- Add crontab entry (Linux)"
 status: DEPLOYED
 priority: high
 requested_by: intel
@@ -90,4 +90,4 @@ data_source_requirements:
 compiled_lucene: detections/persistence/compiled/t1053_003.lucene
 compiled_spl: detections/persistence/compiled/t1053_003.spl
 elastic_rule_id: 2bd430a0-cfa4-40d2-9ba0-dc005f012a09
-splunk_saved_search: "Detection for T1053.003 \xE2\u20AC\u201D Add crontab entry (Linux) T1053.003"
+splunk_saved_search: "Detection for T1053.003 -- Add crontab entry (Linux) T1053.003"

@@ -1,7 +1,7 @@
 # Detection Backlog — Prioritized Top 10
 
 **Created**: 2026-02-23
-**Last updated**: 2026-03-07
+**Last updated**: 2026-04-14
 **Scoring method**: Intel overlap (3pts) + Data source availability (3pts) + Impact (3pts) + Coverage urgency (1pt)
 **SIEM status**: Elasticsearch 8.17.0 ONLINE | Splunk 9.3.9 ONLINE — lab profile `--both`
 **Intel sources**: Fawkes C2 (primary), Scattered Spider / UNC3944 (2026-03-01)
@@ -21,11 +21,11 @@
 
 ## Backlog
 
-### Rank 1 — T1055.001: CreateRemoteThread Process Injection 🔨 IN PROGRESS (F1=0.667)
+### ~~Rank 1 — T1055.001: CreateRemoteThread Process Injection~~ ✅ DEPLOYED (F1=1.0)
 
 **Score**: 10/10
 **Fawkes command**: `vanilla-injection`
-**Status**: AUTHORED — F1=0.667, needs multi-EID correlation logic rework
+**Status**: DEPLOYED — F1=1.0 (see `detections/privilege_escalation/t1055_001.yml`)
 **MITRE**: Privilege Escalation / Defense Evasion → T1055.001
 **ATT&CK description**: Adversary injects code into another process using VirtualAllocEx + WriteProcessMemory + CreateRemoteThread
 

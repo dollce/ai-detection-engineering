@@ -1,5 +1,5 @@
 technique_id: T1518.001
-title: "Detection for T1518.001 \xE2\u20AC\u201D Detect installed AV/EDR products"
+title: "Detection for T1518.001 -- Detect installed AV/EDR products"
 status: DEPLOYED
 priority: high
 requested_by: intel
@@ -67,4 +67,4 @@ fawkes_commands:
 compiled_lucene: detections/discovery/compiled/t1518_001.lucene
 compiled_spl: detections/discovery/compiled/t1518_001.spl
 elastic_rule_id: a922db82-acc5-41ea-962f-28834f2e99d5
-splunk_saved_search: "Detection for T1518.001 \xE2\u20AC\u201D Detect installed AV/EDR products T1518.001"
+splunk_saved_search: "Detection for T1518.001 -- Detect installed AV/EDR products T1518.001"

@@ -1,5 +1,5 @@
 technique_id: T1070.006
-title: "Detection for T1070.006 \xE2\u20AC\u201D Modify file timestamps to hide activity"
+title: "Detection for T1070.006 -- Modify file timestamps to hide activity"
 status: DEPLOYED
 priority: high
 requested_by: intel
@@ -92,4 +92,4 @@ data_source_gaps:
 compiled_lucene: detections/defense_evasion/compiled/t1070_006.lucene
 compiled_spl: detections/defense_evasion/compiled/t1070_006.spl
 elastic_rule_id: cf660241-51a9-434f-aaf3-7437c0abf981
-splunk_saved_search: "Detection for T1070.006 \xE2\u20AC\u201D Modify file timestamps to hide activity T1070.006"
+splunk_saved_search: "Detection for T1070.006 -- Modify file timestamps to hide activity T1070.006"

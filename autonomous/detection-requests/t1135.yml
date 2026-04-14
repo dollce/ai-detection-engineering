@@ -1,5 +1,5 @@
 technique_id: T1135
-title: "Detection for T1135 \xE2\u20AC\u201D Enumerate network shares"
+title: "Detection for T1135 -- Enumerate network shares"
 status: DEPLOYED
 priority: high
 requested_by: intel
@@ -71,4 +71,4 @@ fawkes_commands:
 compiled_lucene: detections/discovery/compiled/t1135.lucene
 compiled_spl: detections/discovery/compiled/t1135.spl
 elastic_rule_id: ee81c093-3fe9-4c4d-ab5a-d0d1b1c12db7
-splunk_saved_search: "Detection for T1135 \xE2\u20AC\u201D Enumerate network shares T1135"
+splunk_saved_search: "Detection for T1135 -- Enumerate network shares T1135"

@@ -3,9 +3,9 @@
 This guide covers setting up [Mythic C2](https://github.com/its-a-feature/Mythic) with the
 [Fawkes](https://github.com/galoryber/fawkes) agent for true red vs. blue exercises in your lab.
 
-> **This is optional Phase 2.** The log simulator provides synthetic Fawkes attack telemetry
-> so you can build and validate detections without Mythic. Set up Mythic when you're ready
-> for real attack traffic.
+> **This is optional advanced setup.** The log simulator provides synthetic Fawkes attack
+> telemetry so you can build and validate detections without Mythic. Set up Mythic when
+> you're ready for real attack traffic.
 
 ## Architecture
 
