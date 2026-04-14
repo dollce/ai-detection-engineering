@@ -6,7 +6,7 @@ requested_by: intel
 requested_date: '2026-03-08T14:12:14Z'
 intel_report: threat-intel\reports\2026-03-08-apache-activemq-exploit-leads-to-lockbit-ransomwar.yml
 scenario_file: simulator\scenarios\t1021_001.json
-sigma_rule: detections\execution\t1021_001.yml
+sigma_rule: detections/lateral_movement/t1021_001.yml
 deployed_date: '2026-04-12T21:34:20Z'
 last_quality_review: ''
 quality_score: 0.857
@@ -68,8 +68,8 @@ changelog:
   agent: blue-team
   action: update
   details: 'Updated fields: deployed_date'
-compiled_lucene: detections\execution\compiled\t1021_001.lucene
-compiled_spl: detections\execution\compiled\t1021_001.spl
-mitre_tactic: execution
+compiled_lucene: detections/lateral_movement/compiled/t1021_001.lucene
+compiled_spl: detections/lateral_movement/compiled/t1021_001.spl
+mitre_tactic: lateral_movement
 elastic_rule_id: 18c91ee2-c9da-4817-bce8-9b0a93898730
 splunk_saved_search: 'Remote Services: Remote Desktop Protocol T1021.001'

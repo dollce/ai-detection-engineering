@@ -6,7 +6,7 @@ requested_by: intel
 requested_date: '2026-03-08T14:12:14Z'
 intel_report: threat-intel\reports\2026-03-08-cat-s-got-your-files-lynx-ransomware.yml
 scenario_file: simulator\scenarios\t1082.json
-sigma_rule: detections\execution\t1082.yml
+sigma_rule: detections/discovery/t1082.yml
 deployed_date: '2026-04-12T21:34:28Z'
 last_quality_review: ''
 quality_score: 0.75
@@ -71,8 +71,8 @@ changelog:
 fawkes_commands:
 - drives
 - env
-compiled_lucene: detections\execution\compiled\t1082.lucene
-compiled_spl: detections\execution\compiled\t1082.spl
-mitre_tactic: execution
+compiled_lucene: detections/discovery/compiled/t1082.lucene
+compiled_spl: detections/discovery/compiled/t1082.spl
+mitre_tactic: discovery
 elastic_rule_id: f053159c-1f7d-49a9-8375-af6dc4442ca7
 splunk_saved_search: System Information Discovery T1082

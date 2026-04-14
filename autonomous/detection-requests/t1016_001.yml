@@ -6,7 +6,7 @@ requested_by: intel
 requested_date: '2026-03-21T13:04:56Z'
 intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
 scenario_file: simulator\scenarios\t1016_001.json
-sigma_rule: detections\execution\t1016_001.yml
+sigma_rule: detections/discovery/t1016_001.yml
 deployed_date: '2026-04-12T21:34:18Z'
 last_quality_review: ''
 quality_score: 0.8
@@ -72,8 +72,8 @@ threat_actors:
 - Fawkes C2 Agent
 fawkes_commands:
 - arp
-compiled_lucene: detections\execution\compiled\t1016_001.lucene
-compiled_spl: detections\execution\compiled\t1016_001.spl
-mitre_tactic: execution
+compiled_lucene: detections/discovery/compiled/t1016_001.lucene
+compiled_spl: detections/discovery/compiled/t1016_001.spl
+mitre_tactic: discovery
 elastic_rule_id: ae5af605-4935-4278-ab80-53bf1fe5dd02
 splunk_saved_search: "Detection for T1016.001 \u2014 ARP table (host discovery) T1016.001"
