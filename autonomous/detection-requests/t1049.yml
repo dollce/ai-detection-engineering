@@ -1,5 +1,5 @@
 technique_id: T1049
-title: "Detection for T1049 \xE2\u20AC\u201D Active network connections (netstat)"
+title: "Detection for T1049 -- Active network connections (netstat)"
 status: DEPLOYED
 priority: high
 requested_by: intel
@@ -79,4 +79,4 @@ fawkes_commands:
 compiled_lucene: detections/discovery/compiled/t1049.lucene
 compiled_spl: detections/discovery/compiled/t1049.spl
 elastic_rule_id: 956a2110-670b-42f5-a6c3-ce01bcd48152
-splunk_saved_search: "Detection for T1049 \xE2\u20AC\u201D Active network connections (netstat) T1049"
+splunk_saved_search: "Detection for T1049 -- Active network connections (netstat) T1049"

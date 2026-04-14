@@ -13,7 +13,6 @@ Called by agent_runner.py. Implements run(state_manager) interface.
 
 import datetime
 import json
-import subprocess
 from pathlib import Path
 from uuid import uuid4
 
@@ -23,6 +22,10 @@ from orchestration.state import StateManager
 from orchestration import learnings
 from orchestration.siem import TACTIC_MAP, SEVERITY_MAP
 from orchestration import claude_llm
+from orchestration.constants import (
+    TECHNIQUE_TACTIC_MAP,
+    transpile_sigma,
+)
 
 AUTONOMOUS_DIR = Path(__file__).resolve().parent.parent.parent
 REPO_ROOT = AUTONOMOUS_DIR.parent
@@ -33,30 +36,9 @@ TEMPLATES_DIR = REPO_ROOT / "templates"
 AGENT_NAME = "author"
 MAX_DETECTIONS = 5
 
-# Map MITRE technique prefixes to tactic directories
-TECHNIQUE_TACTIC_MAP = {
-    "T1055": "privilege_escalation",
-    "T1134": "credential_access",
-    "T1059": "execution",
-    "T1053": "persistence",
-    "T1547": "persistence",
-    "T1543": "persistence",
-    "T1070": "defense_evasion",
-    "T1562": "defense_evasion",
-    "T1027": "defense_evasion",
-    "T1197": "defense_evasion",
-    "T1071": "command_and_control",
-    "T1219": "command_and_control",
-    "T1078": "initial_access",
-    "T1566": "initial_access",
-    "T1087": "discovery",
-    "T1047": "execution",
-    "T1003": "credential_access",
-    "T1490": "impact",
-    "T1569": "execution",
-    "T1046": "discovery",
-    "T1083": "discovery",
-}
+# TECHNIQUE_TACTIC_MAP and transpile_sigma are imported from orchestration.constants.
+# They are re-exported here so that validation_agent.py (which imports them from
+# this module) continues to work without change.
 
 # Sigma logsource categories by Sysmon EID
 SYSMON_CATEGORIES = {
@@ -233,46 +215,7 @@ def save_sigma_rule(tactic: str, tid_under: str, sigma_yaml: str) -> Path:
     return path
 
 
-def transpile_sigma(rule_path: Path) -> tuple[str, str]:
-    """
-    Transpile Sigma rule to Lucene and SPL.
-    Returns (lucene_query, spl_query).
-    """
-    import re as _re
-    lucene = ""
-    spl = ""
-
-    try:
-        result = subprocess.run(
-            ["sigma", "convert", "-t", "lucene", "-p", "ecs_windows", str(rule_path)],
-            capture_output=True, text=True, cwd=str(REPO_ROOT),
-        )
-        if result.returncode == 0:
-            lucene = result.stdout.strip()
-        else:
-            print(f"    [author] Lucene transpile warning: {result.stderr.strip()[:200]}")
-            lucene = result.stdout.strip()
-        # Strip sigma-cli preamble lines ("Parsing Sigma rules...")
-        lucene = "\n".join(l for l in lucene.splitlines() if not l.startswith("Parsing Sigma"))
-        # Strip winlog.channel prefix added by ecs_windows pipeline (field absent in sim-* indices)
-        lucene = _re.sub(r"^winlog\.channel:\S+ AND ", "", lucene.strip())
-    except Exception as e:
-        print(f"    [author] Lucene transpile failed: {e}")
-
-    try:
-        result = subprocess.run(
-            ["sigma", "convert", "-t", "splunk", "--without-pipeline", str(rule_path)],
-            capture_output=True, text=True, cwd=str(REPO_ROOT),
-        )
-        if result.returncode == 0:
-            spl = result.stdout.strip()
-        else:
-            print(f"    [author] SPL transpile warning: {result.stderr.strip()[:200]}")
-            spl = result.stdout.strip()
-    except Exception as e:
-        print(f"    [author] SPL transpile failed: {e}")
-
-    return lucene, spl
+# transpile_sigma() is imported from orchestration.constants — see top of file.
 
 
 def save_compiled(tactic: str, tid_under: str, lucene: str, spl: str) -> tuple[Path, Path]:

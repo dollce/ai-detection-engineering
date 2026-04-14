@@ -26,7 +26,7 @@ changelog:
 - date: '2026-03-06T00:00:00Z'
   agent: intel_agent
   action: created
-  details: "Fawkes vanilla-injection maps to CreateRemoteThread injection. High priority \xE2\u20AC\u201D both Fawkes and\
+  details: "Fawkes vanilla-injection maps to CreateRemoteThread injection. High priority -- both Fawkes and\
     \ Scattered Spider use this."
 - date: '2026-03-06T23:04:09Z'
   agent: blue-team

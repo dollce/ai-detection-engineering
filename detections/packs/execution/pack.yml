@@ -52,25 +52,25 @@ rules:
     required: true
     status: validated
     f1: 0.75
-  - path: detections/execution/t1082.yml
+  - path: detections/discovery/t1082.yml
     technique: T1082
     type: sigma
     required: false
     status: validated
     f1: 0.75
-  - path: detections/execution/t1105.yml
+  - path: detections/command_and_control/t1105.yml
     technique: T1105
     type: sigma
     required: true
     status: authored
     f1: 0.50
-  - path: detections/execution/t1133.yml
+  - path: detections/initial_access/t1133.yml
     technique: T1133
     type: sigma
     required: false
     status: validated
     f1: 0.86
-  - path: detections/execution/t1190.yml
+  - path: detections/initial_access/t1190.yml
     technique: T1190
     type: sigma
     required: false
@@ -82,13 +82,13 @@ rules:
     required: true
     status: validated
     f1: 0.75
-  - path: detections/execution/t1486.yml
+  - path: detections/impact/t1486.yml
     technique: T1486
     type: sigma
     required: true
     status: monitoring
     f1: 1.00
-  - path: detections/execution/t1490.yml
+  - path: detections/impact/t1490.yml
     technique: T1490
     type: sigma
     required: true

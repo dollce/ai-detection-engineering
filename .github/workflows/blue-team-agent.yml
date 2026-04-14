@@ -47,7 +47,7 @@ jobs:
         id: check
         run: |
           cd autonomous
-          PENDING=$(python -m orchestration.cli pending blue-team 2>/dev/null | grep -c "technique_id" || true)
+          PENDING=$(python -m orchestration.cli pending author 2>/dev/null | grep -c "technique_id" || true)
           echo "pending=$PENDING" >> "$GITHUB_OUTPUT"
           if [ "$PENDING" -eq 0 ]; then
             echo "No SCENARIO_BUILT detections pending — skipping"
@@ -59,10 +59,10 @@ jobs:
           git config user.name "patronus-bot"
           git config user.email "patronus-bot@users.noreply.github.com"
 
-      - name: Run Blue Team Agent
+      - name: Run Author Agent
         if: steps.check.outputs.pending != '0'
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         run: |
           cd autonomous
-          python -m orchestration.agent_runner --agent blue-team
+          python -m orchestration.agent_runner --agent author

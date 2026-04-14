@@ -90,7 +90,7 @@ AGENT_MODULES = {
     "coverage": "orchestration.agents.coverage_agent",
     "security": "orchestration.agents.security_agent",
     # Backward compatibility aliases (resolve to new modules)
-    "blue-team": "orchestration.agents.blue_team_agent",
+    "blue-team": "orchestration.agents.author_agent",
     "quality": "orchestration.agents.quality_agent",
 }
 

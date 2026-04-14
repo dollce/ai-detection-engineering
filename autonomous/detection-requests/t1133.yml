@@ -6,7 +6,7 @@ requested_by: intel
 requested_date: '2026-03-08T14:12:14Z'
 intel_report: threat-intel\reports\2026-03-08-from-bing-search-to-ransomware-bumblebee-and-adapt.yml
 scenario_file: simulator\scenarios\t1133.json
-sigma_rule: detections\execution\t1133.yml
+sigma_rule: detections/initial_access/t1133.yml
 deployed_date: '2026-04-12T21:34:30Z'
 last_quality_review: ''
 quality_score: 0.857
@@ -64,8 +64,8 @@ changelog:
   agent: blue-team
   action: update
   details: 'Updated fields: deployed_date'
-compiled_lucene: detections\execution\compiled\t1133.lucene
-compiled_spl: detections\execution\compiled\t1133.spl
-mitre_tactic: execution
+compiled_lucene: detections/initial_access/compiled/t1133.lucene
+compiled_spl: detections/initial_access/compiled/t1133.spl
+mitre_tactic: initial_access
 elastic_rule_id: 9af1f41d-e904-457e-9104-4038803e00e1
 splunk_saved_search: External Remote Services T1133

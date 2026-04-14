@@ -362,6 +362,19 @@ def create_intel_report(
     """
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
+    # Dedup check: skip if we already have a report from the same source URL
+    if source_url:
+        for existing_report in REPORTS_DIR.glob("*.yml"):
+            try:
+                with open(existing_report, encoding="utf-8") as _f:
+                    existing_data = yaml.safe_load(_f) or {}
+                if existing_data.get("source", "").strip() == source_url.strip():
+                    print(f"    [intel] Dedup: skipping '{title}' — already ingested from {source_url} "
+                          f"({existing_report.name})")
+                    return existing_report
+            except Exception:
+                pass  # Corrupted report file — continue checking others
+
     # Generate filename from date and title
     slug = re.sub(r"[^a-z0-9]+", "-", title.lower())[:50].strip("-")
     filename = f"{_today()}-{slug}.yml"

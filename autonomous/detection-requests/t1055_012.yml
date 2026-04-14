@@ -1,5 +1,5 @@
 technique_id: T1055.012
-title: "Detection for T1055.012 \xE2\u20AC\u201D DLL function pointer overwrite (no new thread)"
+title: "Detection for T1055.012 -- DLL function pointer overwrite (no new thread)"
 status: DEPLOYED
 priority: high
 requested_by: intel
@@ -97,4 +97,4 @@ data_source_gaps:
 compiled_lucene: detections/privilege_escalation/compiled/t1055_012.lucene
 compiled_spl: detections/privilege_escalation/compiled/t1055_012.spl
 elastic_rule_id: c524fb98-0e29-452e-a2e4-d5c261eb102f
-splunk_saved_search: "Detection for T1055.012 \xE2\u20AC\u201D DLL function pointer overwrite (no new thread) T1055.012"
+splunk_saved_search: "Detection for T1055.012 -- DLL function pointer overwrite (no new thread) T1055.012"

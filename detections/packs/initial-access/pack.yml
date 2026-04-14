@@ -28,7 +28,7 @@ data_requirements:
     required: true
 
 rules:
-  - path: detections/initial_access/t1219.yml
+  - path: detections/command_and_control/t1219.yml
     technique: T1219
     type: sigma
     required: true

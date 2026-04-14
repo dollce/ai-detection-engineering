@@ -196,18 +196,9 @@ Agents invoke Claude Code CLI (`claude -p`) for reasoning tasks at key decision 
 
 ### Current Detection Coverage
 
-42 authored rule files (35 Sigma + 3 EQL + 4 threshold) — 16 deployed to SIEM (MONITORING), 17 validated, 8 authored/pending validation. Full matrix: [coverage/attack-matrix.md](coverage/attack-matrix.md)
-
-| Phase | Status | Key Deliverable |
-|-------|--------|-----------------|
-| Phase 1 | COMPLETED (PR #52) | Fixed stuck detections, compiled all outputs |
-| Phase 2 | COMPLETED (PR #54) | Elasticsearch-based SIEM validation |
-| Phase 3 | COMPLETED (PR #58) | Raw logs → Cribl Stream → normalized → SIEM data pipeline |
-| Phase 4 | COMPLETED (PR #62) | 10 specialized agents, threat model registry, coordinator |
-| Phase 5 | COMPLETED (PR #63) | Multi-platform simulation, data quality engine, per-source Cribl pipelines |
-| Phase 6 | COMPLETED (PR #65) | Content packs, EQL/threshold rules, evasion testing, perf profiling |
-| Phase 7 | COMPLETED (PR #68) | Feedback loop, SLA tracking, regression CI, health monitor, dashboards |
-| Phase 8 | NOT STARTED | Advanced capabilities (Agent SDK, live C2, behavioral analytics) |
+For live detection counts and pipeline state, see [STATUS.md](STATUS.md).
+Full ATT&CK coverage matrix: [coverage/attack-matrix.md](coverage/attack-matrix.md).
+Improvement roadmap (Phases 1-8): [ROADMAP.md](ROADMAP.md).
 
 ## MCP Configuration
 

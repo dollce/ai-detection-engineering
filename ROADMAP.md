@@ -3,8 +3,8 @@
 Master plan for enhancing the AI Detection Engineering Lab from a single-threat-actor lab
 to an enterprise-grade, scalable detection engineering platform.
 
-**Last reviewed**: 2026-03-22
-**Current state**: 42 authored rule files (35 Sigma + 3 EQL + 4 threshold), 16 MONITORING, 17 VALIDATED, 8 AUTHORED, 71 total detection requests tracked, 10 specialized agents + coordinator, 2 SIEMs active, Phases 1-7 complete
+**Last reviewed**: 2026-04-14
+**Current state**: 95 detection-request files (88 Sigma + 3 EQL + 4 threshold), 39 DEPLOYED + 20 MONITORING, 0 VALIDATED, 0 AUTHORED, 36 REQUESTED. 10 specialized agents + coordinator, 2 SIEMs active, Phases 1-7 complete. See [STATUS.md](STATUS.md) for live counts.
 **Architecture redesign**: Phases 4-8 rebuilt around real-world scaling concerns (see `plans/architecture-scalable-detection-platform.md`)
 
 ---
@@ -212,13 +212,16 @@ Each capability is independent and can be pursued based on interest and availabl
 
 ## Quick Reference: Current State vs Target
 
+> For live counts, run `cd autonomous && python3 orchestration/cli.py status`
+> or see [STATUS.md](STATUS.md).
+
 | Metric | Phases 1-7 (Current) | Phase 8 Target |
 |--------|---------------------|----------------|
-| Threat actors | 3 registered (Fawkes, LockBit, Scattered Spider) | N |
-| Platforms | Win + Linux + Cloud + Network (sim) | All |
-| Detection requests | 71 tracked (42 authored files: 35 Sigma + 3 EQL + 4 threshold) | 60+ authored |
-| Deployed | 16 MONITORING | 50+ |
-| Coverage (Fawkes) | ~16/21 techniques | 90%+ |
+| Threat actors | 1 Fawkes active (3 registered) | 4+ |
+| Platforms | Win + Linux + macOS partial | All |
+| Detection requests | 95 tracked (88 Sigma + 3 EQL + 4 threshold) | 120+ |
+| Deployed to SIEM | 59 rules (39 DEPLOYED + 20 MONITORING) | 80+ |
+| Coverage (Fawkes) | ~20/21 core techniques (95%) | 100% |
 | Agents | 10 specialized + coordinator | SDK-based |
 | Data quality | Monitored + scored + per-source Cribl (Phase 5) | Monitored |
 | Feedback loop | Analyst TP/FP + auto-tune + evasion testing (Phase 7) | SOAR |

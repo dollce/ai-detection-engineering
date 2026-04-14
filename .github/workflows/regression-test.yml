@@ -17,14 +17,14 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Install dependencies
         run: pip install pyyaml
@@ -54,7 +54,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const reportPath = 'tests/results/regression-report.md';
+            const reportPath = 'tests/results/regression/regression-report.md';
 
             let body;
             if (fs.existsSync(reportPath)) {

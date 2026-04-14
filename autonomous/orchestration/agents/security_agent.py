@@ -286,7 +286,7 @@ def scan_pipeline_integrity(changed_files: list[str], pr_agent: str) -> list[dic
     agent_dirs = {
         "intel": "orchestration/agents/intel_agent.py",
         "red-team": "orchestration/agents/red_team_agent.py",
-        "blue-team": "orchestration/agents/blue_team_agent.py",
+        "blue-team": "orchestration/agents/author_agent.py",
         "quality": "orchestration/agents/quality_agent.py",
         "security": "orchestration/agents/security_agent.py",
     }

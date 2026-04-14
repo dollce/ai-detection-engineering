@@ -16,6 +16,7 @@ import yaml
 # Project root relative to this file: autonomous/orchestration/ -> ../../
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 _RESULTS_DIR = _PROJECT_ROOT / "tests" / "results"
+_REGRESSION_DIR = _RESULTS_DIR / "regression"
 _TP_DIR = _PROJECT_ROOT / "tests" / "true_positives"
 _TN_DIR = _PROJECT_ROOT / "tests" / "true_negatives"
 _DETECTIONS_DIR = _PROJECT_ROOT / "detections"
@@ -486,7 +487,7 @@ def generate_report(results: list[RegressionResult]) -> str:
     report = "\n".join(lines)
 
     # Write to disk
-    report_path = _RESULTS_DIR / "regression-report.md"
+    report_path = _REGRESSION_DIR / "regression-report.md"
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(report, encoding="utf-8")
 
@@ -504,14 +505,14 @@ def save_snapshot(
 ) -> None:
     """Persist each regression result as a historical JSON record.
 
-    Files are written to ``tests/results/{technique_id}_regression.json``.
+    Files are written to ``tests/results/regression/{technique_id}_regression.json``.
     """
-    _RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    _REGRESSION_DIR.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now(tz=timezone.utc).isoformat()
 
     for r in results:
         normalized = r.technique_id.lower().replace(".", "_")
-        snapshot_path = _RESULTS_DIR / f"{normalized}_regression.json"
+        snapshot_path = _REGRESSION_DIR / f"{normalized}_regression.json"
         record: dict[str, Any] = {
             "technique_id": r.technique_id,
             "timestamp": timestamp,

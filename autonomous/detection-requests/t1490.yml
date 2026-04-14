@@ -6,7 +6,7 @@ requested_by: intel
 requested_date: '2026-03-08T14:12:14Z'
 intel_report: threat-intel\reports\2026-03-08-cat-s-got-your-files-lynx-ransomware.yml
 scenario_file: simulator\scenarios\t1490.json
-sigma_rule: detections\execution\t1490.yml
+sigma_rule: detections/impact/t1490.yml
 deployed_date: '2026-03-19T11:19:08Z'
 last_quality_review: '2026-03-22T18:19:16Z'
 quality_score: 1.0
@@ -72,8 +72,8 @@ changelog:
   agent: quality
   action: update
   details: 'Updated fields: alert_volume_24h, last_quality_review'
-compiled_lucene: detections\execution\compiled\t1490.lucene
-compiled_spl: detections\execution\compiled\t1490.spl
-mitre_tactic: execution
+compiled_lucene: detections/impact/compiled/t1490.lucene
+compiled_spl: detections/impact/compiled/t1490.spl
+mitre_tactic: impact
 elastic_rule_id: 8f000da5-2284-4919-9c47-9b3f62d2ffa2
 splunk_saved_search: Inhibit System Recovery T1490

@@ -49,35 +49,54 @@ Entries are append-only JSONL (one JSON object per line):
 | **idea** | Thought of a better approach but didn't implement it this run |
 | **resolved** | A previously open issue was fixed — link to the fix |
 
+## 10-Agent Architecture (Phase 4+)
+
+The pipeline uses 10 specialized agents + a coordinator (Phase 4 refactor):
+
+| Agent | Role | Key File |
+|-------|------|----------|
+| Intel | Ingests threat reports, creates detection requests | `orchestration/agents/intel_agent.py` |
+| Red Team | Generates attack + benign scenarios per technique | `orchestration/agents/red_team_agent.py` |
+| Author | Authors Sigma/EQL/threshold rules from scenarios | `orchestration/agents/author_agent.py` |
+| Validation | Tests rules against ES, scores F1, retry-with-feedback | `orchestration/agents/validation_agent.py` |
+| Deployment | Deploys validated rules to Elastic + Splunk | `orchestration/agents/deployment_agent.py` |
+| Tuning | Monitors alert health, auto-tunes FP exclusions | `orchestration/agents/tuning_agent.py` |
+| Coverage | Gap analysis, technique prioritization, GitHub Issues | `orchestration/agents/coverage_agent.py` |
+| Quality | Fleet health scoring, daily monitoring reports | `orchestration/agents/quality_agent.py` |
+| Security | PR gate — secrets scanning, rule quality checks | `orchestration/agents/security_agent.py` |
+| Coordinator | Routes work by priority + state | `orchestration/agents/coordinator_agent.py` |
+
+Run agents: `cd autonomous && python3 orchestration/agent_runner.py --agent <name>`
+Check state: `cd autonomous && python3 orchestration/cli.py status`
+
 ## Agent-Specific Guidance
 
-### Intel Agent Journal
+### Intel Agent
 - Track: sources that consistently yield good/bad results
-- Track: search queries that return noise vs signal
 - Track: report formats that are hard to parse vs easy
 - Improve: which query patterns find the most relevant TTPs per token
 
-### Red Team Agent Journal
+### Red Team Agent
 - Track: log schema mismatches between scenario output and SIEM expectations
-- Track: event sequences that are unrealistic (caught during blue team validation)
 - Track: which Sysmon event codes are hardest to simulate accurately
 - Improve: build a library of verified-good event templates per technique
 
-### Blue Team Agent Journal
+### Author Agent (formerly Blue Team)
 - Track: Sigma transpilation failures per backend (Splunk vs Elastic)
 - Track: detection logic patterns that consistently produce FPs
-- Track: MCP queries that returned unexpected results
-- Track: tuning patterns that consistently improve quality scores
 - Improve: build a "don't do this" list for detection authoring
 
-### Quality Monitor Journal
+### Validation Agent
+- Track: F1 failures and root causes (field mapping, scenario mismatch)
+- Track: rules that needed multiple refinement iterations
+- Improve: refinement prompt patterns that reliably increase F1
+
+### Tuning Agent (formerly Quality Monitor)
 - Track: detection decay patterns (rules that degrade over time)
-- Track: cost vs value outliers
 - Track: tuning recommendations that were accepted vs rejected by human
 - Improve: refine health score weights based on which metrics predict problems
 
-### Security Agent Journal
+### Security Agent
 - Track: false positive patterns (what triggers secrets scan but isn't a secret)
-- Track: findings that were legitimate vs noise
 - Track: which agents produce the most security issues
 - Improve: refine scan-patterns.yml to reduce FP rate

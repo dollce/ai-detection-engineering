@@ -7,7 +7,7 @@ rule_type: sigma
 requested_by: blue-team
 requested_date: '2026-04-01T00:00:00Z'
 intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
-scenario_file: simulator/scenarios/t1562_006_registry.json
+scenario_file: simulator/scenarios/windows/t1562_006_registry.json
 sigma_rule: detections/defense_evasion/t1562_006_registry.yml
 compiled_lucene: detections/defense_evasion/compiled/t1562_006_registry.lucene
 compiled_spl: detections/defense_evasion/compiled/t1562_006_registry.spl
