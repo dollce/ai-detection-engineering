@@ -3,7 +3,7 @@ SIEM Deployment Module — Shared interface for deploying detections
 to Elastic Security and Splunk.
 
 Reads credentials from orchestration/config.yml (single source of truth).
-Used by blue_team_agent.py for automated deployment.
+Used by deployment_agent.py for automated deployment.
 """
 
 import base64
@@ -19,7 +19,7 @@ import yaml
 
 CONFIG_PATH = Path(__file__).resolve().parent / "config.yml"
 
-# MITRE tactic mapping (shared with blue_team_agent)
+# MITRE tactic mapping (used by author_agent and deployment_agent)
 TACTIC_MAP = {
     "execution": ("Execution", "TA0002"),
     "persistence": ("Persistence", "TA0003"),

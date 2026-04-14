@@ -26,6 +26,12 @@ from uuid import uuid4
 from orchestration.state import StateManager
 from orchestration import learnings
 from orchestration import claude_llm
+from orchestration.constants import (
+    TECHNIQUE_TACTIC_MAP,
+    TECHNIQUE_PLATFORM_MAP,
+    resolve_tactic,
+    resolve_platforms,
+)
 
 AUTONOMOUS_DIR = Path(__file__).resolve().parent.parent.parent
 REPO_ROOT = AUTONOMOUS_DIR.parent
@@ -64,67 +70,12 @@ TEMP_PATHS = [
 
 
 # ─── MITRE Technique Lookups ───────────────────────────────────────
-# Derived from MITRE ATT&CK v15 — maps technique prefix to primary tactic.
-# Used when detection requests don't have mitre_tactic set (most don't).
-TECHNIQUE_TACTIC_MAP: dict[str, str] = {
-    "T1021": "lateral_movement",
-    "T1027": "defense_evasion",
-    "T1036": "defense_evasion",
-    "T1047": "execution",
-    "T1049": "discovery",
-    "T1053": "execution",
-    "T1055": "privilege_escalation",
-    "T1056": "collection",
-    "T1057": "discovery",
-    "T1059": "execution",
-    "T1068": "privilege_escalation",
-    "T1069": "discovery",
-    "T1070": "defense_evasion",
-    "T1071": "command_and_control",
-    "T1078": "defense_evasion",
-    "T1087": "discovery",
-    "T1090": "command_and_control",
-    "T1105": "command_and_control",
-    "T1112": "defense_evasion",
-    "T1113": "collection",
-    "T1115": "collection",
-    "T1134": "privilege_escalation",
-    "T1135": "discovery",
-    "T1219": "command_and_control",
-    "T1497": "defense_evasion",
-    "T1518": "discovery",
-    "T1543": "persistence",
-    "T1547": "persistence",
-    "T1552": "credential_access",
-    "T1555": "credential_access",
-    "T1560": "collection",
-    "T1562": "defense_evasion",
-    "T1566": "initial_access",
-    "T1573": "command_and_control",
-    "T1620": "defense_evasion",
-}
+# TECHNIQUE_TACTIC_MAP, TECHNIQUE_PLATFORM_MAP, resolve_tactic, and
+# resolve_platforms are imported from orchestration.constants (canonical source).
 
-# Techniques that are NOT Windows-primary — override the ["windows"] default
-TECHNIQUE_PLATFORM_MAP: dict[str, list[str]] = {
-    "T1053.003": ["linux"],          # crontab
-    "T1543.001": ["macos"],          # LaunchAgent plist
-    "T1552.004": ["linux", "macos"], # SSH private keys
-    "T1555.001": ["macos"],          # macOS keychain
-}
-
-
-def _resolve_tactic(technique_id: str, request: dict) -> str:
-    """Return the MITRE tactic for a technique, falling back to prefix lookup."""
-    tactic = request.get("mitre_tactic", "")
-    if tactic and tactic != "unknown":
-        return tactic
-    prefix = technique_id.split(".")[0]
-    return TECHNIQUE_TACTIC_MAP.get(prefix, "unknown")
-
-
-def _resolve_platforms(technique_id: str) -> list[str]:
-    """Return the target platforms for a technique."""
-    return TECHNIQUE_PLATFORM_MAP.get(technique_id, ["windows"])
+# Local aliases preserved for call-site compatibility within this file.
+_resolve_tactic = resolve_tactic
+_resolve_platforms = resolve_platforms
 
 
 # ─── Scenario Generators ───────────────────────────────────────────
