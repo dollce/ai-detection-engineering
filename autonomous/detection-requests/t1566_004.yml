@@ -4,9 +4,9 @@ status: MONITORING
 priority: high
 requested_by: intel
 requested_date: '2026-03-06T13:06:21Z'
-intel_report: threat-intel\reports\2026-03-06-cisa-scattered-spider-advisory.yml
-scenario_file: simulator\scenarios\t1566_004.json
-sigma_rule: detections\initial_access\t1566_004.yml
+intel_report: threat-intel/reports/2026-03-06-cisa-scattered-spider-advisory.yml
+scenario_file: simulator/scenarios/windows/t1566_004.json
+sigma_rule: detections/initial_access/t1566_004.yml
 deployed_date: '2026-03-06T23:10:00Z'
 last_quality_review: '2026-03-22T18:19:16Z'
 quality_score: 1.0
@@ -112,8 +112,8 @@ changelog:
   agent: quality
   action: update
   details: 'Updated fields: alert_volume_24h, last_quality_review'
-compiled_lucene: detections\initial_access\compiled\t1566_004.lucene
-compiled_spl: detections\initial_access\compiled\t1566_004.spl
+compiled_lucene: detections/initial_access/compiled/t1566_004.lucene
+compiled_spl: detections/initial_access/compiled/t1566_004.spl
 mitre_tactic: initial_access
 elastic_rule_id: 1369e748-4806-4c23-aced-766b561109a2
 splunk_saved_search: Spearphishing Voice (Vishing) T1566.004

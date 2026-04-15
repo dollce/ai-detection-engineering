@@ -6,10 +6,10 @@ mitre_tactic: privilege_escalation
 requested_by: intel_agent
 requested_date: '2026-03-06T00:00:00Z'
 intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
-scenario_file: simulator\scenarios\t1055_001.json
-sigma_rule: detections\privilege_escalation\t1055_001.yml
-compiled_lucene: detections\privilege_escalation\compiled\t1055_001.lucene
-compiled_spl: detections\privilege_escalation\compiled\t1055_001.spl
+scenario_file: simulator/scenarios/windows/t1055_001.json
+sigma_rule: detections/privilege_escalation/t1055_001.yml
+compiled_lucene: detections/privilege_escalation/compiled/t1055_001.lucene
+compiled_spl: detections/privilege_escalation/compiled/t1055_001.spl
 deployed_date: '2026-04-04T14:18:46Z'
 elastic_rule_id: c2641694-134e-44e4-b21b-6bd6217c2b98
 splunk_saved_search: Process Injection via CreateRemoteThread T1055.001

@@ -4,9 +4,9 @@ status: DEPLOYED
 priority: critical
 requested_by: intel
 requested_date: '2026-03-08T14:12:14Z'
-intel_report: threat-intel\reports\2026-03-08-apache-activemq-exploit-leads-to-lockbit-ransomwar.yml
-scenario_file: simulator\scenarios\t1003_001.json
-sigma_rule: detections\credential_access\t1003_001.yml
+intel_report: threat-intel/reports/2026-03-08-apache-activemq-exploit-leads-to-lockbit-ransomwar.yml
+scenario_file: simulator/scenarios/windows/t1003_001.json
+sigma_rule: detections/credential_access/t1003_001.yml
 deployed_date: '2026-04-12T21:34:16Z'
 last_quality_review: ''
 quality_score: 0.8
@@ -68,8 +68,8 @@ changelog:
   agent: blue-team
   action: update
   details: 'Updated fields: deployed_date'
-compiled_lucene: detections\credential_access\compiled\t1003_001.lucene
-compiled_spl: detections\credential_access\compiled\t1003_001.spl
+compiled_lucene: detections/credential_access/compiled/t1003_001.lucene
+compiled_spl: detections/credential_access/compiled/t1003_001.spl
 mitre_tactic: credential_access
 elastic_rule_id: 0c353e7b-d338-4371-b655-02a47b091c74
 splunk_saved_search: 'OS Credential Dumping: LSASS Memory T1003.001'

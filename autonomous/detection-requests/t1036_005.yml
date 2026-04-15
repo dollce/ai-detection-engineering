@@ -5,8 +5,8 @@ priority: high
 requested_by: intel
 requested_date: '2026-03-23T06:57:50Z'
 intel_report: threat-intel/reports/2026-03-22-blurring-the-lines-intrusion-shows-connection-with.yml
-scenario_file: simulator\scenarios\t1036_005.json
-sigma_rule: detections\defense_evasion\t1036_005.yml
+scenario_file: simulator/scenarios/windows/t1036_005.json
+sigma_rule: detections/defense_evasion/t1036_005.yml
 deployed_date: '2026-04-12T21:24:31Z'
 last_quality_review: ''
 quality_score: 1.0
@@ -69,8 +69,8 @@ changelog:
   action: update
   details: 'Updated fields: deployed_date'
 threat_actors: []
-compiled_lucene: detections\defense_evasion\compiled\t1036_005.lucene
-compiled_spl: detections\defense_evasion\compiled\t1036_005.spl
+compiled_lucene: detections/defense_evasion/compiled/t1036_005.lucene
+compiled_spl: detections/defense_evasion/compiled/t1036_005.spl
 mitre_tactic: defense_evasion
 elastic_rule_id: f8bc368c-f8a3-455f-a286-297b49541786
 splunk_saved_search: 'Masquerading: Match Legitimate Name or Location T1036.005'

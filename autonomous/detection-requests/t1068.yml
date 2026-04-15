@@ -4,8 +4,8 @@ status: DEPLOYED
 priority: high
 requested_by: intel
 requested_date: '2026-03-21T13:04:55Z'
-intel_report: threat-intel\reports\2026-03-21-apache-activemq-exploit-leads-to-lockbit-ransomwar.yml
-scenario_file: simulator\scenarios\t1068.json
+intel_report: threat-intel/reports/2026-03-21-apache-activemq-exploit-leads-to-lockbit-ransomwar.yml
+scenario_file: simulator/scenarios/windows/t1068.json
 sigma_rule: detections/privilege_escalation/t1068.yml
 deployed_date: '2026-04-12T21:24:41Z'
 last_quality_review: ''
