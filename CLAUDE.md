@@ -361,7 +361,7 @@ Five AI agents currently run the detection lifecycle:
 ### Target Architecture (10 Agents — Phase 4+)
 
 Phase 4 refactors into 10 specialized agents across 3 tiers plus an orchestrator.
-See `plans/architecture-scalable-detection-platform.md` for the full design.
+See `plans/archive/architecture-scalable-detection-platform.md` for the full design.
 
 | Tier | Agent | Responsibility | Refactored From |
 |------|-------|---------------|-----------------|

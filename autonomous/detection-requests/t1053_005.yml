@@ -6,10 +6,10 @@ mitre_tactic: persistence
 requested_by: intel_agent
 requested_date: '2026-03-06T00:00:00Z'
 intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
-scenario_file: simulator\scenarios\t1053_005.json
-sigma_rule: detections\persistence\t1053_005.yml
-compiled_lucene: detections\persistence\compiled\t1053_005.lucene
-compiled_spl: detections\persistence\compiled\t1053_005.spl
+scenario_file: simulator/scenarios/windows/t1053_005.json
+sigma_rule: detections/persistence/t1053_005.yml
+compiled_lucene: detections/persistence/compiled/t1053_005.lucene
+compiled_spl: detections/persistence/compiled/t1053_005.spl
 deployed_date: '2026-03-06T23:10:00Z'
 elastic_rule_id: cf4b3969-5861-4a0d-bd17-785f829f691b
 splunk_saved_search: Scheduled Task Creation for Persistence T1053.005

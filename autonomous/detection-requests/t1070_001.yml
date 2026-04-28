@@ -4,9 +4,9 @@ status: MONITORING
 priority: high
 requested_by: intel
 requested_date: '2026-03-06T13:06:21Z'
-intel_report: threat-intel\reports\2026-03-06-cisa-scattered-spider-advisory.yml
-scenario_file: simulator\scenarios\t1070_001.json
-sigma_rule: detections\defense_evasion\t1070_001.yml
+intel_report: threat-intel/reports/2026-03-06-cisa-scattered-spider-advisory.yml
+scenario_file: simulator/scenarios/windows/t1070_001.json
+sigma_rule: detections/defense_evasion/t1070_001.yml
 deployed_date: '2026-03-06T23:10:00Z'
 last_quality_review: '2026-03-22T18:19:15Z'
 quality_score: 1.0
@@ -112,8 +112,8 @@ changelog:
   agent: quality
   action: update
   details: 'Updated fields: alert_volume_24h, last_quality_review'
-compiled_lucene: detections\defense_evasion\compiled\t1070_001.lucene
-compiled_spl: detections\defense_evasion\compiled\t1070_001.spl
+compiled_lucene: detections/defense_evasion/compiled/t1070_001.lucene
+compiled_spl: detections/defense_evasion/compiled/t1070_001.spl
 mitre_tactic: defense_evasion
 elastic_rule_id: 41074e7a-6949-41db-8ca7-71e3e2a811db
 splunk_saved_search: Clear Windows Event Logs T1070.001

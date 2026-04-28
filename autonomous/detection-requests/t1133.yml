@@ -4,8 +4,8 @@ status: DEPLOYED
 priority: high
 requested_by: intel
 requested_date: '2026-03-08T14:12:14Z'
-intel_report: threat-intel\reports\2026-03-08-from-bing-search-to-ransomware-bumblebee-and-adapt.yml
-scenario_file: simulator\scenarios\t1133.json
+intel_report: ''
+scenario_file: simulator/scenarios/windows/t1133.json
 sigma_rule: detections/initial_access/t1133.yml
 deployed_date: '2026-04-12T21:34:30Z'
 last_quality_review: ''

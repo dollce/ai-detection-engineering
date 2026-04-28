@@ -4,7 +4,7 @@ status: REQUESTED
 priority: medium
 requested_by: intel
 requested_date: '2026-03-23T06:57:50Z'
-intel_report: threat-intel/reports/2026-03-21-from-bing-search-to-ransomware-bumblebee-and-adapt.yml
+intel_report: ''
 scenario_file: ''
 sigma_rule: ''
 deployed_date: ''

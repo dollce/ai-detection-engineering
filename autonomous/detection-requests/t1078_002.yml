@@ -4,7 +4,7 @@ status: REQUESTED
 priority: high
 requested_by: intel
 requested_date: '2026-03-21T13:04:55Z'
-intel_report: threat-intel\reports\2026-03-21-apache-activemq-exploit-leads-to-lockbit-ransomwar.yml
+intel_report: threat-intel/reports/2026-03-22-apache-activemq-exploit-leads-to-lockbit-ransomwar.yml
 scenario_file: ''
 sigma_rule: ''
 deployed_date: ''

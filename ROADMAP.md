@@ -5,7 +5,7 @@ to an enterprise-grade, scalable detection engineering platform.
 
 **Last reviewed**: 2026-04-14
 **Current state**: 95 detection-request files (88 Sigma + 3 EQL + 4 threshold), 39 DEPLOYED + 20 MONITORING, 0 VALIDATED, 0 AUTHORED, 36 REQUESTED. 10 specialized agents + coordinator, 2 SIEMs active, Phases 1-7 complete. See [STATUS.md](STATUS.md) for live counts.
-**Architecture redesign**: Phases 4-8 rebuilt around real-world scaling concerns (see `plans/architecture-scalable-detection-platform.md`)
+**Architecture redesign**: Phases 4-8 rebuilt around real-world scaling concerns (see `plans/archive/architecture-scalable-detection-platform.md`)
 
 ---
 
@@ -19,7 +19,7 @@ Read ROADMAP.md for context, then read plans/<phase-file>.md for step-by-step in
 
 For the architectural vision behind the new phases:
 ```
-Read plans/architecture-scalable-detection-platform.md for the full system design.
+Read plans/archive/architecture-scalable-detection-platform.md for the full system design.
 ```
 
 Phases 4-8 have dependencies noted in each plan. Phases 1-3 are complete and independent.
@@ -52,7 +52,7 @@ The redesigned phases address these proportions directly:
 
 **Status**: COMPLETED — Merged to main via PR #52 (2026-03-13)
 
-**Plan**: [plans/phase1-detection-quality.md](plans/phase1-detection-quality.md)
+**Plan**: [plans/archive/phase1-detection-quality.md](plans/archive/phase1-detection-quality.md)
 
 **Delivered**:
 - Fixed T1046, T1562.006, T1569.002 (stuck at AUTHORED due to backslash + non-dict bugs)
@@ -69,7 +69,7 @@ The redesigned phases address these proportions directly:
 
 **Status**: COMPLETED — Merged to main via PR #54 (2026-03-14)
 
-**Plan**: [plans/phase2-siem-validation.md](plans/phase2-siem-validation.md)
+**Plan**: [plans/archive/phase2-siem-validation.md](plans/archive/phase2-siem-validation.md)
 
 **Delivered**:
 - `validation.py` module (~280 lines) with `validate_against_elasticsearch()`
@@ -87,7 +87,7 @@ The redesigned phases address these proportions directly:
 
 **Status**: COMPLETED (2026-03-14)
 
-**Plan**: [plans/phase3-data-pipeline.md](plans/phase3-data-pipeline.md)
+**Plan**: [plans/archive/phase3-data-pipeline.md](plans/archive/phase3-data-pipeline.md)
 
 **Delivered**:
 - `simulator/raw_events.py` — raw vendor event converter (Windows Event XML, Sysmon text)
@@ -103,9 +103,9 @@ The redesigned phases address these proportions directly:
 
 **Status**: COMPLETED — Merged to main via PR #62 (2026-03-15)
 
-**Plan**: [plans/phase4-scalable-architecture.md](plans/phase4-scalable-architecture.md)
+**Plan**: [plans/archive/phase4-scalable-architecture.md](plans/archive/phase4-scalable-architecture.md)
 
-**Architecture**: [plans/architecture-scalable-detection-platform.md](plans/architecture-scalable-detection-platform.md)
+**Architecture**: [plans/archive/architecture-scalable-detection-platform.md](plans/archive/architecture-scalable-detection-platform.md)
 
 **Delivered**:
 - **Threat model registry**: Pluggable YAML-based threat models (`threat-intel/models/`) — Fawkes, LockBit, Scattered Spider, generic schema
@@ -117,7 +117,7 @@ The redesigned phases address these proportions directly:
 - **CLI expansion**: `cli.py` extended with Phase 4 commands (+186 lines)
 - **State management**: Schema-enforced YAML with SQLite-ready design
 
-**State after Phase 4**: 5 → 10 agents, 3 threat models registered (Fawkes + 2 non-Fawkes), coordinator active
+**State after Phase 4**: 5 → 10 agents, 4 threat models registered (Fawkes + LockBit + Scattered Spider + generic-rat), coordinator active
 
 ---
 
@@ -125,7 +125,7 @@ The redesigned phases address these proportions directly:
 
 **Status**: COMPLETED — Merged to main via PR #63 (2026-03-15)
 
-**Plan**: [plans/phase5-data-engineering.md](plans/phase5-data-engineering.md)
+**Plan**: [plans/archive/phase5-data-engineering.md](plans/archive/phase5-data-engineering.md)
 
 **Delivered**:
 - **Data quality monitoring engine**: Per-source health scoring (freshness, completeness, volume, schema compliance)
@@ -144,7 +144,7 @@ The redesigned phases address these proportions directly:
 
 **Status**: COMPLETED — Merged to main via PR #65 (2026-03-17)
 
-**Plan**: [plans/phase6-detection-content.md](plans/phase6-detection-content.md)
+**Plan**: [plans/archive/phase6-detection-content.md](plans/archive/phase6-detection-content.md)
 
 **Delivered**:
 - **Content pack framework**: 9 versioned packs with `pack.yml` + `CHANGELOG.md` (8 tactic-based + process-injection)
@@ -172,7 +172,7 @@ The redesigned phases address these proportions directly:
 
 **Status**: COMPLETED — Merged to main via PR #68 (2026-03-18)
 
-**Plan**: [plans/phase7-operational-excellence.md](plans/phase7-operational-excellence.md)
+**Plan**: [plans/archive/phase7-operational-excellence.md](plans/archive/phase7-operational-excellence.md)
 
 **Goal**: Close the operational feedback loop — build, deploy, measure, improve. This separates a lab from a production detection program.
 
@@ -217,7 +217,7 @@ Each capability is independent and can be pursued based on interest and availabl
 
 | Metric | Phases 1-7 (Current) | Phase 8 Target |
 |--------|---------------------|----------------|
-| Threat actors | 1 Fawkes active (3 registered) | 4+ |
+| Threat actors | 1 Fawkes active (4 registered: Fawkes, LockBit, Scattered Spider, generic-rat) | 4+ |
 | Platforms | Win + Linux + macOS partial | All |
 | Detection requests | 95 tracked (88 Sigma + 3 EQL + 4 threshold) | 120+ |
 | Deployed to SIEM | 59 rules (39 DEPLOYED + 20 MONITORING) | 80+ |
@@ -231,19 +231,19 @@ Each capability is independent and can be pursued based on interest and availabl
 
 ## Superseded Plans (for reference only)
 
-The following old plan files are kept for historical reference but are no longer active:
+Completed and superseded plans live in `plans/archive/`. The `_superseded` suffix marks plans whose scope was reworked during the Phase 4 redesign:
 
-- `plans/phase4-agent-upgrades.md` — Superseded by `plans/phase4-scalable-architecture.md`
-- `plans/phase5-coverage-expansion.md` — Scope absorbed into Phases 5-6
-- `plans/phase6-operational-maturity.md` — Superseded by `plans/phase7-operational-excellence.md`
-- `plans/phase7-advanced-capabilities.md` — Superseded by `plans/phase8-advanced-capabilities.md`
+- `plans/archive/phase4-agent-upgrades_superseded.md` — Superseded by `plans/archive/phase4-scalable-architecture.md`
+- `plans/archive/phase5-coverage-expansion_superseded.md` — Scope absorbed into Phases 5-6
+- `plans/archive/phase6-operational-maturity_superseded.md` — Superseded by `plans/archive/phase7-operational-excellence.md`
+- `plans/archive/phase7-advanced-capabilities_superseded.md` — Superseded by `plans/phase8-advanced-capabilities.md`
 
 ---
 
 ## Notes for Future Claude Sessions
 
 1. **Always read CLAUDE.md first** — it has the full agent identity and workflow
-2. **Read `plans/architecture-scalable-detection-platform.md`** — it explains the multi-agent architecture
+2. **Read `plans/archive/architecture-scalable-detection-platform.md`** — it explains the multi-agent architecture
 3. **Check MEMORY.md** — contains infrastructure state, known bugs, lessons learned
 4. **Check git status** — active branches may have in-progress work
 5. **Run `cd autonomous && python3 orchestration/cli.py status`** to see detection pipeline state
