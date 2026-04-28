@@ -60,12 +60,17 @@ Full Agent SDK integration with native tool use, streaming, sub-agent spawning, 
 
 - `autonomous/orchestration/sdk_runner.py` -- SDK-based agent runner (replaces CLI-based `agent_runner.py`)
 - `autonomous/orchestration/sdk_tools.py` -- Tool definitions for each agent (ES queries, file writes, GitHub API, Sigma CLI)
-- `autonomous/orchestration/sdk_agents/` -- Per-agent configurations (system prompt, tools, conversation loop)
-  - `intel_config.py`
-  - `red_team_config.py`
-  - `blue_team_config.py`
-  - `quality_config.py`
-  - `security_config.py`
+- `autonomous/orchestration/sdk_agents/` -- Per-agent configurations (system prompt, tools, conversation loop) for the 10-agent architecture delivered in Phase 4:
+  - `intel_config.py` (Threat Intel)
+  - `red_team_config.py` (Scenario Engineer)
+  - `author_config.py` (Detection Author -- was blue_team authoring half)
+  - `validation_config.py` (Validation -- was blue_team validation half)
+  - `deployment_config.py` (Deployment)
+  - `tuning_config.py` (Tuning -- was quality_agent)
+  - `coverage_config.py` (Coverage Analyst)
+  - `security_config.py` (Security Gate)
+  - `data_onboarding_config.py` (Data Onboarding)
+  - `coordinator_config.py` (Coordinator / orchestrator)
 - Updated `agent_runner.py` to support both CLI and SDK modes (feature flag in `config.yml`)
 
 ### Architecture
@@ -73,15 +78,23 @@ Full Agent SDK integration with native tool use, streaming, sub-agent spawning, 
 ```
 Coordinator (Agent SDK)
   |
-  +-- spawn: Intel Agent
+  +-- spawn: Data Onboarding Agent
+  |     Tools: schema_register, health_check, field_mapping
+  |     Conversation: single-turn (deterministic onboarding)
+  |
+  +-- spawn: Threat Intel Agent
   |     Tools: web_search, github_search, file_write, coverage_check
   |     Conversation: multi-turn (ask for clarification on ambiguous intel)
+  |
+  +-- spawn: Coverage Analyst Agent
+  |     Tools: file_read, coverage_compute, priority_score
+  |     Conversation: single-turn (gap analysis + backlog rank)
   |
   +-- spawn: Scenario Engineer (Red-Team)
   |     Tools: file_write, simulator_generate, data_source_check
   |     Conversation: single-turn (deterministic scenario generation)
   |
-  +-- spawn: Author Agent (Blue-Team)
+  +-- spawn: Detection Author
   |     Tools: sigma_cli, file_write, elasticsearch_search, validate_rule
   |     Conversation: multi-turn (iterative refinement loop built into SDK)
   |
@@ -90,8 +103,16 @@ Coordinator (Agent SDK)
   |     Parallelism: validate 5 rules simultaneously via sub-agents
   |
   +-- spawn: Deployment Agent
-        Tools: elasticsearch_deploy, splunk_deploy, github_pr, file_write
-        Conversation: single-turn (deterministic deployment)
+  |     Tools: elasticsearch_deploy, splunk_deploy, github_pr, file_write
+  |     Conversation: single-turn (deterministic deployment)
+  |
+  +-- spawn: Tuning Agent
+  |     Tools: alert_query, exclusion_write, health_score, feedback_read
+  |     Conversation: multi-turn (FP investigation + refinement)
+  |
+  +-- spawn: Security Gate Agent
+        Tools: secret_scan, yaml_validate, diff_review
+        Conversation: single-turn (PR gate decision)
 ```
 
 ### Tool Schema Example
