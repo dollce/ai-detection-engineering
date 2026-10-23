@@ -1,6 +1,6 @@
-# Claude Code Starter Prompts
+# Codex CLI Starter Prompts
 
-Copy-paste these into Claude Code to kick off different workflows.
+Copy-paste these into Codex CLI to kick off different workflows.
 
 ---
 
@@ -11,7 +11,7 @@ The complete workflow — from raw logs through Cribl normalization to deployed,
 > **Note**: Steps 2-3 (Cribl pipeline) are optional — skip them if you're not running with `--cribl` or `--full`. Jump from Step 1 straight to Step 4.
 
 ```
-Read CLAUDE.md and templates/detection-authoring-rules.md, then run the full detection engineering lifecycle:
+Read AGENTS.md and templates/detection-authoring-rules.md, then run the full detection engineering lifecycle:
 
 === STEP 1: SETUP VERIFICATION ===
 
@@ -216,7 +216,7 @@ Read CLAUDE.md and templates/detection-authoring-rules.md, then run the full det
 ## First Run — Environment Setup & Discovery
 
 ```
-Read the CLAUDE.md file, then:
+Read the AGENTS.md file, then:
 
 1. Check all services: Elasticsearch (elastic/changeme), Kibana, Splunk (admin/BlueTeamLab1!), Cribl (cribl_health)
 2. Verify git remote is configured (git remote -v)
@@ -409,7 +409,7 @@ Read templates/detection-authoring-rules.md first. Build a detection for T1053.0
 Analyze a threat intelligence source (blog post, report URL, or pasted text) and map it to actionable detections for this lab. This is the "intel-to-detection" pipeline.
 
 ```
-Read CLAUDE.md and templates/detection-authoring-rules.md, then analyze the threat intel I provide.
+Read AGENTS.md and templates/detection-authoring-rules.md, then analyze the threat intel I provide.
 
 === STEP 1: INTEL INGESTION ===
 

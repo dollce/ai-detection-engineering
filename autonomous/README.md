@@ -100,3 +100,30 @@ Check state: `cd autonomous && python3 orchestration/cli.py status`
 - Track: false positive patterns (what triggers secrets scan but isn't a secret)
 - Track: which agents produce the most security issues
 - Improve: refine scan-patterns.yml to reduce FP rate
+
+### Codex CLI Integration
+
+Agents invoke `codex exec` for reasoning tasks at key decision points:
+
+| Agent | Reasoning task | Fallback |
+|-------|----------------|----------|
+| Author | Author Sigma rules from attack/benign event data | Deterministic field extraction |
+| Validation | Refine rules when F1 < 0.90, up to two retries | Skip refinement |
+| Red Team | Generate scenarios for techniques without hardcoded generators | Hardcoded generators where available |
+| Tuning / Quality | Analyze fleet health and recommend actions | Fixed threshold scoring |
+| Intel | Select reports and extract MITRE techniques from fetched text | Local reports and regex parsing |
+| Security | Review rule quality | Deterministic security checks |
+
+- **Install/authenticate**: Codex CLI **0.163.0 or later** (`npm install -g @openai/codex`), then `codex login`. Check authentication with `codex login status`.
+- **Models**: `model: null` in `autonomous/orchestration/config.yml` uses the Codex CLI built-in default. Set a per-agent Codex model ID, or set `CODEX_MODEL` to override all agents. User/project model settings are not inherited by isolated reasoning calls.
+- **In CI**: Model calls remain disabled; existing deterministic fallbacks require no Codex credentials.
+- **Isolation**: Reasoning calls run from a temporary directory, ignore user/project configuration, and disable shell execution, local image reads, MCP, and app integrations. The read-only sandbox rejects file edits; harmless built-in interaction tools may still be advertised. Authentication still uses the Codex login session. Interactive `codex` reads `AGENTS.md` and the project's MCP config.
+- **Intel fetching**: Python fetches report pages and passes text to Codex for analysis. The optional web helper uses native web search without shell access.
+- **Responses**: Only the final assistant message enters JSON/YAML validation. CLI failures, empty responses, and timeouts trigger the existing fallback paths.
+- **Runtime limits**: Subprocess timeouts bound requests. The legacy `max_turns` argument remains accepted for callers; Codex has no equivalent hard turn limit.
+- **Budget**: `budget.py` tracks local estimates, not actual Codex subscription usage or billing.
+- **Validation/deployment**: Elasticsearch validation and local CI validation are unchanged; deployment remains post-merge. `--dry-run` on the existing agent runner skips Git operations only and still executes agents.
+
+The old `orchestration.claude_llm` import remains a compatibility shim; it invokes Codex.
+See the official [Codex CLI](https://learn.chatgpt.com/docs/codex/cli) and
+[MCP configuration](https://learn.chatgpt.com/docs/extend/mcp?surface=cli) documentation.

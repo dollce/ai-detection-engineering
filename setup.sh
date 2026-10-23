@@ -32,7 +32,7 @@ banner() {
     echo ""
     echo -e "${CYAN}╔══════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${CYAN}║       Blue Team Detection Engineering Lab                    ║${NC}"
-    echo -e "${CYAN}║       Autonomous Detection Agent — Claude Code               ║${NC}"
+    echo -e "${CYAN}║       Autonomous Detection Agent — Codex CLI                 ║${NC}"
     echo -e "${CYAN}╚══════════════════════════════════════════════════════════════╝${NC}"
     echo ""
 }
@@ -435,64 +435,30 @@ if [ -d "pipeline/attack-range-data" ] && [[ "$SIEM_MODE" == "splunk" || "$SIEM_
 fi
 
 # ─── MCP Configuration ──────────────────────────────────────────
-log_step "Configuring MCP for Claude Code"
+log_step "Configuring MCP for Codex CLI"
 
-if [ ! -f ".mcp.json" ]; then
-    # Build .mcp.json dynamically based on available tools
-    MCP_SERVERS='    "elasticsearch": {
-      "command": "docker",
-      "args": [
-        "run", "--rm", "-i",
-        "--network", "blue-team-lab",
-        "-e", "ES_URL=http://elastic:changeme@elasticsearch:9200",
-        "docker.elastic.co/mcp/elasticsearch"
-      ]
-    }'
-
-    if command -v node &>/dev/null; then
-        if [ "$INCLUDE_CRIBL" = true ]; then
-            MCP_SERVERS="$MCP_SERVERS"',
-    "cribl": {
-      "command": "node",
-      "args": ["./cribl/mcp-server/index.js"],
-      "env": {
-        "CRIBL_URL":   "http://localhost:9000",
-        "CRIBL_USER":  "admin",
-        "CRIBL_PASS":  "admin"
-      }
-    }'
-        fi
-        MCP_SERVERS="$MCP_SERVERS"',
-    "github": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "<YOUR_GITHUB_PAT>"
-      }
-    }'
-        log_warn "Edit .mcp.json and replace <YOUR_GITHUB_PAT> with your Personal Access Token"
-        log_warn "Create a PAT at: https://github.com/settings/tokens (scopes: repo, issues, pull_requests)"
+if command -v python3 &>/dev/null; then
+    if [ "$INCLUDE_CRIBL" = true ]; then
+        python3 pipeline/configure_codex.py --siem-mode "$SIEM_MODE" --cribl
     else
-        log_warn "Node.js not installed — GitHub and Cribl MCP servers not added to .mcp.json"
-        log_warn "Install Node.js and re-run setup, or copy entries from mcp-config.example.json"
+        python3 pipeline/configure_codex.py --siem-mode "$SIEM_MODE"
     fi
-
-    cat > .mcp.json <<MCPEOF
-{
-  "mcpServers": {
-$MCP_SERVERS
-  }
-}
-MCPEOF
-    log_ok "MCP config generated at .mcp.json"
+    log_info "Codex loads .codex/config.toml after you trust this project."
+    log_info "For GitHub MCP, export GITHUB_PERSONAL_ACCESS_TOKEN before launching Codex."
 else
-    log_ok ".mcp.json already exists (not overwritten)"
+    log_warn "Python 3 is required to generate .codex/config.toml."
+    log_warn "Install Python, then run: python3 pipeline/configure_codex.py --cribl"
+fi
+
+if ! command -v codex &>/dev/null; then
+    log_warn "Install Codex CLI >= 0.163.0: npm install -g @openai/codex"
+    log_warn "Then authenticate: codex login"
 fi
 
 # ─── Git Check ─────────────────────────────────────────────────
 log_step "Git Repository"
 
-if [ ! -d ".git" ]; then
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     git init
     git add .
     git commit -m "chore: initial project scaffolding
@@ -543,8 +509,8 @@ fi
 echo ""
 echo -e "${GREEN}Next steps:${NC}"
 echo ""
-echo "  1. Open Claude Code in this directory:"
-echo -e "     ${YELLOW}claude${NC}"
+echo "  1. Open Codex CLI in this directory (run codex login first):"
+echo -e "     ${YELLOW}codex${NC}"
 echo ""
 echo "  2. Paste the first-run prompt from PROMPTS.md"
 echo ""

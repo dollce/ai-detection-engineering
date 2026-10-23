@@ -15,7 +15,7 @@ import yaml
 
 from orchestration.state import StateManager
 from orchestration import learnings
-from orchestration import claude_llm
+from orchestration import codex_llm
 
 AUTONOMOUS_DIR = Path(__file__).resolve().parent.parent.parent
 REPO_ROOT = AUTONOMOUS_DIR.parent
@@ -284,16 +284,16 @@ def run(state_manager: StateManager) -> dict:
             except ValueError:
                 pass  # May lack required artifacts, skip silently
 
-    # 4. Ask Claude for fleet analysis (if available)
+    # 4. Ask Codex for fleet analysis (if available)
     llm_insights = []
-    if claude_llm.is_available() and results:
-        print(f"  [quality] Asking Claude (sonnet) for fleet analysis...")
+    if codex_llm.is_available() and results:
+        print(f"  [quality] Asking Codex for fleet analysis...")
         health_summary = "\n".join(
             f"- {r['technique_id']}: health={r['health']['health_score']}, "
             f"action={r['action']}, FP={r['health']['fp_rate']}, TP={r['health']['tp_rate']}"
             for r in results
         )
-        llm_result = claude_llm.ask_for_analysis(
+        llm_result = codex_llm.ask_for_analysis(
             question=(
                 "Based on this detection fleet health data, provide 2-3 brief, "
                 "actionable recommendations. Focus on: detections that need tuning, "
@@ -304,10 +304,10 @@ def run(state_manager: StateManager) -> dict:
             agent_name="quality",
         )
         if llm_result["success"]:
-            llm_insights = [f"[Claude] {llm_result['response']}"]
-            print(f"  [quality] Claude analysis received")
+            llm_insights = [f"[Codex] {llm_result['response']}"]
+            print(f"  [quality] Codex analysis received")
         else:
-            print(f"  [quality] Claude analysis skipped: {llm_result.get('error', 'unknown')}")
+            print(f"  [quality] Codex analysis skipped: {llm_result.get('error', 'unknown')}")
 
     all_insights = cross_agent_insights + llm_insights
 

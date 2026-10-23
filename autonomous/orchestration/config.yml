@@ -1,73 +1,72 @@
 # Patronus Agent Configuration
-# Optimized for Claude Pro plan token budget
-#
-# Claude LLM integration:
-#   Agents invoke Claude Code CLI (claude -p) for reasoning tasks.
-#   - Locally: uses Pro subscription OAuth (auto-detected from ~/.claude/)
-#   - In CI: Claude CLI is not authenticated — agents fall back to
-#     deterministic Python logic automatically. No credentials needed.
-#   - Model aliases: "opus" -> claude-opus-4-6, "sonnet" -> claude-sonnet-4-6
-#   - All invocations use --tools "" (no file/shell access, pure reasoning)
+# Codex CLI integration:
+#   Agents invoke `codex exec` for isolated reasoning tasks.
+#   Codex CLI >= 0.163.0 and an authenticated `codex login` session are required.
+#   model: null uses the CLI built-in default; CODEX_MODEL overrides per-agent models.
+#   Set a concrete Codex model ID per agent to pin a model explicitly.
+#   User/project CLI config, repository instructions, shell, MCP, and app tools are
+#   excluded from these inference calls. Interactive `codex` still reads AGENTS.md.
+#   CI keeps deterministic Python fallbacks and does not require authentication.
 
 # Phase 4 topology: 8 specialized agents (refactored from 5)
 # Legacy names (blue-team, quality) still work via AGENT_ALIASES in agent_runner.py
 agents:
   intel:
     schedule: "daily"
-    model: "sonnet"                # Fast model for report parsing
+    model: null                    # Codex CLI built-in default
     max_reports: 5
     max_tokens_estimate: 50000
-    web_search: true               # Enable web search when Claude CLI available
+    web_search: true               # Enable web search when Codex CLI available
     web_search_max_reports: 3      # Max reports to fetch per run
-    claude_tasks:
-      - "Search web for new threat reports (WebSearch/WebFetch)"
+    llm_tasks:
+      - "Select and analyze threat reports fetched by Python"
       - "Extract MITRE techniques from raw report summaries"
 
   red-team:
     trigger: "intel_merge"
-    model: "sonnet"
+    model: null                    # Codex CLI built-in default
     max_scenarios_per_run: 5
     max_tokens_estimate: 30000
 
   author:
     trigger: "red_merge"
-    model: "opus"                  # Best model for detection authoring
+    model: null                    # Codex CLI built-in default
     max_detections_per_run: 5
     max_tokens_estimate: 80000
-    claude_tasks:
+    llm_tasks:
       - "Author Sigma detection rules from attack/benign event data"
 
   validation:
     trigger: "author_merge"
-    model: "sonnet"
+    model: null                    # Codex CLI built-in default
     max_tokens_estimate: 30000
     auto_deploy_threshold: 0.90
     max_tune_retries: 2
     refinement_timeout_seconds: 300
-    claude_tasks:
+    llm_tasks:
       - "Suggest rule improvements when F1 < threshold"
 
   deployment:
     trigger: "validation_merge OR manual"
-    model: "sonnet"
+    model: null                    # Codex CLI built-in default
     max_tokens_estimate: 10000
 
   tuning:
     schedule: "daily"
-    model: "sonnet"                # Fast model for fleet analysis
+    model: null                    # Codex CLI built-in default
     max_tokens_estimate: 40000
     max_exclusions_per_rule: 3
-    claude_tasks:
+    llm_tasks:
       - "Analyze fleet health and recommend tuning actions"
 
   coverage:
     schedule: "daily"
-    model: "sonnet"
+    model: null                    # Codex CLI built-in default
     max_tokens_estimate: 20000
 
   security:
     trigger: "every_agent_pr"
-    model: "sonnet"
+    model: null                    # Codex CLI built-in default
     max_tokens_estimate: 20000
     block_on_critical: true
     auto_fix_enabled: true
@@ -99,14 +98,13 @@ github:
   repo: "lsmithg12/ai-detection-engineering"
   base_branch: "main"
 
-# Budget tracking
+# Local budget heuristics (not Codex subscription quota or API pricing)
 budget:
   log_file: "autonomous/budget-log.jsonl"
   daily_cap_tokens: 500000
   warn_at_pct: 80
-  models:
-    opus: 1.0
-    sonnet: 0.2
+  default_model_multiplier: 1.0
+  models: {}                      # Optional model ID -> estimate multiplier
   light_mode:
     intel_max_reports: 2
     blue_max_detections: 2

@@ -7,6 +7,7 @@ on:
       - 'plans/**'
       - 'README.md'
       - 'ROADMAP.md'
+      - 'AGENTS.md'
       - 'CLAUDE.md'
       - 'STATUS.md'
       - 'PROMPTS.md'
