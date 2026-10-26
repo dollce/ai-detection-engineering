@@ -1,42 +1,66 @@
 {
   "technique_id": "T1087.002_EQL",
-  "date": "2026-04-12T14:50:58Z",
-  "sigma_rule": "detections\\discovery\\t1087_002_discovery_burst_eql.yml",
+  "date": "2026-10-26T07:50:51Z",
+  "status": "PASS",
+  "sigma_rule": "detections/discovery/t1087_002_discovery_burst_eql.yml",
+  "scenario_path": "simulator/scenarios/windows/t1087_002_eql.json",
+  "compiled_artifact": "detections/discovery/compiled/t1087_002_discovery_burst_eql_elastic.json",
+  "validation_method": "elasticsearch_eql",
+  "validated_by": "revalidate-evidence",
+  "quality_tier": "validated",
+  "validation_scope": "Scenario validation on Elasticsearch temporary indices only; no Splunk, Cribl, production telemetry, or scheduled-alert validation.",
+  "siem_targets": [
+    "elasticsearch"
+  ],
+  "elasticsearch_version": "8.17.0",
+  "attack_event_count": 3,
+  "benign_event_count": 2,
+  "scoring_unit": "scenario",
   "metrics": {
-    "tp": 3,
+    "tp": 1,
     "fp": 0,
     "fn": 0,
-    "tn": 2,
+    "tn": 1,
     "precision": 1.0,
     "recall": 1.0,
     "f1_score": 1.0,
     "fp_rate": 0.0,
     "tp_rate": 1.0,
-    "total_attack": 3,
-    "total_benign": 2
+    "total_attack": 1,
+    "total_benign": 1,
+    "scoring_unit": "scenario"
   },
-  "quality_tier": "auto_deploy",
-  "validation_method": "elasticsearch",
-  "validated_by": "validation-agent",
-  "siem_targets": [
-    "elasticsearch",
-    "splunk"
-  ],
-  "sigma_rule_path": "detections\\discovery\\t1087_002_discovery_burst_eql.yml",
-  "scenario_path": "simulator/scenarios/t1087_002_eql.json",
-  "attack_event_count": 3,
-  "benign_event_count": 2,
-  "quality_tier_criteria": {
-    "auto_deploy": "F1 >= 0.90 AND FP_rate <= 0.05",
-    "validated": "F1 >= 0.75",
-    "needs_rework": "F1 < 0.75"
+  "query": "sequence by host.name with maxspan=60s\n  [process where event.code == \"1\" and\n    process.name in (\"whoami.exe\", \"net.exe\", \"net1.exe\", \"ipconfig.exe\",\n                     \"systeminfo.exe\", \"tasklist.exe\", \"nltest.exe\",\n                     \"netstat.exe\", \"arp.exe\", \"nslookup.exe\")]\n  [process where event.code == \"1\" and\n    process.name in (\"whoami.exe\", \"net.exe\", \"net1.exe\", \"ipconfig.exe\",\n                     \"systeminfo.exe\", \"tasklist.exe\", \"nltest.exe\",\n                     \"netstat.exe\", \"arp.exe\", \"nslookup.exe\")]\n  [process where event.code == \"1\" and\n    process.name in (\"whoami.exe\", \"net.exe\", \"net1.exe\", \"ipconfig.exe\",\n                     \"systeminfo.exe\", \"tasklist.exe\", \"nltest.exe\",\n                     \"netstat.exe\", \"arp.exe\", \"nslookup.exe\")]",
+  "query_parameters": {
+    "expected_sequences": 1
+  },
+  "input_hashes": {
+    "autonomous/detection-requests/t1087_002_eql.yml": "547aeebfb59226a279c36ea651d4ffcac8f484cf4a1638cb608cdeb023b5fcc7",
+    "detections/discovery/t1087_002_discovery_burst_eql.yml": "5dde53c97c2d763c93060b7ae4d86895027515079649f4082636165c6567bdb4",
+    "simulator/scenarios/windows/t1087_002_eql.json": "9815770e542b3d811e7ac620f35c38765132ad096c91395340cd9cd7bbd7f9a4",
+    "detections/discovery/compiled/t1087_002_discovery_burst_eql_elastic.json": "03760da15c768c6fa2f900577326ee22ff5bb7d3f72f24dba2b22f9621065098"
   },
   "validation_details": {
-    "index": "sim-validation-fb59c3e6",
-    "query": "(event.code:1 AND (process.name:(whoami.exe OR net.exe OR net1.exe OR ipconfig.exe OR systeminfo.exe OR tasklist.exe OR nltest.exe OR netstat.exe OR arp.exe OR nslookup.exe))) AND (NOT ((process.paren",
+    "validation_method": "elasticsearch_eql",
+    "scoring_unit": "scenario",
+    "eql_query": "sequence by host.name with maxspan=60s\n  [process where event.code == \"1\" and\n    process.name in (\"whoami.exe\", \"net.exe\", \"net1.exe\", \"ipconfig.exe\",\n                     \"systeminfo.exe\", \"tasklist.exe\", \"nltest.exe\",\n                     \"netstat.exe\", \"arp.exe\", \"nslookup.exe\")]\n  [process where event.code == \"1\" and\n    process.name in (\"whoami.exe\", \"net.exe\", \"net1.exe\", \"ipconfig.exe\",\n                     \"systeminfo.exe\", \"tasklist.exe\", \"nltest.exe\",\n                     \"netstat.exe\", \"arp.exe\", \"nslookup.exe\")]\n  [process where event.code == \"1\" and\n    process.name in (\"whoami.exe\", \"net.exe\", \"net1.exe\", \"ipconfig.exe\",\n                     \"systeminfo.exe\", \"tasklist.exe\", \"nltest.exe\",\n                     \"netstat.exe\", \"arp.exe\", \"nslookup.exe\")]",
+    "expected_sequences": 1,
+    "sequences_found": 1,
+    "attack_sequences_found": 1,
+    "benign_sequences_found": 0,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "tn": 1,
+    "total_attack": 1,
+    "total_benign": 1,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "fp_rate": 0.0,
+    "tp_rate": 1.0,
     "events_ingested": 5,
-    "query_hits": 3,
-    "query_time_ms": 6,
+    "index_used": "sim-validation-4ee789ce",
     "errors": []
   }
 }

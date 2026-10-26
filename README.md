@@ -257,6 +257,14 @@ reuse a committed report. CI never rewrites accepted regression baselines; optio
 reviewed snapshots are stored and read under `tests/results/regression/` by rule path.
 Existing invalid evidence must be repaired and revalidated, not relabeled as passing.
 
+To refresh selected results with native Elasticsearch queries, use
+`autonomous/orchestration/revalidate_evidence.py --es-url <url> --technique <exact-id>`
+(repeat `--technique` for a batch). The command requires both scenario populations,
+fails without local fallback, and saves successful evidence atomically with input
+hashes and the server version. It does not deploy rules or change request states.
+See [the isolated SIEM validation procedure](tests/siem_integration/README.md) for
+the issue #4 reproduction, integration tests and evidence scope.
+
 ### Current Detection Coverage
 
 For live detection counts and pipeline state, see [STATUS.md](STATUS.md).

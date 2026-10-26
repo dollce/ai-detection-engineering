@@ -1,42 +1,76 @@
 {
   "technique_id": "T1489",
-  "date": "2026-04-12T14:45:18Z",
-  "sigma_rule": "detections\\impact\\t1489_mass_service_stop_threshold.yml",
+  "date": "2026-10-26T07:50:51Z",
+  "status": "PASS",
+  "sigma_rule": "detections/impact/t1489_mass_service_stop_threshold.yml",
+  "scenario_path": "simulator/scenarios/windows/t1489.json",
+  "compiled_artifact": "detections/impact/compiled/t1489_mass_service_stop_threshold_elastic.json",
+  "validation_method": "elasticsearch_threshold",
+  "validated_by": "revalidate-evidence",
+  "quality_tier": "validated",
+  "validation_scope": "Scenario validation on Elasticsearch temporary indices only; no Splunk, Cribl, production telemetry, or scheduled-alert validation.",
+  "siem_targets": [
+    "elasticsearch"
+  ],
+  "elasticsearch_version": "8.17.0",
+  "attack_event_count": 4,
+  "benign_event_count": 2,
+  "scoring_unit": "scenario",
   "metrics": {
-    "tp": 4,
+    "tp": 1,
     "fp": 0,
     "fn": 0,
-    "tn": 2,
+    "tn": 1,
     "precision": 1.0,
     "recall": 1.0,
     "f1_score": 1.0,
     "fp_rate": 0.0,
     "tp_rate": 1.0,
-    "total_attack": 4,
-    "total_benign": 2
+    "total_attack": 1,
+    "total_benign": 1,
+    "scoring_unit": "scenario"
   },
-  "quality_tier": "auto_deploy",
-  "validation_method": "elasticsearch",
-  "validated_by": "validation-agent",
-  "siem_targets": [
-    "elasticsearch",
-    "splunk"
-  ],
-  "sigma_rule_path": "detections\\impact\\t1489_mass_service_stop_threshold.yml",
-  "scenario_path": "simulator/scenarios/t1489.json",
-  "attack_event_count": 4,
-  "benign_event_count": 2,
-  "quality_tier_criteria": {
-    "auto_deploy": "F1 >= 0.90 AND FP_rate <= 0.05",
-    "validated": "F1 >= 0.75",
-    "needs_rework": "F1 < 0.75"
+  "query": "event.code: \"7036\" AND winlog.event_data.param2: stopped AND NOT winlog.event_data.param1: (\"Windows Update\" OR \"Background Intelligent Transfer Service\" OR \"Windows Defender Advanced Threat Protection Service\")",
+  "query_parameters": {
+    "threshold_field": "host.name",
+    "threshold_value": 3,
+    "window": "11m",
+    "cardinality_field": "winlog.event_data.param1.keyword",
+    "cardinality_value": 3
+  },
+  "input_hashes": {
+    "autonomous/detection-requests/t1489.yml": "e4a4481367a96d8d69a076195f576dae13c179ddcd51c0b274993a87e64f1901",
+    "detections/impact/t1489_mass_service_stop_threshold.yml": "5d0cf42439765a563133e152099f4cb93b9042b77890eb38bb281760c8a76cb5",
+    "simulator/scenarios/windows/t1489.json": "874d212325114dbfb922df52ba3fb8a3396412ea6deb98b211b17d2becdf7c62",
+    "detections/impact/compiled/t1489_mass_service_stop_threshold_elastic.json": "f5718f12f15b40725ba200c1ff311a0dd9a68dea0533ebbe11afaf010a03999b"
   },
   "validation_details": {
-    "index": "sim-validation-3fe66636",
-    "query": "((event.code:7036 AND winlog.event_data.param2.keyword:stopped) AND (NOT (winlog.event_data.param1.keyword:(Windows\\ Update OR Background\\ Intelligent\\ Transfer\\ Service OR Windows\\ Defender\\ Advanced",
+    "validation_method": "elasticsearch_threshold",
+    "base_query": "event.code: \"7036\" AND winlog.event_data.param2: stopped AND NOT winlog.event_data.param1: (\"Windows Update\" OR \"Background Intelligent Transfer Service\" OR \"Windows Defender Advanced Threat Protection Service\")",
+    "threshold_field": "host.name",
+    "threshold_value": 3,
+    "cardinality_field": "winlog.event_data.param1.keyword",
+    "cardinality_value": 3,
+    "window": "11m",
+    "threshold_breaches": 1,
+    "attack_threshold_breaches": 1,
+    "benign_threshold_breaches": 0,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "tn": 1,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "fp_rate": 0.0,
+    "tp_rate": 1.0,
+    "total_attack": 1,
+    "total_benign": 1,
     "events_ingested": 6,
-    "query_hits": 4,
-    "query_time_ms": 25,
-    "errors": []
+    "index_used": "sim-validation-c2029dc9",
+    "errors": [],
+    "scoring_unit": "scenario",
+    "window_evaluations": 5,
+    "timestamp_policy": "preserve_supplied"
   }
 }

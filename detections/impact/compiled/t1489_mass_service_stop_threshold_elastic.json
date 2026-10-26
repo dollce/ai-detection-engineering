@@ -9,7 +9,7 @@
   "threshold": {
     "field": ["host.name"],
     "value": 3,
-    "cardinality": [{"field": "winlog.event_data.param1", "value": 3}]
+    "cardinality": [{"field": "winlog.event_data.param1.keyword", "value": 3}]
   },
   "threat": [
     {
