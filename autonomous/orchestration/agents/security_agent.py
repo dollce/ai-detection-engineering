@@ -49,7 +49,7 @@ def _load_github_config() -> tuple[str, str]:
     1. GITHUB_TOKEN env var (set by GitHub Actions automatically)
     2. .mcp.json (local development, gitignored)
     """
-    repo = "lsmithg12/ai-detection-engineering"
+    repo = "dollce/ai-detection-engineering"
 
     # 1. Environment variable (GitHub Actions provides this)
     token = os.environ.get("GITHUB_TOKEN", "")

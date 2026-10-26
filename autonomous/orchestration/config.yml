@@ -95,7 +95,7 @@ infrastructure:
 
 # GitHub
 github:
-  repo: "lsmithg12/ai-detection-engineering"
+  repo: "dollce/ai-detection-engineering"
   base_branch: "main"
 
 # Local budget heuristics (not Codex subscription quota or API pricing)

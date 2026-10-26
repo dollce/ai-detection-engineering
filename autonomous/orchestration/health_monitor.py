@@ -105,7 +105,7 @@ class DetectionHealthMonitor:
         es_url: str = "http://localhost:9200",
         es_auth: tuple[str, str] = ("elastic", "changeme"),
         github_token: str = "",
-        repo: str = "lsmithg12/ai-detection-engineering",
+        repo: str = "dollce/ai-detection-engineering",
     ) -> None:
         self.es_url = es_url.rstrip("/")
         self.es_auth = es_auth

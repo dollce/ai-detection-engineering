@@ -26,6 +26,7 @@ from orchestration.siem import check_elastic
 from orchestration.validation import validate_against_elasticsearch
 from orchestration.validation_eql import validate_eql_against_elasticsearch
 from orchestration.validation_threshold import validate_threshold_against_elasticsearch
+from orchestration.validation_results import ValidationUnavailable, read_f1, require_no_errors, score
 from orchestration import codex_llm
 
 # Re-use authoring utilities for transpilation and scenario loading
@@ -280,20 +281,40 @@ def _event_detected_by_rule(rule_path: Path, event: dict) -> bool:
     return True
 
 
-def assess_quality(metrics: dict) -> str:
+def assess_quality(metrics: dict, validation_errors: list | None = None) -> str:
     """
     Determine quality tier based on validation metrics.
     Returns: 'auto_deploy' | 'human_review' | 'needs_rework'
     """
-    f1 = metrics.get("f1_score", 0)
-    fp_rate = metrics.get("fp_rate", 1)
+    try:
+        require_no_errors(metrics)
+        if validation_errors is not None:
+            require_no_errors({"errors": validation_errors})
+        f1 = read_f1(metrics)
+        fp_rate = score(metrics.get("fp_rate"), "FP rate")
+        for key in ("total_attack", "total_benign"):
+            count = metrics.get(key)
+            if isinstance(count, bool) or not isinstance(count, int) or count <= 0:
+                raise ValidationUnavailable(f"Missing or empty {key} validation population")
+    except ValidationUnavailable:
+        return "needs_rework"
 
     if f1 >= AUTO_DEPLOY_THRESHOLD and fp_rate <= MAX_FP_RATE_AUTO_DEPLOY:
         return "auto_deploy"
-    elif f1 >= 0.70:
+    elif f1 >= 0.75:
         return "human_review"
     else:
         return "needs_rework"
+
+
+def _siem_validation_errors(response: dict) -> list:
+    """Preserve failure evidence before projecting a SIEM response into metrics."""
+    try:
+        require_no_errors(response)
+    except ValidationUnavailable as exc:
+        errors = response.get("errors") if isinstance(response, dict) else None
+        return errors if isinstance(errors, list) and errors else [str(exc)]
+    return []
 
 
 # ---------------------------------------------------------------------------
@@ -315,6 +336,8 @@ def validate_single(request: dict, state_manager: StateManager, run_id: str,
     tactic = request.get("mitre_tactic") or TECHNIQUE_TACTIC_MAP.get(tid.split(".")[0], "execution")
 
     result = {"technique_id": tid, "title": request.get("title", ""), "status": "failed"}
+    # An interrupted/missing validation must not retain eligibility from an earlier run.
+    state_manager.update(tid, agent=AGENT_NAME, auto_deploy_eligible=False)
 
     # Load scenario
     scenario_path = request.get("scenario_file", "")
@@ -384,7 +407,7 @@ def validate_single(request: dict, state_manager: StateManager, run_id: str,
             )
             if eql_metrics is not None:
                 validation_method = "elasticsearch_eql"
-                siem_errors = eql_metrics.get("errors", [])
+                siem_errors = _siem_validation_errors(eql_metrics)
                 validation_details = {
                     "index": eql_metrics.get("index_used", ""),
                     "query": eql_metrics.get("eql_query", "")[:200],
@@ -441,7 +464,7 @@ def validate_single(request: dict, state_manager: StateManager, run_id: str,
             )
             if threshold_metrics is not None:
                 validation_method = "elasticsearch_threshold"
-                siem_errors = threshold_metrics.get("errors", [])
+                siem_errors = _siem_validation_errors(threshold_metrics)
                 validation_details = {
                     "index": threshold_metrics.get("index_used", ""),
                     "query": threshold_metrics.get("base_query", "")[:200],
@@ -479,7 +502,7 @@ def validate_single(request: dict, state_manager: StateManager, run_id: str,
 
         if siem_metrics is not None:
             validation_method = "elasticsearch"
-            siem_errors = siem_metrics.get("errors", [])
+            siem_errors = _siem_validation_errors(siem_metrics)
             validation_details = {
                 "index": siem_metrics.get("index_used", ""),
                 "query": siem_metrics.get("query_used", "")[:200],
@@ -510,7 +533,17 @@ def validate_single(request: dict, state_manager: StateManager, run_id: str,
             print(f"    [validation] Validating locally (no compiled query available)")
         metrics = validate_detection(str(rule_path.relative_to(REPO_ROOT)), scenario)
 
-    quality_tier = assess_quality(metrics)
+    if rule_type in {"eql", "threshold"} and validation_method == "local_json":
+        siem_errors.append(f"{rule_type} validation did not execute in Elasticsearch")
+    elif use_siem and validation_method == "local_json":
+        siem_errors.append("Requested Elasticsearch validation did not complete")
+    if rule_type == "sigma" and not lucene:
+        siem_errors.append("Required compiled Lucene query is missing or empty")
+    if rule_type not in {"sigma", "eql", "threshold"}:
+        siem_errors.append(f"Unsupported rule type: {rule_type}")
+    if siem_errors:
+        validation_details["errors"] = siem_errors
+    quality_tier = assess_quality(metrics, siem_errors)
 
     print(f"    [validation] Results: TP={metrics['tp']}/{metrics['total_attack']}, "
           f"FP={metrics['fp']}/{metrics['total_benign']}, "
@@ -518,7 +551,7 @@ def validate_single(request: dict, state_manager: StateManager, run_id: str,
     print(f"    [validation] Quality: {quality_tier}")
 
     # --- RETRY-WITH-FEEDBACK (if F1 < threshold and Codex available) ---
-    if metrics["f1_score"] < AUTO_DEPLOY_THRESHOLD and codex_llm.is_available():
+    if rule_type == "sigma" and metrics["f1_score"] < AUTO_DEPLOY_THRESHOLD and codex_llm.is_available():
         attack_events = scenario.get("events", {}).get("attack_sequence", [])
         benign_events = scenario.get("events", {}).get("benign_similar", [])
 
@@ -628,9 +661,14 @@ Return ONLY the corrected Sigma YAML. No markdown fences, no explanation."""
 
                     # Re-transpile
                     new_lucene, new_spl = transpile_sigma(rule_path)
-                    if new_lucene:
-                        save_compiled(tactic, tid_under, new_lucene, new_spl)
-                        lucene = new_lucene
+                    # Never validate a refined rule using the previous rule's query.
+                    lucene = new_lucene
+                    if not new_lucene:
+                        rule_path.write_text(original_rule_yaml, encoding="utf-8")
+                        siem_errors.append("Refinement transpilation failed; restored previous rule")
+                        quality_tier = "needs_rework"
+                        break
+                    save_compiled(tactic, tid_under, new_lucene, new_spl)
 
                     # Re-validate (prefer SIEM when available)
                     if use_siem and lucene:
@@ -642,7 +680,7 @@ Return ONLY the corrected Sigma YAML. No markdown fences, no explanation."""
                         )
                         if siem_retry is not None:
                             validation_method = "elasticsearch"
-                            siem_errors = siem_retry.get("errors", [])
+                            siem_errors = _siem_validation_errors(siem_retry)
                             validation_details = {
                                 "index": siem_retry.get("index_used", ""),
                                 "query": siem_retry.get("query_used", "")[:200],
@@ -665,9 +703,11 @@ Return ONLY the corrected Sigma YAML. No markdown fences, no explanation."""
                         else:
                             metrics = validate_detection(str(rule_path.relative_to(REPO_ROOT)), scenario)
                             validation_method = "local_json"
+                            siem_errors = ["Requested Elasticsearch retry did not complete"]
                     else:
                         metrics = validate_detection(str(rule_path.relative_to(REPO_ROOT)), scenario)
-                    quality_tier = assess_quality(metrics)
+                        validation_method = "local_json"
+                    quality_tier = assess_quality(metrics, siem_errors)
 
                     print(f"    [validation] After retry {attempt}: "
                           f"TP={metrics['tp']}/{metrics['total_attack']}, "
@@ -680,7 +720,10 @@ Return ONLY the corrected Sigma YAML. No markdown fences, no explanation."""
                         print(f"    [validation] Refinement degraded F1 ({metrics['f1_score']} < {original_f1}) — reverting to best")
                         rule_path.write_text(original_rule_yaml, encoding="utf-8")
                         metrics = validate_detection(str(rule_path.relative_to(REPO_ROOT)), scenario)
-                        quality_tier = assess_quality(metrics)
+                        validation_method = "local_json"
+                        if use_siem:
+                            siem_errors.append("Reverted rule requires a fresh Elasticsearch validation")
+                        quality_tier = assess_quality(metrics, siem_errors)
                         break
 
                     # Track best intermediate result so revert goes to best, not first
@@ -721,7 +764,10 @@ Return ONLY the corrected Sigma YAML. No markdown fences, no explanation."""
         },
     }
     if validation_details:
+        validation_details["errors"] = siem_errors
         result_data["validation_details"] = validation_details
+    elif siem_errors:
+        result_data["validation_details"] = {"errors": siem_errors}
     results_file.write_text(json.dumps(result_data, indent=2), encoding="utf-8")
 
     # Update metrics on request

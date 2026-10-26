@@ -949,7 +949,7 @@ def _list_open_gap_issues(token: str) -> set[str]:
     import urllib.request
     import urllib.error
 
-    url = ("https://api.github.com/repos/lsmithg12/ai-detection-engineering/issues"
+    url = ("https://api.github.com/repos/dollce/ai-detection-engineering/issues"
            "?labels=coverage-gap&state=open&per_page=100")
     req = urllib.request.Request(url, headers={
         "Authorization": f"Bearer {token}",
@@ -1006,7 +1006,7 @@ def _create_gap_issue(
     }).encode()
 
     req = urllib.request.Request(
-        "https://api.github.com/repos/lsmithg12/ai-detection-engineering/issues",
+        "https://api.github.com/repos/dollce/ai-detection-engineering/issues",
         data=payload, method="POST",
         headers={
             "Authorization": f"Bearer {token}",

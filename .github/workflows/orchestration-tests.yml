@@ -11,6 +11,8 @@ on:
       - 'Makefile'
       - 'AGENTS.md'
       - '.github/workflows/orchestration-tests.yml'
+      - '.github/workflows/regression-test.yml'
+      - '.github/workflows/continuous-validation.yml'
   push:
     branches: [main]
     paths:
@@ -22,6 +24,8 @@ on:
       - 'Makefile'
       - 'AGENTS.md'
       - '.github/workflows/orchestration-tests.yml'
+      - '.github/workflows/regression-test.yml'
+      - '.github/workflows/continuous-validation.yml'
   workflow_dispatch:
 
 permissions:
@@ -29,7 +33,7 @@ permissions:
 
 jobs:
   offline-regressions:
-    name: Codex adapter and consumer regressions
+    name: Orchestration and validation gate regressions
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
