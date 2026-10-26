@@ -1,0 +1,95 @@
+technique_id: T1070.006
+title: "Detection for T1070.006 -- Modify file timestamps to hide activity"
+status: DEPLOYED
+priority: high
+requested_by: intel
+requested_date: '2026-03-21T13:04:56Z'
+intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
+scenario_file: simulator/scenarios/windows/t1070_006.json
+sigma_rule: detections/defense_evasion/t1070_006.yml
+deployed_date: '2026-04-12T21:24:43Z'
+last_quality_review: ''
+quality_score: 1.0
+fp_rate: 0.0
+tp_rate: 1.0
+alert_volume_24h: 0
+cost_estimate: low
+auto_deploy_eligible: true
+changelog:
+- date: '2026-03-21T13:04:56Z'
+  agent: intel
+  action: created
+  details: 'Detection request created from intel: threat-intel/fawkes/fawkes-ttp-mapping.md'
+- date: '2026-03-21T13:04:56Z'
+  agent: intel
+  action: update
+  details: 'Updated fields: threat_actors, fawkes_commands'
+- date: '2026-03-21T13:04:56Z'
+  agent: intel
+  action: update
+  details: 'Updated fields: data_source_requirements'
+- date: '2026-03-21T13:04:56Z'
+  agent: intel
+  action: update
+  details: 'Updated fields: data_source_gaps'
+- date: '2026-03-22T17:25:14Z'
+  agent: red-team
+  action: update
+  details: 'Updated fields: scenario_file'
+- date: '2026-03-22T17:25:14Z'
+  agent: red-team
+  action: transition:REQUESTED->SCENARIO_BUILT
+  details: 'Scenario generated: 3 attack, 2 benign events'
+- date: '2026-04-01T13:03:38Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: compiled_lucene'
+- date: '2026-04-04T09:00:00Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: compiled_splunk'
+- date: '2026-04-11T14:04:55Z'
+  agent: validation
+  action: update
+  details: 'Updated fields: quality_score, fp_rate, tp_rate'
+- date: '2026-04-11T14:04:55Z'
+  agent: validation
+  action: transition:AUTHORED->VALIDATED
+  details: F1=1.0, FP_rate=0.0, tier=auto_deploy
+- date: '2026-04-11T14:04:55Z'
+  agent: validation
+  action: update
+  details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:24:43Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:24:43Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:24:43Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:24:43Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
+threat_actors:
+- Fawkes C2 Agent
+fawkes_commands:
+- timestomp
+data_source_requirements:
+- source: sysmon
+  event_ids:
+  - 1
+  fields:
+  - process.name
+  - process.command_line
+data_source_gaps:
+- GAP-006
+compiled_lucene: detections/defense_evasion/compiled/t1070_006.lucene
+compiled_spl: detections/defense_evasion/compiled/t1070_006.spl
+elastic_rule_id: cf660241-51a9-434f-aaf3-7437c0abf981
+splunk_saved_search: "Detection for T1070.006 -- Modify file timestamps to hide activity T1070.006"

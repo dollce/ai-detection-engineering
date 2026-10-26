@@ -1,0 +1,78 @@
+[
+  {
+    "@timestamp": "2026-04-11T08:02:11.504Z",
+    "event": {
+      "category": "process",
+      "type": "start",
+      "action": "Process Create (rule: ProcessCreate)",
+      "code": "1"
+    },
+    "process": {
+      "pid": 3120,
+      "name": "net.exe",
+      "executable": "C:\\Windows\\System32\\net.exe",
+      "command_line": "net.exe view /domain:CORP",
+      "parent": {
+        "pid": 2288,
+        "name": "cmd.exe",
+        "executable": "C:\\Windows\\System32\\cmd.exe"
+      }
+    },
+    "user": {
+      "name": "mjones",
+      "domain": "CORP"
+    },
+    "host": {
+      "name": "SRV-DC-01",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "benign_similar",
+      "technique": "T1018",
+      "description": "IT admin mjones running net view manually from an interactive cmd.exe session during routine inventory check \u2014 identical command line but parent is cmd.exe, not an unsigned ProgramData binary"
+    }
+  },
+  {
+    "@timestamp": "2026-04-11T07:30:00.012Z",
+    "event": {
+      "category": "process",
+      "type": "start",
+      "action": "Process Create (rule: ProcessCreate)",
+      "code": "1"
+    },
+    "process": {
+      "pid": 1644,
+      "name": "nltest.exe",
+      "executable": "C:\\Windows\\System32\\nltest.exe",
+      "command_line": "nltest.exe /dclist:CORP",
+      "parent": {
+        "pid": 980,
+        "name": "CcmExec.exe",
+        "executable": "C:\\Windows\\CCM\\CcmExec.exe"
+      }
+    },
+    "user": {
+      "name": "SYSTEM",
+      "domain": "NT AUTHORITY"
+    },
+    "host": {
+      "name": "SRV-DC-01",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "benign_similar",
+      "technique": "T1018",
+      "description": "SCCM client (CcmExec.exe) running scheduled nltest DC discovery as SYSTEM during morning policy refresh \u2014 same command but trusted parent path, SYSTEM context, and predictable scheduled cadence"
+    }
+  }
+]

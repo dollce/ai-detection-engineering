@@ -1,0 +1,96 @@
+{
+  "technique_id": "T1135",
+  "technique_name": "Network Share Discovery",
+  "fawkes_command": "net-shares",
+  "data_sources": ["Sysmon EventID 1"],
+  "events": {
+  "attack_sequence": [
+    {
+      "@timestamp": "2026-03-29T11:22:44.112Z",
+      "event": {
+        "category": "process",
+        "type": "start",
+        "action": "Process Create (rule: ProcessCreate)",
+        "code": "1"
+      },
+      "process": {
+        "pid": 8841,
+        "name": "net.exe",
+        "executable": "C:\\Windows\\System32\\net.exe",
+        "command_line": "net view \\\\DC-01 /all",
+        "parent": {
+          "pid": 5120,
+          "name": "agent.exe",
+          "executable": "C:\\Users\\jsmith\\AppData\\Local\\Temp\\agent.exe"
+        }
+      },
+      "user": {
+        "name": "jsmith",
+        "domain": "CORP"
+      },
+      "host": {
+        "name": "WS-CORP-07",
+        "os": {
+          "platform": "windows"
+        }
+      },
+      "agent": {
+        "type": "sysmon"
+      },
+      "_simulation": {
+        "type": "attack",
+        "technique": "T1135",
+        "fawkes_command": "net-shares",
+        "description": "Fawkes C2 agent (agent.exe from AppData Temp) executes net view targeting DC-01 with /all flag to enumerate all hidden and visible network shares — pre-lateral-movement reconnaissance consistent with Fawkes net-shares command"
+      },
+      "_description": "Fawkes net-shares: net.exe spawned from user-writable temp path enumerating network shares on a domain controller",
+      "_technique": "T1135 - Network Share Discovery",
+      "_fawkes_command": "net-shares",
+      "_expected_result": "ALERT"
+    }
+  ],
+  "benign_similar": [
+    {
+      "@timestamp": "2026-03-29T08:05:17.334Z",
+      "event": {
+        "category": "process",
+        "type": "start",
+        "action": "Process Create (rule: ProcessCreate)",
+        "code": "1"
+      },
+      "process": {
+        "pid": 2204,
+        "name": "net.exe",
+        "executable": "C:\\Windows\\System32\\net.exe",
+        "command_line": "net share",
+        "parent": {
+          "pid": 812,
+          "name": "svchost.exe",
+          "executable": "C:\\Windows\\System32\\svchost.exe"
+        }
+      },
+      "user": {
+        "name": "SYSTEM",
+        "domain": "NT AUTHORITY"
+      },
+      "host": {
+        "name": "WS-CORP-07",
+        "os": {
+          "platform": "windows"
+        }
+      },
+      "agent": {
+        "type": "sysmon"
+      },
+      "_simulation": {
+        "type": "benign_similar",
+        "technique": "T1135",
+        "description": "Windows service (svchost.exe) running as SYSTEM invokes net share for legitimate share management — filtered by parent+user context, should not alert"
+      },
+      "_description": "Benign: net share invoked by svchost.exe as SYSTEM — matches filter_parent_system, should NOT alert",
+      "_technique": "T1135 - Network Share Discovery",
+      "_expected_result": "NO_ALERT"
+    }
+  ]
+  }
+}

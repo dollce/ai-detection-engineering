@@ -1,0 +1,1 @@
+((event.code:7036 AND winlog.event_data.param2.keyword:stopped) AND (NOT (winlog.event_data.param1.keyword:(Windows\ Update OR Background\ Intelligent\ Transfer\ Service OR Windows\ Defender\ Advanced\ Threat\ Protection\ Service))))

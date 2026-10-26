@@ -1,0 +1,139 @@
+[
+  {
+    "@timestamp": "2026-04-11T14:23:07.412Z",
+    "event": {
+      "category": "process",
+      "type": "start",
+      "action": "Process Create (rule: ProcessCreate)",
+      "code": "1"
+    },
+    "process": {
+      "pid": 6284,
+      "name": "svc_updater.exe",
+      "executable": "C:\\Users\\bwilson\\AppData\\Local\\Temp\\svc_updater.exe",
+      "command_line": "\"C:\\Users\\bwilson\\AppData\\Local\\Temp\\svc_updater.exe\" -silent -run",
+      "parent": {
+        "pid": 4192,
+        "name": "explorer.exe",
+        "executable": "C:\\Windows\\explorer.exe"
+      }
+    },
+    "user": {
+      "name": "bwilson",
+      "domain": "CORP"
+    },
+    "host": {
+      "name": "WS-EXEC-01",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "attack",
+      "technique": "T1036.005",
+      "sequence_order": 1,
+      "sequence_total": 3,
+      "description": "Masquerading binary svc_updater.exe launched from user Temp directory \u2014 name mimics legitimate Windows service updater convention but executable path is anomalous"
+    }
+  },
+  {
+    "@timestamp": "2026-04-11T14:23:12.891Z",
+    "event": {
+      "category": "network",
+      "type": "connection",
+      "action": "Network connection detected (rule: NetworkConnect)",
+      "code": "3"
+    },
+    "process": {
+      "pid": 6284,
+      "name": "svc_updater.exe",
+      "executable": "C:\\Users\\bwilson\\AppData\\Local\\Temp\\svc_updater.exe",
+      "command_line": "\"C:\\Users\\bwilson\\AppData\\Local\\Temp\\svc_updater.exe\" -silent -run",
+      "parent": {
+        "pid": 4192,
+        "name": "explorer.exe",
+        "executable": "C:\\Windows\\explorer.exe"
+      }
+    },
+    "destination": {
+      "ip": "185.234.219.47",
+      "port": 443
+    },
+    "source": {
+      "ip": "10.10.5.44",
+      "port": 49832
+    },
+    "network": {
+      "direction": "egress",
+      "transport": "tcp"
+    },
+    "user": {
+      "name": "bwilson",
+      "domain": "CORP"
+    },
+    "host": {
+      "name": "WS-EXEC-01",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "attack",
+      "technique": "T1036.005",
+      "sequence_order": 2,
+      "sequence_total": 3,
+      "description": "Masquerading svc_updater.exe initiates outbound C2 beacon over port 443 to raw IP \u2014 legitimate update services connect to signed vendor domain names, not bare IPs"
+    }
+  },
+  {
+    "@timestamp": "2026-04-11T14:23:19.553Z",
+    "event": {
+      "category": "file",
+      "type": "creation",
+      "action": "File created (rule: FileCreate)",
+      "code": "11"
+    },
+    "process": {
+      "pid": 6284,
+      "name": "svc_updater.exe",
+      "executable": "C:\\Users\\bwilson\\AppData\\Local\\Temp\\svc_updater.exe",
+      "command_line": "\"C:\\Users\\bwilson\\AppData\\Local\\Temp\\svc_updater.exe\" -silent -run",
+      "parent": {
+        "pid": 4192,
+        "name": "explorer.exe",
+        "executable": "C:\\Windows\\explorer.exe"
+      }
+    },
+    "file": {
+      "name": "winhelp32.dll",
+      "path": "C:\\Users\\bwilson\\AppData\\Roaming\\Microsoft\\winhelp32.dll",
+      "extension": "dll"
+    },
+    "user": {
+      "name": "bwilson",
+      "domain": "CORP"
+    },
+    "host": {
+      "name": "WS-EXEC-01",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "attack",
+      "technique": "T1036.005",
+      "sequence_order": 3,
+      "sequence_total": 3,
+      "description": "Masquerading svc_updater.exe drops secondary payload winhelp32.dll into AppData\\Roaming\\Microsoft \u2014 filename mimics legitimate Windows helper library to avoid casual inspection"
+    }
+  }
+]

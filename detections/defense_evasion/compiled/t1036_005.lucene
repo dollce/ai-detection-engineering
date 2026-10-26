@@ -1,0 +1,1 @@
+(process.executable:(*\\AppData\\Local\\Temp\\* OR *\\AppData\\Roaming\\* OR *\\Users\\Public\\*)) AND (process.name:(*svc* OR *service* OR *update* OR *helper*)) AND (NOT (process.name:(MicrosoftEdgeUpdate.exe OR MicrosoftEdgeUpdateSetup.exe OR wuauclt.exe OR SgrmBroker.exe)))

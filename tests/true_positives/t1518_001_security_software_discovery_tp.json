@@ -1,0 +1,43 @@
+{
+  "@timestamp": "2026-03-29T10:22:14.513Z",
+  "event": {
+    "category": "process",
+    "type": "start",
+    "action": "Process Create (rule: ProcessCreate)",
+    "code": "1"
+  },
+  "process": {
+    "pid": 9144,
+    "name": "wmic.exe",
+    "executable": "C:\\Windows\\System32\\wbem\\wmic.exe",
+    "command_line": "wmic /namespace:\\\\root\\securitycenter2 path antivirusproduct get displayname,pathToSignedReportingExe",
+    "parent": {
+      "pid": 6720,
+      "name": "cmd.exe",
+      "executable": "C:\\Users\\jsmith\\AppData\\Roaming\\Microsoft\\fawkes.exe"
+    }
+  },
+  "user": {
+    "name": "jsmith",
+    "domain": "CORP"
+  },
+  "host": {
+    "name": "WS-FIN-04",
+    "os": {
+      "platform": "windows"
+    }
+  },
+  "agent": {
+    "type": "sysmon"
+  },
+  "_simulation": {
+    "type": "attack",
+    "technique": "T1518.001",
+    "fawkes_command": "av-detect",
+    "description": "Fawkes C2 av-detect command queries WMI SecurityCenter2 to enumerate installed AV/EDR products before selecting an evasion strategy"
+  },
+  "_description": "Fawkes av-detect uses wmic to query the SecurityCenter2 WMI namespace for installed antivirus products, revealing names and paths of security software on the target.",
+  "_technique": "T1518.001 — Security Software Discovery",
+  "_fawkes_command": "av-detect",
+  "_expected_result": "ALERT"
+}

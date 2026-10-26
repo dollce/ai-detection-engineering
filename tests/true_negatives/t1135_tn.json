@@ -1,0 +1,41 @@
+{
+  "@timestamp": "2026-03-29T08:05:17.334Z",
+  "event": {
+    "category": "process",
+    "type": "start",
+    "action": "Process Create (rule: ProcessCreate)",
+    "code": "1"
+  },
+  "process": {
+    "pid": 2204,
+    "name": "net.exe",
+    "executable": "C:\\Windows\\System32\\net.exe",
+    "command_line": "net share",
+    "parent": {
+      "pid": 812,
+      "name": "svchost.exe",
+      "executable": "C:\\Windows\\System32\\svchost.exe"
+    }
+  },
+  "user": {
+    "name": "SYSTEM",
+    "domain": "NT AUTHORITY"
+  },
+  "host": {
+    "name": "WS-CORP-07",
+    "os": {
+      "platform": "windows"
+    }
+  },
+  "agent": {
+    "type": "sysmon"
+  },
+  "_simulation": {
+    "type": "benign_similar",
+    "technique": "T1135",
+    "description": "Windows service (svchost.exe) running as SYSTEM invokes net share for legitimate share management — filtered by parent+user context, should not alert"
+  },
+  "_description": "Benign: net share invoked by svchost.exe as SYSTEM — matches filter_parent_system, should NOT alert",
+  "_technique": "T1135 - Network Share Discovery",
+  "_expected_result": "NO_ALERT"
+}

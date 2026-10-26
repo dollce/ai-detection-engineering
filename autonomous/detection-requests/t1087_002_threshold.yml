@@ -1,0 +1,72 @@
+technique_id: T1087.002_THRESHOLD
+title: Discovery Command Burst - Recon Tool Threshold
+status: DEPLOYED
+priority: high
+mitre_tactic: discovery
+rule_type: threshold
+requested_by: blue-team
+requested_date: '2026-03-15T00:00:00Z'
+intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
+scenario_file: simulator/scenarios/windows/t1087_002_threshold.json
+sigma_rule: detections/discovery/t1087_002_discovery_threshold.yml
+compiled_lucene: ''
+compiled_spl: detections/discovery/compiled/t1087_002_discovery_threshold.spl
+compiled_artifact: detections/discovery/compiled/t1087_002_discovery_threshold_elastic.json
+secondary_techniques:
+- T1082
+deployed_date: '2026-04-12T21:26:07Z'
+elastic_rule_id: 2e7a5c6d-8f9b-0c1d-2e3f-4a5b6c7d8e9f
+splunk_saved_search: Discovery Command Burst - Recon Tool Threshold T1087.002_THRESHOLD
+last_quality_review: ''
+quality_score: 1.0
+fp_rate: 0.0
+tp_rate: 1.0
+alert_volume_24h: 0
+cost_estimate: low
+auto_deploy_eligible: true
+fawkes_commands:
+- ps
+- whoami
+- net-enum
+- net-stat
+- arp
+- ifconfig
+- drives
+- env
+changelog:
+- date: '2026-03-15T00:00:00Z'
+  agent: blue-team
+  action: created
+  details: Phase 6 threshold rule for discovery command burst
+- date: '2026-03-19T00:00:00Z'
+  agent: remediation
+  action: registered
+  details: Fix Pack 1 - registered orphaned Phase 6 threshold rule in state machine
+- date: '2026-04-12T14:50:58Z'
+  agent: validation
+  action: update
+  details: 'Updated fields: quality_score, fp_rate, tp_rate'
+- date: '2026-04-12T14:50:58Z'
+  agent: validation
+  action: transition:AUTHORED->VALIDATED
+  details: F1=1.0, FP_rate=0.0, tier=auto_deploy
+- date: '2026-04-12T14:50:58Z'
+  agent: validation
+  action: update
+  details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:26:07Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:26:07Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:26:07Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:26:07Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'

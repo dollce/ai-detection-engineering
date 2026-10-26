@@ -1,0 +1,39 @@
+{
+  "@timestamp": "2026-03-29T09:45:03.221Z",
+  "event": {
+    "category": "process",
+    "type": "start",
+    "action": "Process Create (rule: ProcessCreate)",
+    "code": "1"
+  },
+  "process": {
+    "pid": 5312,
+    "name": "wmic.exe",
+    "executable": "C:\\Windows\\System32\\wbem\\wmic.exe",
+    "command_line": "wmic os get caption,version",
+    "parent": {
+      "pid": 788,
+      "name": "svchost.exe",
+      "executable": "C:\\Windows\\System32\\svchost.exe"
+    }
+  },
+  "user": {
+    "name": "SYSTEM",
+    "domain": "NT AUTHORITY"
+  },
+  "host": {
+    "name": "WS-FIN-04",
+    "os": {
+      "platform": "windows"
+    }
+  },
+  "agent": {
+    "type": "sysmon"
+  },
+  "_simulation": {
+    "type": "benign_similar",
+    "technique": "T1518.001",
+    "description": "Routine wmic OS query from svchost running as SYSTEM — queries OS metadata only, no SecurityCenter2 or security service references, matches both filter conditions"
+  },
+  "_expected_result": "NO ALERT"
+}

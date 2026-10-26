@@ -1,0 +1,63 @@
+title: Local Account Discovery via Net/WMIC Commands
+id: 72fab233-c7ea-44d3-a9bc-bbde7e72939a
+status: experimental
+description: |
+  Detects local account enumeration commands (net user, net localgroup, wmic useraccount)
+  commonly used by the Fawkes C2 net-enum command and other adversary tooling for
+  post-compromise reconnaissance. Filters out legitimate system context invocations
+  from known management tools (svchost.exe, services.exe, SCCM) to reduce false positives.
+author: Blue Team Detection Engineering Agent
+date: 2026/03/29
+modified: 2026/03/29
+references:
+  - https://attack.mitre.org/techniques/T1087/001/
+  - https://github.com/galoryber/fawkes
+tags:
+  - attack.discovery
+  - attack.t1087.001
+  - detection.fawkes
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_net_user:
+    event.code: '1'
+    process.name: 'net.exe'
+    process.command_line|contains: 'user'
+  selection_net1_user:
+    event.code: '1'
+    process.name: 'net1.exe'
+    process.command_line|contains: 'user'
+  selection_wmic_useraccount:
+    event.code: '1'
+    process.name: 'wmic.exe'
+    process.command_line|contains: 'useraccount'
+  selection_localgroup:
+    event.code: '1'
+    process.name:
+      - 'net.exe'
+      - 'net1.exe'
+    process.command_line|contains: 'localgroup'
+  filter_system_context:
+    process.parent.executable|startswith:
+      - 'C:\Windows\System32\svchost.exe'
+      - 'C:\Windows\System32\services.exe'
+    user.name: 'SYSTEM'
+  filter_sccm:
+    process.parent.executable|contains:
+      - '\ccmexec'
+      - '\CcmExec'
+  condition: 1 of selection_* and not 1 of filter_*
+falsepositives:
+  - Legitimate IT administration scripts enumerating local accounts
+  - SCCM/Intune compliance scripts checking user accounts
+  - Login scripts that verify group membership
+  - Interactive admin sessions running net user manually
+fields:
+  - process.name
+  - process.command_line
+  - process.parent.name
+  - process.parent.executable
+  - user.name
+  - host.name
+level: medium

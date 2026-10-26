@@ -1,0 +1,47 @@
+[
+  {
+    "@timestamp": "2026-03-29T10:22:14.337Z",
+    "event": {
+      "category": "process",
+      "type": "start",
+      "action": "Process Create (rule: ProcessCreate)",
+      "code": "1"
+    },
+    "process": {
+      "pid": 5184,
+      "name": "net.exe",
+      "executable": "C:\\Windows\\System32\\net.exe",
+      "command_line": "net user /domain",
+      "parent": {
+        "pid": 3872,
+        "name": "fawkes_agent.exe",
+        "executable": "C:\\Users\\jsmith\\AppData\\Local\\Temp\\fawkes_agent.exe"
+      }
+    },
+    "user": {
+      "name": "jsmith",
+      "domain": "CORP"
+    },
+    "host": {
+      "name": "WS-FINANCE-01",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "attack",
+      "technique": "T1087.001",
+      "fawkes_command": "net-enum",
+      "sequence_order": 1,
+      "sequence_total": 1,
+      "description": "Fawkes C2 agent (fawkes_agent.exe in AppData Temp) executes net user /domain to enumerate local and domain accounts — matches Fawkes net-enum command behavior"
+    },
+    "_description": "Fawkes net-enum: net.exe spawned from suspicious parent path enumerating user accounts",
+    "_technique": "T1087.001",
+    "_fawkes_command": "net-enum",
+    "_expected_result": "ALERT"
+  }
+]

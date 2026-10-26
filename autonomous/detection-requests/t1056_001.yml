@@ -1,0 +1,94 @@
+technique_id: T1056.001
+title: "Detection for T1056.001 -- Low-level keyboard hook via SetWindowsHookEx"
+status: DEPLOYED
+priority: high
+requested_by: intel
+requested_date: '2026-03-21T13:04:56Z'
+intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
+scenario_file: simulator/scenarios/windows/t1056_001.json
+sigma_rule: detections/collection/t1056_001.yml
+deployed_date: '2026-04-12T21:34:24Z'
+last_quality_review: ''
+quality_score: 0.8
+fp_rate: 0.0
+tp_rate: 0.667
+alert_volume_24h: 0
+cost_estimate: low
+auto_deploy_eligible: true
+changelog:
+- date: '2026-03-21T13:04:56Z'
+  agent: intel
+  action: created
+  details: 'Detection request created from intel: threat-intel/fawkes/fawkes-ttp-mapping.md'
+- date: '2026-03-21T13:04:56Z'
+  agent: intel
+  action: update
+  details: 'Updated fields: threat_actors, fawkes_commands'
+- date: '2026-03-21T13:04:56Z'
+  agent: intel
+  action: update
+  details: 'Updated fields: data_source_requirements'
+- date: '2026-03-21T13:04:56Z'
+  agent: intel
+  action: update
+  details: 'Updated fields: data_source_gaps'
+- date: '2026-03-22T17:23:23Z'
+  agent: red-team
+  action: update
+  details: 'Updated fields: scenario_file'
+- date: '2026-03-22T17:23:23Z'
+  agent: red-team
+  action: transition:REQUESTED->SCENARIO_BUILT
+  details: 'Scenario generated: 3 attack, 2 benign events'
+- date: '2026-04-01T13:03:38Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: compiled_lucene'
+- date: '2026-04-04T09:00:00Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: compiled_splunk'
+- date: '2026-04-11T14:04:54Z'
+  agent: validation
+  action: update
+  details: 'Updated fields: quality_score, fp_rate, tp_rate'
+- date: '2026-04-11T14:04:54Z'
+  agent: validation
+  action: transition:AUTHORED->VALIDATED
+  details: F1=0.8, FP_rate=0.0, tier=human_review
+- date: '2026-04-12T21:34:09Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:34:24Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:34:24Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:34:24Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:34:24Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
+threat_actors:
+- Fawkes C2 Agent
+- Generic Remote Access Trojan
+fawkes_commands:
+- keylog
+data_source_requirements:
+- source: elastic_endpoint
+  event_ids: []
+  fields:
+  - process.Ext.api.name
+data_source_gaps:
+- GAP-008
+compiled_lucene: detections/collection/compiled/t1056_001.lucene
+compiled_spl: detections/collection/compiled/t1056_001.spl
+elastic_rule_id: 77750ecc-3e67-49ee-8173-575ef8e5519e
+splunk_saved_search: "Detection for T1056.001 -- Low-level keyboard hook via SetWindowsHookEx T1056.001"

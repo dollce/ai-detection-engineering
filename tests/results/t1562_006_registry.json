@@ -1,0 +1,19 @@
+{
+  "technique_id": "T1562.006_REGISTRY",
+  "date": "2026-04-12T21:28:51Z",
+  "sigma_rule": "detections/defense_evasion/t1562_006_registry.yml",
+  "validation_method": "elasticsearch",
+  "metrics": {
+    "tp": 2,
+    "fp": 0,
+    "fn": 0,
+    "tn": 2,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "fp_rate": 0.0
+  },
+  "quality": "auto_deploy",
+  "events_ingested": 4,
+  "notes": "Registry variant: EID 13 writes to SysmonDrv\\Parameters\\ProcessExclude and Autologger\\EventLog-Security\\Enable=0 by non-system processes. Both attack events (update_helper.exe from ProgramData) fired; both benign events (services.exe from System32) suppressed by filter_system_services."
+}

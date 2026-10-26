@@ -1,0 +1,1 @@
+(process.name IN ("net.exe", "net1.exe") process.command_line="*share*") OR (process.name IN ("net.exe", "net1.exe") process.command_line="*view*") NOT (process.parent.executable IN ("C:\\Windows\\System32\\svchost.exe*", "C:\\Windows\\System32\\services.exe*") user.name="SYSTEM")

@@ -1,0 +1,47 @@
+title: Spearphishing Voice (Vishing) [T1566.004]
+id: 835688fc-8ec0-47e2-95d4-06294cb5354c
+status: experimental
+description: "Detects spearphishing voice (vishing). Limited endpoint telemetry for vishing. Detection relies on correlation:\
+  \ MFA reset + immediate external login. Sysmon alone insufficient \u2014 needs identity provider logs."
+author: blue-team-agent
+date: '2026-03-06'
+modified: '2026-03-06'
+references:
+- https://attack.mitre.org/techniques/T1566/004/
+tags:
+- attack.initial_access
+- attack.t1566.004
+logsource:
+  category: authentication
+  product: windows
+detection:
+  selection:
+    event.code: '4624'
+    winlog.logon.type: RemoteInteractive
+  filter_internal_networks:
+    source.ip|startswith:
+      - '10.'
+      - '172.16.'
+      - '172.17.'
+      - '172.18.'
+      - '172.19.'
+      - '172.20.'
+      - '172.21.'
+      - '172.22.'
+      - '172.23.'
+      - '172.24.'
+      - '172.25.'
+      - '172.26.'
+      - '172.27.'
+      - '172.28.'
+      - '172.29.'
+      - '172.30.'
+      - '172.31.'
+      - '192.168.'
+      - '127.'
+  condition: selection and not filter_internal_networks
+falsepositives:
+  - Legitimate remote employees connecting via RDP from external IPs
+  - VPN exit nodes that appear as external IPs
+  - Note - this rule is limited to endpoint logon events; full vishing detection requires identity provider logs for MFA reset correlation
+level: medium

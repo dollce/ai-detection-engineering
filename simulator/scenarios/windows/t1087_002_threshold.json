@@ -1,0 +1,124 @@
+{
+  "technique_id": "T1087.002",
+  "technique_name": "Account Discovery: Domain Account (Threshold)",
+  "description": "3+ distinct recon tools from same host within 60s, triggering threshold rule",
+  "mitre_tactic": "discovery",
+  "events": {
+    "attack_sequence": [
+      {
+        "@timestamp": "2026-04-12T10:00:00.000Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "code": "1",
+          "action": "Process Create (rule: ProcessCreate)"
+        },
+        "process": {
+          "pid": 7100,
+          "name": "whoami.exe",
+          "executable": "C:\\Windows\\System32\\whoami.exe",
+          "command_line": "whoami.exe /all",
+          "parent": {"pid": 4416, "name": "update_helper.exe",
+                     "executable": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"}
+        },
+        "user": {"name": "mjones", "domain": "CORP"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {"type": "attack", "technique": "T1087.002",
+                         "description": "Fawkes whoami via C2 implant"}
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:10.000Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "code": "1",
+          "action": "Process Create (rule: ProcessCreate)"
+        },
+        "process": {
+          "pid": 7120,
+          "name": "net.exe",
+          "executable": "C:\\Windows\\System32\\net.exe",
+          "command_line": "net.exe user /domain",
+          "parent": {"pid": 4416, "name": "update_helper.exe",
+                     "executable": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"}
+        },
+        "user": {"name": "mjones", "domain": "CORP"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {"type": "attack", "technique": "T1087.002",
+                         "description": "Fawkes net user /domain via C2 implant"}
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:20.000Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "code": "1",
+          "action": "Process Create (rule: ProcessCreate)"
+        },
+        "process": {
+          "pid": 7140,
+          "name": "netstat.exe",
+          "executable": "C:\\Windows\\System32\\netstat.exe",
+          "command_line": "netstat.exe -ano",
+          "parent": {"pid": 4416, "name": "update_helper.exe",
+                     "executable": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"}
+        },
+        "user": {"name": "mjones", "domain": "CORP"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {"type": "attack", "technique": "T1087.002",
+                         "description": "Fawkes net-stat via C2 implant"}
+      }
+    ],
+    "benign_similar": [
+      {
+        "@timestamp": "2026-04-12T09:00:00.000Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "code": "1",
+          "action": "Process Create (rule: ProcessCreate)"
+        },
+        "process": {
+          "pid": 5000,
+          "name": "whoami.exe",
+          "executable": "C:\\Windows\\System32\\whoami.exe",
+          "command_line": "whoami.exe"
+        },
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {"type": "benign_similar", "technique": "T1087.002",
+                         "description": "Only 2 distinct tools used (below threshold of 3)"}
+      },
+      {
+        "@timestamp": "2026-04-12T09:00:15.000Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "code": "1",
+          "action": "Process Create (rule: ProcessCreate)"
+        },
+        "process": {
+          "pid": 5020,
+          "name": "ipconfig.exe",
+          "executable": "C:\\Windows\\System32\\ipconfig.exe",
+          "command_line": "ipconfig.exe /all"
+        },
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {"type": "benign_similar", "technique": "T1087.002",
+                         "description": "2nd of 2 distinct tools -- still below threshold of 3"}
+      }
+    ]
+  },
+  "expected_detection": {
+    "should_alert_on": "attack_sequence",
+    "should_not_alert_on": "benign_similar",
+    "key_fields": ["process.name", "host.name"],
+    "notes": "Threshold: cardinality_value=3 distinct process.name values within 60s window. Benign has only 2 distinct tools."
+  },
+  "log_sources_used": ["sysmon_1"],
+  "platforms": ["windows"]
+}

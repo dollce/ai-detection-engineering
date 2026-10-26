@@ -1,0 +1,57 @@
+title: PowerShell Execution with Bypass Flags or Registry Run Key Persistence
+id: 0c5e3b4a-6d7f-8a9b-0c1d-2e3f4a5b6c7d
+status: experimental
+description: |
+  Detects PowerShell launched with execution policy bypass flags (T1059.001)
+  or PowerShell writing to registry Run keys for persistence (T1547.001).
+  Both events match Fawkes C2 agent activity using the powershell and persist
+  (registry method) commands. Either event independently indicates suspicious
+  activity; together they indicate a full execution-then-persist chain.
+  Rule converted from EQL sequence to standard Sigma to avoid Elasticsearch
+  search_after ZonedDateTime serialisation error and to enable Lucene transpilation.
+references:
+  - https://attack.mitre.org/techniques/T1059/001/
+  - https://attack.mitre.org/techniques/T1547/001/
+  - https://github.com/galoryber/fawkes
+author: blue-team-agent
+date: 2026/03/15
+modified: 2026/04/12
+tags:
+  - attack.execution
+  - attack.t1059.001
+  - attack.persistence
+  - attack.t1547.001
+  - detection.fawkes
+logsource:
+  product: windows
+  service: sysmon
+detection:
+  selection_ps_bypass:
+    event.code: '1'
+    process.name:
+      - 'powershell.exe'
+      - 'pwsh.exe'
+    process.command_line|contains:
+      - '-ExecutionPolicy Bypass'
+      - '-ExecutionPolicy bypass'
+      - '-ep Bypass'
+      - '-ep bypass'
+      - '-EncodedCommand'
+      - '-enc '
+      - '-NonInteractive'
+  selection_reg_run:
+    event.code: '13'
+    process.name:
+      - 'powershell.exe'
+      - 'pwsh.exe'
+    registry.path|contains:
+      - '\CurrentVersion\Run\'
+      - '\CurrentVersion\RunOnce\'
+      - '\CurrentVersion\RunServices\'
+  condition: 1 of selection_*
+falsepositives:
+  - Software installers that use PowerShell to set up startup entries
+  - Configuration management tools (Ansible, DSC) modifying Run keys via PowerShell
+  - Legitimate software updaters using PowerShell with non-default execution policy
+  - IT automation scripts using -NonInteractive for unattended execution
+level: high

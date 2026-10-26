@@ -1,0 +1,158 @@
+{
+  "technique_id": "T1087.002",
+  "technique_name": "Account Discovery: Domain Account (EQL burst)",
+  "description": "3 recon tools within 60 seconds on same host, triggering EQL sequence rule",
+  "mitre_tactic": "discovery",
+  "events": {
+    "attack_sequence": [
+      {
+        "@timestamp": "2026-04-12T10:00:00.000Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "code": "1",
+          "action": "Process Create (rule: ProcessCreate)"
+        },
+        "process": {
+          "pid": 7100,
+          "name": "whoami.exe",
+          "executable": "C:\\Windows\\System32\\whoami.exe",
+          "command_line": "whoami.exe /all",
+          "parent": {
+            "pid": 4416,
+            "name": "update_helper.exe",
+            "executable": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"
+          }
+        },
+        "user": {"name": "mjones", "domain": "CORP"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1087.002",
+          "sequence_order": 1,
+          "sequence_total": 3,
+          "description": "Fawkes whoami: implant enumerates current user context"
+        }
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:08.000Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "code": "1",
+          "action": "Process Create (rule: ProcessCreate)"
+        },
+        "process": {
+          "pid": 7120,
+          "name": "net.exe",
+          "executable": "C:\\Windows\\System32\\net.exe",
+          "command_line": "net.exe user /domain",
+          "parent": {
+            "pid": 4416,
+            "name": "update_helper.exe",
+            "executable": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"
+          }
+        },
+        "user": {"name": "mjones", "domain": "CORP"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1087.002",
+          "sequence_order": 2,
+          "sequence_total": 3,
+          "description": "Fawkes net-enum: implant enumerates domain user accounts"
+        }
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:16.000Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "code": "1",
+          "action": "Process Create (rule: ProcessCreate)"
+        },
+        "process": {
+          "pid": 7140,
+          "name": "ipconfig.exe",
+          "executable": "C:\\Windows\\System32\\ipconfig.exe",
+          "command_line": "ipconfig.exe /all",
+          "parent": {
+            "pid": 4416,
+            "name": "update_helper.exe",
+            "executable": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"
+          }
+        },
+        "user": {"name": "mjones", "domain": "CORP"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1087.002",
+          "sequence_order": 3,
+          "sequence_total": 3,
+          "description": "Fawkes ifconfig: implant enumerates network configuration"
+        }
+      }
+    ],
+    "benign_similar": [
+      {
+        "@timestamp": "2026-04-12T09:00:00.000Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "code": "1",
+          "action": "Process Create (rule: ProcessCreate)"
+        },
+        "process": {
+          "pid": 5000,
+          "name": "whoami.exe",
+          "executable": "C:\\Windows\\System32\\whoami.exe",
+          "command_line": "whoami.exe",
+          "parent": {"pid": 3200, "name": "cmd.exe", "executable": "C:\\Windows\\System32\\cmd.exe"}
+        },
+        "user": {"name": "admin", "domain": "CORP"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1087.002",
+          "description": "IT admin runs whoami once from interactive cmd -- only 1 tool, not 3"
+        }
+      },
+      {
+        "@timestamp": "2026-04-12T09:30:00.000Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "code": "1",
+          "action": "Process Create (rule: ProcessCreate)"
+        },
+        "process": {
+          "pid": 5020,
+          "name": "ipconfig.exe",
+          "executable": "C:\\Windows\\System32\\ipconfig.exe",
+          "command_line": "ipconfig.exe /all",
+          "parent": {"pid": 3200, "name": "cmd.exe", "executable": "C:\\Windows\\System32\\cmd.exe"}
+        },
+        "user": {"name": "admin", "domain": "CORP"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1087.002",
+          "description": "ipconfig run 30 min after whoami -- far outside the 60s maxspan window"
+        }
+      }
+    ]
+  },
+  "expected_detection": {
+    "should_alert_on": "attack_sequence",
+    "should_not_alert_on": "benign_similar",
+    "key_fields": ["process.name", "host.name", "@timestamp"],
+    "notes": "EQL sequence requires 3 recon tools on same host within 60s. Benign events: only 2 tools spread 30 min apart (far outside window)."
+  },
+  "log_sources_used": ["sysmon_1"],
+  "platforms": ["windows"]
+}

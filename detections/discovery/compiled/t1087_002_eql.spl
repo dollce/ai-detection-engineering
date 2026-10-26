@@ -1,0 +1,1 @@
+event.code="1" process.name IN ("whoami.exe", "net.exe", "net1.exe", "ipconfig.exe", "systeminfo.exe", "tasklist.exe", "nltest.exe", "netstat.exe", "arp.exe", "nslookup.exe") NOT (process.parent.name IN ("cmd.exe", "powershell.exe", "pwsh.exe", "explorer.exe") process.parent.executable IN ("*\\Windows\\System32\\*", "*\\Windows\\SysWOW64\\*", "*\\Windows\\explorer.exe*"))

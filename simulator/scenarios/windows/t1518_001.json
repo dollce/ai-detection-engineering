@@ -1,0 +1,230 @@
+{
+  "technique_id": "T1518.001",
+  "technique_name": "Software Discovery: Security Software Discovery",
+  "description": "Simulates Fawkes C2 av-detect command enumerating installed AV/EDR products via WMI SecurityCenter2, sc query, and PowerShell Get-MpPreference",
+  "mitre_tactic": "discovery",
+  "fawkes_command": "av-detect",
+  "data_sources": ["Sysmon EventID 1"],
+  "events": {
+  "attack_sequence": [
+    {
+      "@timestamp": "2026-03-29T10:22:14.513Z",
+      "event": {
+        "category": "process",
+        "type": "start",
+        "action": "Process Create (rule: ProcessCreate)",
+        "code": "1"
+      },
+      "process": {
+        "pid": 9144,
+        "name": "wmic.exe",
+        "executable": "C:\\Windows\\System32\\wbem\\wmic.exe",
+        "command_line": "wmic /namespace:\\\\root\\securitycenter2 path antivirusproduct get displayname,pathToSignedReportingExe",
+        "parent": {
+          "pid": 6720,
+          "name": "fawkes.exe",
+          "executable": "C:\\Users\\jsmith\\AppData\\Roaming\\Microsoft\\fawkes.exe"
+        }
+      },
+      "user": {
+        "name": "jsmith",
+        "domain": "CORP"
+      },
+      "host": {
+        "name": "WS-FIN-04",
+        "os": {
+          "platform": "windows"
+        }
+      },
+      "agent": {
+        "type": "sysmon"
+      },
+      "_simulation": {
+        "type": "attack",
+        "technique": "T1518.001",
+        "fawkes_command": "av-detect",
+        "sequence_order": 1,
+        "sequence_total": 3,
+        "description": "Fawkes av-detect queries WMI SecurityCenter2 for installed antivirus products"
+      }
+    },
+    {
+      "@timestamp": "2026-03-29T10:22:16.891Z",
+      "event": {
+        "category": "process",
+        "type": "start",
+        "action": "Process Create (rule: ProcessCreate)",
+        "code": "1"
+      },
+      "process": {
+        "pid": 9198,
+        "name": "powershell.exe",
+        "executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "command_line": "powershell.exe -NoProfile -Command Get-MpPreference | Select-Object DisableRealtimeMonitoring,DisableIOAVProtection",
+        "parent": {
+          "pid": 6720,
+          "name": "fawkes.exe",
+          "executable": "C:\\Users\\jsmith\\AppData\\Roaming\\Microsoft\\fawkes.exe"
+        }
+      },
+      "user": {
+        "name": "jsmith",
+        "domain": "CORP"
+      },
+      "host": {
+        "name": "WS-FIN-04",
+        "os": {
+          "platform": "windows"
+        }
+      },
+      "agent": {
+        "type": "sysmon"
+      },
+      "_simulation": {
+        "type": "attack",
+        "technique": "T1518.001",
+        "fawkes_command": "av-detect",
+        "sequence_order": 2,
+        "sequence_total": 3,
+        "description": "Fawkes av-detect queries Windows Defender configuration via PowerShell Get-MpPreference"
+      }
+    },
+    {
+      "@timestamp": "2026-03-29T10:22:19.203Z",
+      "event": {
+        "category": "process",
+        "type": "start",
+        "action": "Process Create (rule: ProcessCreate)",
+        "code": "1"
+      },
+      "process": {
+        "pid": 9247,
+        "name": "sc.exe",
+        "executable": "C:\\Windows\\System32\\sc.exe",
+        "command_line": "sc query CSFalconService",
+        "parent": {
+          "pid": 6720,
+          "name": "fawkes.exe",
+          "executable": "C:\\Users\\jsmith\\AppData\\Roaming\\Microsoft\\fawkes.exe"
+        }
+      },
+      "user": {
+        "name": "jsmith",
+        "domain": "CORP"
+      },
+      "host": {
+        "name": "WS-FIN-04",
+        "os": {
+          "platform": "windows"
+        }
+      },
+      "agent": {
+        "type": "sysmon"
+      },
+      "_simulation": {
+        "type": "attack",
+        "technique": "T1518.001",
+        "fawkes_command": "av-detect",
+        "sequence_order": 3,
+        "sequence_total": 3,
+        "description": "Fawkes av-detect queries Windows Service Control Manager for CrowdStrike Falcon service presence"
+      }
+    }
+  ],
+  "benign_similar": [
+    {
+      "@timestamp": "2026-03-29T09:45:03.221Z",
+      "event": {
+        "category": "process",
+        "type": "start",
+        "action": "Process Create (rule: ProcessCreate)",
+        "code": "1"
+      },
+      "process": {
+        "pid": 5312,
+        "name": "wmic.exe",
+        "executable": "C:\\Windows\\System32\\wbem\\wmic.exe",
+        "command_line": "wmic os get caption,version",
+        "parent": {
+          "pid": 788,
+          "name": "svchost.exe",
+          "executable": "C:\\Windows\\System32\\svchost.exe"
+        }
+      },
+      "user": {
+        "name": "SYSTEM",
+        "domain": "NT AUTHORITY"
+      },
+      "host": {
+        "name": "WS-FIN-04",
+        "os": {
+          "platform": "windows"
+        }
+      },
+      "agent": {
+        "type": "sysmon"
+      },
+      "_simulation": {
+        "type": "benign_similar",
+        "technique": "T1518.001",
+        "description": "Routine wmic OS query from svchost running as SYSTEM — queries OS metadata only, no SecurityCenter2 or security service references"
+      }
+    },
+    {
+      "@timestamp": "2026-03-29T09:50:17.442Z",
+      "event": {
+        "category": "process",
+        "type": "start",
+        "action": "Process Create (rule: ProcessCreate)",
+        "code": "1"
+      },
+      "process": {
+        "pid": 6104,
+        "name": "sc.exe",
+        "executable": "C:\\Windows\\System32\\sc.exe",
+        "command_line": "sc query wuauserv",
+        "parent": {
+          "pid": 1044,
+          "name": "services.exe",
+          "executable": "C:\\Windows\\System32\\services.exe"
+        }
+      },
+      "user": {
+        "name": "SYSTEM",
+        "domain": "NT AUTHORITY"
+      },
+      "host": {
+        "name": "WS-FIN-04",
+        "os": {
+          "platform": "windows"
+        }
+      },
+      "agent": {
+        "type": "sysmon"
+      },
+      "_simulation": {
+        "type": "benign_similar",
+        "technique": "T1518.001",
+        "description": "Windows Update service status check via sc query — targets a non-security service (wuauserv), parent is services.exe, running as SYSTEM"
+      }
+    }
+  ]
+  },
+  "expected_detection": {
+    "should_alert_on": "attack_events",
+    "should_not_alert_on": "benign_events",
+    "key_fields": [
+      "process.name",
+      "process.command_line",
+      "process.parent.executable",
+      "user.name"
+    ],
+    "notes": "High-fidelity signal: WMI SecurityCenter2 queries and sc query for known security service names are rarely performed by legitimate automation outside of security management tools. The filter excludes SYSTEM-context queries from System32 parents, which covers most legitimate endpoint management cases. Non-SYSTEM users running these queries from user-writable parent paths are the primary Fawkes pattern."
+  },
+  "log_sources_used": [
+    "sysmon_1"
+  ],
+  "platforms": [
+    "windows"
+  ]
+}

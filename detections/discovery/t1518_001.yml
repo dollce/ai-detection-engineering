@@ -1,0 +1,58 @@
+title: Security Software Discovery via WMI or Service Queries [T1518.001]
+id: ab536be4-2192-409d-9b31-665cf93cbf02
+status: experimental
+description: |
+  Detects security software discovery via WMI SecurityCenter2 queries, sc query
+  for security services, or PowerShell Get-MpPreference. Fawkes C2 av-detect
+  command uses these techniques to identify installed security products before
+  deciding on evasion strategies.
+author: Blue Team Detection Engineering Agent
+date: 2026/03/29
+modified: 2026/03/29
+references:
+  - https://attack.mitre.org/techniques/T1518/001/
+  - https://github.com/galoryber/fawkes
+tags:
+  - attack.discovery
+  - attack.t1518.001
+  - detection.fawkes
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_wmic_av:
+    event.code: '1'
+    process.name: 'wmic.exe'
+    process.command_line|contains|all:
+      - 'securitycenter2'
+      - 'antivirusproduct'
+  selection_powershell_defender:
+    event.code: '1'
+    process.name:
+      - 'powershell.exe'
+      - 'pwsh.exe'
+    process.command_line|contains: 'Get-MpPreference'
+  selection_sc_security:
+    event.code: '1'
+    process.name: 'sc.exe'
+    process.command_line|contains:
+      - 'query windefend'
+      - 'query MBAMService'
+      - 'query CylanceSvc'
+      - 'query CSFalconService'
+      - 'query SentinelAgent'
+  filter_parent_system:
+    process.parent.executable|startswith: 'C:\Windows\System32\'
+    user.name: 'SYSTEM'
+  condition: 1 of selection_* and not 1 of filter_*
+falsepositives:
+  - IT compliance scripts checking AV installation status
+  - Endpoint management agents verifying security product health
+level: medium
+fields:
+  - process.name
+  - process.command_line
+  - process.parent.name
+  - process.parent.executable
+  - user.name
+  - host.name
