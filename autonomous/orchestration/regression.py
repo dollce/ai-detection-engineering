@@ -3,15 +3,22 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 import yaml
+
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from orchestration.validation_results import (
+    ValidationUnavailable, load_events, read_f1, read_json, require_no_errors, score,
+)
 
 # Project root relative to this file: autonomous/orchestration/ -> ../../
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -30,12 +37,13 @@ _WARN_DELTA = -0.05
 class RegressionResult:
     technique_id: str
     rule_name: str
-    previous_f1: float
-    current_f1: float
-    delta: float
-    status: str  # "PASS", "WARN", "FAIL"
+    previous_f1: float | None
+    current_f1: float | None
+    delta: float | None
+    status: str  # "PASS", "WARN", "FAIL", "NOT_RUN"
     message: str
     local_validated: bool = False  # True when current_f1 came from local keyword validator
+    rule_path: str = ""
 
 
 # ---------------------------------------------------------------------------
@@ -60,40 +68,50 @@ def load_baseline(technique_id: str) -> float | None:
     """
     for path in _result_path_candidates(technique_id):
         if path.exists():
-            try:
-                data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
-                # Support flat {"f1_score": 0.9} and nested metrics/results variants
-                if "f1_score" in data:
-                    return float(data["f1_score"])
-                for nested_key in ("metrics", "results"):
-                    if nested_key in data and "f1_score" in data[nested_key]:
-                        return float(data[nested_key]["f1_score"])
-            except (json.JSONDecodeError, KeyError, ValueError):
-                pass
+            data = read_json(path)
+            require_no_errors(data)
+            return read_f1(data)
     return None
 
 
-def load_local_baseline(technique_id: str) -> float | None:
-    """Load the *local* F1 baseline from a previous regression snapshot.
-
-    This reads the ``local_f1`` key written by :func:`save_snapshot` into
-    ``tests/results/{technique_id}_regression.json``.  Using a local-vs-local
-    baseline prevents false FAILs caused by comparing keyword-based local F1
-    (~0.5) against ES-based full-SIEM F1 (~1.0).
-
-    Returns ``None`` when no local baseline has been stored yet (first run).
-    """
-    normalized = technique_id.lower().replace(".", "_")
-    snapshot_path = _RESULTS_DIR / f"{normalized}_regression.json"
-    if not snapshot_path.is_file():
-        return None
+def _rule_key(rule_path: str) -> str:
+    path = Path(rule_path)
+    if not path.is_absolute():
+        path = _PROJECT_ROOT / path
     try:
-        data: dict[str, Any] = json.loads(snapshot_path.read_text(encoding="utf-8"))
-        if "local_f1" in data:
-            return float(data["local_f1"])
-    except (json.JSONDecodeError, KeyError, ValueError):
-        pass
-    return None
+        return path.resolve().relative_to(_PROJECT_ROOT.resolve()).as_posix()
+    except ValueError as exc:
+        raise ValidationUnavailable("Rule path must be inside the repository") from exc
+
+
+def _snapshot_path(technique_id: str, rule_path: str = "") -> Path:
+    if rule_path:
+        key = _rule_key(rule_path)
+        digest = hashlib.sha256(key.encode()).hexdigest()[:16]
+        name = f"{Path(key).stem}-{digest}"
+    else:
+        name = technique_id.lower().replace(".", "_")
+    return _REGRESSION_DIR / f"{name}_regression.json"
+
+
+def load_local_baseline(technique_id: str, rule_path: str = "") -> float | None:
+    """Read a successful local snapshot using the same path as its writer.
+
+    Per-rule snapshots prevent variants of one technique from sharing a baseline.
+    SIEM F1 and failed/incomplete runs cannot seed a keyword-smoke baseline.
+    """
+    path = _snapshot_path(technique_id, rule_path)
+    if not path.exists():
+        return None
+    data = read_json(path)
+    if not isinstance(data, dict):
+        raise ValidationUnavailable("Baseline must be an object")
+    require_no_errors(data)
+    if data.get("status") not in {"PASS", "WARN"} or data.get("method") != "local_keyword":
+        raise ValidationUnavailable("Baseline is not a successful local keyword validation")
+    if rule_path and data.get("rule_path") != _rule_key(rule_path):
+        raise ValidationUnavailable("Baseline belongs to a different rule")
+    return score(data.get("local_f1"), "Baseline F1")
 
 
 # ---------------------------------------------------------------------------
@@ -144,13 +162,7 @@ def _event_matches_keywords(event: dict[str, Any], keywords: list[str]) -> bool:
 
 
 def _load_events(path: Path) -> list[dict[str, Any]]:
-    """Load a JSON file that is either a list of events or a single event."""
-    raw = json.loads(path.read_text(encoding="utf-8"))
-    if isinstance(raw, list):
-        return raw
-    if isinstance(raw, dict):
-        return [raw]
-    return []
+    return load_events(path)
 
 
 def validate_local(rule_path: str, tp_path: str, tn_path: str) -> float:
@@ -158,8 +170,8 @@ def validate_local(rule_path: str, tp_path: str, tn_path: str) -> float:
 
     This is NOT the full ES-based validator.  It checks whether key fields
     from the detection condition appear in the events and returns an F1 score.
-    Returns the baseline F1 (effectively no-change) when validation is not
-    possible due to missing files.
+    Both positive and negative fixtures are required. Missing or malformed
+    inputs raise ValidationUnavailable; they never produce a fabricated score.
 
     Parameters
     ----------
@@ -173,44 +185,35 @@ def validate_local(rule_path: str, tp_path: str, tn_path: str) -> float:
     Returns
     -------
     float
-        F1 score in [0.0, 1.0].  Returns -1.0 as a sentinel when validation
-        cannot run (caller should fall back to baseline).
+        F1 score in [0.0, 1.0]. This heuristic is not SIEM validation.
     """
     rule_file = Path(rule_path)
     tp_file = Path(tp_path)
     tn_file = Path(tn_path)
 
-    if not rule_file.exists():
-        return -1.0
-
     try:
-        rule_data = yaml.safe_load(rule_file.read_text(encoding="utf-8")) or {}
-    except yaml.YAMLError:
-        return -1.0
+        rule_data = yaml.safe_load(rule_file.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as exc:
+        raise ValidationUnavailable(f"Cannot read rule {rule_file}: {exc}") from exc
+    if not isinstance(rule_data, dict) or not isinstance(rule_data.get("detection"), dict):
+        raise ValidationUnavailable("Rule must contain a detection mapping")
+    detection = rule_data["detection"]
+    if not isinstance(detection.get("condition"), str) or not detection["condition"].strip():
+        raise ValidationUnavailable("Rule must contain a nonempty condition")
+    if rule_data.get("detection_type") in {"eql", "threshold"} or any(
+        key in detection for key in ("query", "sequence", "threshold")
+    ) or "|" in detection["condition"]:
+        raise ValidationUnavailable("EQL/threshold/correlation requires SIEM validation")
 
     keywords = _extract_detection_keywords(rule_data)
     if not keywords:
-        # No keywords to match — cannot validate locally
-        return -1.0
+        raise ValidationUnavailable("No usable detection keywords; local check cannot run")
 
     # --- True Positives ---
-    tp_events: list[dict[str, Any]] = []
-    if tp_file.is_file():
-        try:
-            tp_events = _load_events(tp_file)
-        except (json.JSONDecodeError, ValueError):
-            pass
+    tp_events = _load_events(tp_file)
 
     # --- True Negatives ---
-    tn_events: list[dict[str, Any]] = []
-    if tn_file.is_file():
-        try:
-            tn_events = _load_events(tn_file)
-        except (json.JSONDecodeError, ValueError):
-            pass
-
-    if not tp_events and not tn_events:
-        return -1.0
+    tn_events = _load_events(tn_file)
 
     tp_count = sum(1 for e in tp_events if _event_matches_keywords(e, keywords))
     fn_count = len(tp_events) - tp_count
@@ -261,106 +264,86 @@ def _rule_name_from_path(rule_path: Path | None, technique_id: str) -> str:
         return technique_id
     try:
         data = yaml.safe_load(rule_path.read_text(encoding="utf-8")) or {}
-        return data.get("title", technique_id)
+        return data.get("title", technique_id) if isinstance(data, dict) else technique_id
     except (yaml.YAMLError, OSError):
         return technique_id
+
+
+def find_test_file(rule_path: Path, directory: Path, suffix: str) -> Path:
+    """Resolve one fixture for this rule, never a sibling technique variant."""
+    stems = [rule_path.stem]
+    for ending in ("_eql", "_threshold"):
+        if rule_path.stem.endswith(ending):
+            stems.append(rule_path.stem[:-len(ending)])
+    for stem in stems:
+        candidate = directory / f"{stem}_{suffix}.json"
+        if candidate.is_file():
+            return candidate
+    candidates = sorted(directory.glob(f"{rule_path.stem}_*_{suffix}.json"))
+    if len(candidates) == 1:
+        return candidates[0]
+    reason = "ambiguous" if candidates else "missing"
+    raise ValidationUnavailable(f"{rule_path.name}: {reason} {suffix.upper()} fixture")
 
 
 # ---------------------------------------------------------------------------
 # Core regression check
 # ---------------------------------------------------------------------------
 
-def check_regression(technique_id: str, rule_path: str) -> RegressionResult:
-    """Run a regression check for a single technique.
+def check_regression(technique_id: str, rule_path: str,
+                     baseline_root: Path | None = None) -> RegressionResult:
+    """Compare a local smoke score with a comparable, independently supplied baseline.
 
-    Parameters
-    ----------
-    technique_id:
-        MITRE ATT&CK technique ID (e.g. ``"T1055.001"``).
-    rule_path:
-        Path to the Sigma YAML rule file.
+    A PR can use a trusted base checkout. Both revisions are evaluated on the
+    same current fixtures so that SIEM scores and keyword scores are never mixed.
+    Missing baselines, unsupported engines and unusable fixtures block the gate.
     """
-    baseline = load_baseline(technique_id)
-    rule_file = Path(rule_path)
-    rule_name = _rule_name_from_path(rule_file if rule_file.exists() else None, technique_id)
-
-    # Locate TP/TN files
-    tp_file = _find_tp_for_technique(technique_id)
-    tn_file = _find_tn_for_technique(technique_id)
-
-    tp_path = str(tp_file) if tp_file else ""
-    tn_path = str(tn_file) if tn_file else ""
-
-    current_f1_raw = validate_local(rule_path, tp_path, tn_path)
-
-    # -1.0 sentinel means local validation could not run
-    if current_f1_raw < 0.0:
-        # No change detectable — treat as pass with baseline value
-        effective_f1 = baseline if baseline is not None else 1.0
+    current_f1 = None
+    baseline = None
+    rule_name = technique_id
+    try:
+        key = _rule_key(rule_path)
+        rule_file = _PROJECT_ROOT / key
+        rule_name = _rule_name_from_path(rule_file, technique_id)
+        if rule_file.stem.endswith(("_eql", "_threshold")):
+            raise ValidationUnavailable("EQL/threshold rules require SIEM validation")
+        tp_file = find_test_file(rule_file, _TP_DIR, "tp")
+        tn_file = find_test_file(rule_file, _TN_DIR, "tn")
+        current_f1 = score(validate_local(str(rule_file), str(tp_file), str(tn_file)))
+        if current_f1 == 0:
+            return RegressionResult(
+                technique_id, rule_name, None, current_f1, None, "FAIL",
+                "No true positives detected; F1=0 cannot pass", True, key,
+            )
+        if baseline_root is not None:
+            baseline_rule = baseline_root / key
+            baseline = score(validate_local(str(baseline_rule), str(tp_file), str(tn_file)))
+        else:
+            baseline = load_local_baseline(technique_id, key)
+        if baseline is None:
+            raise ValidationUnavailable(
+                "Missing comparable local baseline; supply a trusted --baseline-root "
+                "or a reviewed successful per-rule snapshot"
+            )
+    except (OSError, ValueError, yaml.YAMLError) as exc:
         return RegressionResult(
-            technique_id=technique_id,
-            rule_name=rule_name,
-            previous_f1=baseline if baseline is not None else 0.0,
-            current_f1=effective_f1,
-            delta=0.0,
-            status="PASS",
-            message="Local validation skipped — no test data or keywords; using baseline",
+            technique_id, rule_name, baseline, current_f1, None, "NOT_RUN",
+            str(exc), current_f1 is not None, rule_path,
         )
-
-    current_f1 = current_f1_raw
-
-    # Prefer local-vs-local comparison to avoid comparing keyword-based F1
-    # (~0.5) against ES-based full-SIEM F1 (~1.0) which causes spurious FAILs.
-    local_baseline = load_local_baseline(technique_id)
-    if local_baseline is None:
-        # First local run — establish baseline and always PASS
-        return RegressionResult(
-            technique_id=technique_id,
-            rule_name=rule_name,
-            previous_f1=current_f1,
-            current_f1=current_f1,
-            delta=0.0,
-            status="PASS",
-            message=f"First local run; baseline established at F1={current_f1:.2f}",
-            local_validated=True,
-        )
-
-    # Local baseline exists — compare local-vs-local
-    baseline = local_baseline
 
     delta = round(current_f1 - baseline, 4)
-
     if delta < _FAIL_DELTA:
         status = "FAIL"
-        message = (
-            f"F1 dropped {abs(delta):.2f} points (from {baseline:.2f} to {current_f1:.2f}) "
-            f"— exceeds FAIL threshold of {abs(_FAIL_DELTA):.2f}"
-        )
+        message = f"F1 dropped {abs(delta):.2f}, exceeding {abs(_FAIL_DELTA):.2f}"
     elif delta < _WARN_DELTA:
         status = "WARN"
-        message = (
-            f"F1 dropped {abs(delta):.2f} points (from {baseline:.2f} to {current_f1:.2f}) "
-            f"— exceeds WARN threshold of {abs(_WARN_DELTA):.2f}"
-        )
+        message = f"F1 dropped {abs(delta):.2f}, exceeding warning threshold"
     else:
         status = "PASS"
-        if delta >= 0:
-            message = f"F1 stable or improved ({baseline:.2f} → {current_f1:.2f})"
-        else:
-            message = (
-                f"F1 dropped {abs(delta):.2f} points ({baseline:.2f} → {current_f1:.2f}) "
-                f"— within acceptable threshold"
-            )
-
+        message = "Local keyword smoke score is within the regression threshold"
     return RegressionResult(
-        technique_id=technique_id,
-        rule_name=rule_name,
-        previous_f1=baseline,
-        current_f1=current_f1,
-        delta=delta,
-        status=status,
-        message=message,
-        local_validated=True,
+        technique_id, rule_name, baseline, current_f1, delta, status,
+        message, True, key,
     )
 
 
@@ -386,46 +369,34 @@ def _technique_id_from_filename(filename: str) -> str | None:
     return raw.replace("_", ".", 1) if "_" in raw else raw
 
 
-def check_changed_files(file_list: str) -> list[RegressionResult]:
-    """Check regression for all detection files listed in *file_list*.
-
-    Parameters
-    ----------
-    file_list:
-        Space-separated (or newline-separated) list of changed file paths,
-        typically produced by ``git diff --name-only``.
-    """
-    results: list[RegressionResult] = []
-    seen: set[str] = set()
-
-    # Accept both space and newline separators
-    paths = file_list.replace("\n", " ").split()
-
+def check_changed_files(file_list: str | list[str],
+                        baseline_root: Path | None = None) -> list[RegressionResult]:
+    """Evaluate every distinct rule path, including variants of one technique."""
+    paths = file_list.split() if isinstance(file_list, str) else file_list
+    results = []
+    seen = set()
     for file_path in paths:
-        file_path = file_path.strip()
-        if not file_path:
+        if not isinstance(file_path, str):
+            results.append(RegressionResult(
+                "unknown", "Invalid file entry", None, None, None, "NOT_RUN",
+                "Rule paths must be strings",
+            ))
             continue
-        # Only process Sigma YAML files outside compiled/ directories
-        if not file_path.endswith(".yml"):
+        path = Path(file_path)
+        if path.suffix not in {".yml", ".yaml"} or {"compiled", "packs"} & set(path.parts):
             continue
-        if "/compiled/" in file_path or "\\compiled\\" in file_path:
+        try:
+            key = _rule_key(file_path)
+        except ValidationUnavailable as exc:
+            results.append(RegressionResult(
+                "unknown", file_path, None, None, None, "NOT_RUN", str(exc),
+            ))
             continue
-
-        technique_id = _technique_id_from_filename(file_path)
-        if technique_id is None:
+        if key in seen:
             continue
-        if technique_id in seen:
-            continue
-        seen.add(technique_id)
-
-        # Resolve to absolute path
-        rule_path = Path(file_path)
-        if not rule_path.is_absolute():
-            rule_path = _PROJECT_ROOT / rule_path
-
-        result = check_regression(technique_id, str(rule_path))
-        results.append(result)
-
+        seen.add(key)
+        technique_id = _technique_id_from_filename(file_path) or "unknown"
+        results.append(check_regression(technique_id, key, baseline_root))
     return results
 
 
@@ -434,10 +405,18 @@ def check_changed_files(file_list: str) -> list[RegressionResult]:
 # ---------------------------------------------------------------------------
 
 # ASCII-safe status markers — render cleanly in GitHub Markdown and all terminals
-_STATUS_EMOJI = {"PASS": "[ PASS ]", "WARN": "[ WARN ]", "FAIL": "[ FAIL ]"}
+_STATUS_EMOJI = {s: f"[ {s} ]" for s in ("PASS", "WARN", "FAIL", "NOT_RUN")}
 
 
-def generate_report(results: list[RegressionResult]) -> str:
+def gate_status(results: list[RegressionResult]) -> str:
+    if any(r.status == "FAIL" for r in results):
+        return "FAIL"
+    if not results or any(r.status not in {"PASS", "WARN"} for r in results):
+        return "NOT_RUN"
+    return "WARN" if any(r.status == "WARN" for r in results) else "PASS"
+
+
+def generate_report(results: list[RegressionResult], output_dir: Path | None = None) -> str:
     """Generate a markdown regression report and write it to disk.
 
     Returns the markdown string.
@@ -445,35 +424,27 @@ def generate_report(results: list[RegressionResult]) -> str:
     lines: list[str] = [
         "## Detection Regression Test Results",
         "",
+        "Local keyword smoke test only; this is not SIEM validation or deployment approval.",
+        "",
         "| Rule | Previous F1 | Current F1 | Delta | Status |",
         "|------|------------|------------|-------|--------|",
     ]
 
     for r in results:
         emoji = _STATUS_EMOJI.get(r.status, "")
-        delta_str = f"{r.delta:+.2f}"
+        delta_str = f"{r.delta:+.2f}" if r.delta is not None else "N/A"
+        previous = f"{r.previous_f1:.2f}" if r.previous_f1 is not None else "N/A"
+        current = f"{r.current_f1:.2f}" if r.current_f1 is not None else "N/A"
         lines.append(
-            f"| {r.technique_id} | {r.previous_f1:.2f} | {r.current_f1:.2f} | "
+            f"| {r.rule_path or r.technique_id} | {previous} | {current} | "
             f"{delta_str} | {emoji} {r.status} |"
         )
 
     lines.append("")
 
-    fail_count = sum(1 for r in results if r.status == "FAIL")
-    warn_count = sum(1 for r in results if r.status == "WARN")
-
-    if fail_count > 0:
-        noun = "rule" if fail_count == 1 else "rules"
-        overall = f"**Overall: FAIL** — {fail_count} {noun} regressed beyond threshold"
-    elif warn_count > 0:
-        noun = "rule" if warn_count == 1 else "rules"
-        overall = f"**Overall: WARN** — {warn_count} {noun} with notable F1 drop"
-    elif results:
-        overall = "**Overall: PASS** — all rules within acceptable thresholds"
-    else:
-        overall = "**Overall: PASS** — no detection files changed"
-
-    lines.append(overall)
+    lines.append(f"**Overall: {gate_status(results)}** — {len(results)} rule(s) accounted for")
+    if not results:
+        lines.append("No rules were evaluated. Empty input cannot pass a required check.")
     lines.append("")
 
     # Detail section
@@ -481,15 +452,19 @@ def generate_report(results: list[RegressionResult]) -> str:
         lines += ["<details><summary>Details</summary>", ""]
         for r in results:
             emoji = _STATUS_EMOJI.get(r.status, "")
-            lines.append(f"- **{r.technique_id}** ({r.rule_name}): {emoji} {r.message}")
+            lines.append(f"- **{r.rule_path or r.technique_id}** ({r.rule_name}): {emoji} {r.message}")
         lines += ["", "</details>", ""]
 
     report = "\n".join(lines)
 
     # Write to disk
-    report_path = _REGRESSION_DIR / "regression-report.md"
+    report_path = (output_dir or _REGRESSION_DIR) / "regression-report.md"
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(report, encoding="utf-8")
+    report_path.with_suffix(".json").write_text(json.dumps({
+        "status": gate_status(results), "method": "local_keyword",
+        "results": [asdict(r) for r in results],
+    }, indent=2, allow_nan=False), encoding="utf-8")
 
     return report
 
@@ -503,28 +478,28 @@ def save_snapshot(
     commit_sha: str = "",
     pr_number: int = 0,
 ) -> None:
-    """Persist each regression result as a historical JSON record.
-
-    Files are written to ``tests/results/regression/{technique_id}_regression.json``.
-    """
+    """Explicitly persist successful local baselines; never overwrite with a failed run."""
     _REGRESSION_DIR.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now(tz=timezone.utc).isoformat()
 
     for r in results:
-        normalized = r.technique_id.lower().replace(".", "_")
-        snapshot_path = _REGRESSION_DIR / f"{normalized}_regression.json"
+        if r.status not in {"PASS", "WARN"} or not r.local_validated or not r.rule_path:
+            continue
+        current_f1 = score(r.current_f1)
+        if current_f1 == 0:
+            continue
+        snapshot_path = _snapshot_path(r.technique_id, r.rule_path)
         record: dict[str, Any] = {
             "technique_id": r.technique_id,
             "timestamp": timestamp,
-            "f1_score": r.current_f1,
+            "f1_score": current_f1,
+            "local_f1": current_f1,
+            "rule_path": _rule_key(r.rule_path),
+            "method": "local_keyword",
+            "status": r.status,
             "commit_sha": commit_sha,
             "pr_number": pr_number,
         }
-        # Write local_f1 only when the score came from the local keyword validator.
-        # This key is used by load_local_baseline() for local-vs-local comparison on
-        # subsequent runs, preventing spurious FAILs from mixing ES and local F1 values.
-        if r.local_validated:
-            record["local_f1"] = r.current_f1
         snapshot_path.write_text(json.dumps(record, indent=2), encoding="utf-8")
 
 
@@ -536,33 +511,24 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Run regression tests on changed detection rules (CI-safe, no ES dependency)."
     )
-    parser.add_argument(
-        "--files",
-        required=True,
-        help="Space-separated list of changed detection file paths (from git diff --name-only).",
-    )
-    parser.add_argument(
-        "--commit-sha",
-        default="",
-        help="Git commit SHA to embed in regression snapshots.",
-    )
-    parser.add_argument(
-        "--pr-number",
-        type=int,
-        default=0,
-        help="Pull request number to embed in regression snapshots.",
-    )
+    inputs = parser.add_mutually_exclusive_group(required=True)
+    inputs.add_argument("--files", help="Space-separated rule paths (local use).")
+    inputs.add_argument("--files-from", type=Path, help="NUL-delimited changed paths from git diff -z.")
+    parser.add_argument("--baseline-root", type=Path, help="Trusted checkout of the PR base revision.")
+    parser.add_argument("--output-dir", type=Path, default=_REGRESSION_DIR)
     args = parser.parse_args(argv)
 
-    results = check_changed_files(args.files)
-    report = generate_report(results)
-    save_snapshot(results, commit_sha=args.commit_sha, pr_number=args.pr_number)
-
-    # Write to stdout with UTF-8 encoding regardless of terminal setting
-    sys.stdout.buffer.write((report + "\n").encode("utf-8", errors="replace"))
-
-    fail_count = sum(1 for r in results if r.status == "FAIL")
-    return 1 if fail_count > 0 else 0
+    try:
+        files = (args.files_from.read_text(encoding="utf-8").rstrip("\0").split("\0")
+                 if args.files_from else args.files)
+        results = check_changed_files(files, args.baseline_root)
+    except (OSError, ValueError) as exc:
+        results = [RegressionResult("unknown", "Input manifest", None, None, None,
+                                    "NOT_RUN", str(exc))]
+    report = generate_report(results, args.output_dir)
+    print(report)
+    # Reports and accepted baselines are separate: a CI run never rewrites its baseline.
+    return 0 if gate_status(results) in {"PASS", "WARN"} else 1
 
 
 if __name__ == "__main__":

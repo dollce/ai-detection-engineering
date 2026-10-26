@@ -218,6 +218,45 @@ not contact a live model or SIEM. These checks do not establish live detection F
 See the official [Codex CLI](https://learn.chatgpt.com/docs/codex/cli) and
 [MCP configuration](https://learn.chatgpt.com/docs/extend/mcp?surface=cli) documentation.
 
+### Validation gates
+
+Missing inputs, invalid/non-finite scores, failed checks and empty result sets block
+validation. `NOT_RUN` is a blocking result, never a substitute for `PASS`.
+
+- **PR regression** compares each changed rule path with a trusted checkout of the
+  PR base, using the same TP/TN fixtures. Variants of one ATT&CK technique are
+  evaluated separately. This remains a keyword smoke test; it does not implement
+  full Sigma, EQL or threshold semantics. Unsupported rules and missing comparable
+  baselines require SIEM validation/review and block this gate. Current F1=0 fails
+  even without a baseline. Drops greater than 0.10 fail; drops greater than 0.05 warn.
+- **Weekly audit** checks rule metadata, nonempty TP/TN fixtures, type-specific
+  compiled artifacts, pack references and stored results (including nested
+  `metrics`/`results` scores). It requires stored F1 >= 0.75 and no recorded
+  validation errors. It does not rerun detections or establish artifact freshness.
+  Requested evasion execution is reported as `NOT_RUN` in this offline job.
+- **Validation agent** rejects errors, missing attack/benign populations and
+  invalid scores before granting eligibility. A requested Elasticsearch check
+  cannot pass by falling back to local matching. EQL/threshold rules require their
+  SIEM validation path. Explicit offline Sigma validation remains available.
+
+Run from the repository root:
+
+```bash
+python3 -m unittest discover -s tests/unit -v
+python3 autonomous/orchestration/validation_audit.py --output-dir /tmp/validation-audit
+python3 autonomous/orchestration/regression.py \
+  --files detections/discovery/t1016.yml \
+  --baseline-root /path/to/trusted-base-checkout \
+  --output-dir /tmp/detection-regression
+```
+
+The regression CLI exits nonzero for `FAIL`, `NOT_RUN` or empty input. The workflow
+uses `NOT_APPLICABLE` only after a successful Git diff proves there are no rule
+source changes. CI reports are written outside the checkout so a failed run cannot
+reuse a committed report. CI never rewrites accepted regression baselines; optional
+reviewed snapshots are stored and read under `tests/results/regression/` by rule path.
+Existing invalid evidence must be repaired and revalidated, not relabeled as passing.
+
 ### Current Detection Coverage
 
 For live detection counts and pipeline state, see [STATUS.md](STATUS.md).
