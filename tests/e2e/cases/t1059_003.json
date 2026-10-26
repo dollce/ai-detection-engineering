@@ -1,0 +1,12 @@
+{
+  "technique_id": "T1059.003",
+  "sigma_rule": "detections/execution/t1059_003.yml",
+  "description": "Existing Sysmon fixtures with explicit event-level alert expectations. TP fixture event 0 is contextual process creation and must not alert.",
+  "cases": [
+    {"case_id": "context_process", "fixture": "tests/true_positives/t1059_003_tp.json", "event_index": 0, "expected_alert": false},
+    {"case_id": "chained_recon", "fixture": "tests/true_positives/t1059_003_tp.json", "event_index": 1, "expected_alert": true},
+    {"case_id": "suspicious_parent", "fixture": "tests/true_positives/t1059_003_tp.json", "event_index": 2, "expected_alert": true},
+    {"case_id": "helpdesk_diagnostic", "fixture": "tests/true_negatives/t1059_003_tn.json", "event_index": 0, "expected_alert": false},
+    {"case_id": "network_drive", "fixture": "tests/true_negatives/t1059_003_tn.json", "event_index": 1, "expected_alert": false}
+  ]
+}

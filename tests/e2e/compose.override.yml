@@ -1,0 +1,24 @@
+# Isolated local E2E lab. Use with the root compose file and project ade-e2e.
+# Requires Docker Compose 2.24.4+ for !override.
+services:
+  elasticsearch:
+    container_name: ${COMPOSE_PROJECT_NAME}-elasticsearch
+    ports: !override
+      - "127.0.0.1:${ADE_E2E_ES_PORT:-19200}:9200"
+    environment:
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+    mem_limit: 2g
+  kibana-setup:
+    container_name: ${COMPOSE_PROJECT_NAME}-kibana-setup
+  kibana:
+    container_name: ${COMPOSE_PROJECT_NAME}-kibana
+    ports: !override
+      - "127.0.0.1:${ADE_E2E_KIBANA_PORT:-15601}:5601"
+    environment:
+      TELEMETRY_ENABLED: "false"
+      TELEMETRY_OPTIN: "false"
+      NODE_OPTIONS: "--max-old-space-size=1024"
+    mem_limit: 2g
+networks:
+  labnet:
+    name: ${COMPOSE_PROJECT_NAME}-lab

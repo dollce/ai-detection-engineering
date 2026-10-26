@@ -1,0 +1,9 @@
+PHP2Shell 공격 탐지 E2E
+
+사용자 요구: nginx 및 PHP 환경을 추가한다. 아래 AWS 공개 탐지 조건을 참고하고,
+로컬 StealMyBitcoin-PoC의 요청을 대상으로 실제 탐지 결과를 확인한다.
+
+참고: https://aws.amazon.com/ko/blogs/korea/using-aws-waf-to-apply-mitigations-for-php2shell-rce-vulnerabilities-cve-2026-109618-and-cve-2026-109619/
+
+범위: 공개 커스텀 HTTP 조건은 CVE-2026-109619의 의심 요청을 가리킨다.
+성공한 RCE나 CVE-2026-109618 전체 커버리지를 이 조건만으로 주장하지 않는다.

@@ -63,6 +63,17 @@ codex
 
 See [QUICKSTART.md](QUICKSTART.md) for a detailed walkthrough.
 
+## Local end-to-end checks
+
+To supply a PHP2Shell scenario and inspect the generated rule, observed nginx
+requests, local PoC result, and actual scheduled Elastic alerts, follow the
+[PHP2Shell E2E guide](tests/e2e/php2shell/README.md). After its one-time setup,
+run `make e2e-php2shell` or pass your own scenario file with
+`bash pipeline/e2e-php2shell.sh --scenario /absolute/path/to/scenario.txt`.
+Each run writes a report under `artifacts/e2e/` and removes only its own
+disposable Compose projects. A fixed Windows detection smoke and a general
+live-model smoke are documented in [the Elastic E2E guide](tests/e2e/README.md).
+
 ## Startup Options
 
 | Command | What Runs |

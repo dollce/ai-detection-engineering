@@ -61,7 +61,7 @@ services:
       elasticsearch:
         condition: service_healthy
     restart: "no"
-    entrypoint: ["sh", "-c", "curl -sf -u elastic:changeme -X POST http://elasticsearch:9200/_security/user/kibana_system/_password -H 'Content-Type: application/json' -d '{\"password\":\"changeme\"}' && echo ' kibana_system password set' || echo ' (already set or failed)'"]
+    entrypoint: ["sh", "-c", "curl --connect-timeout 5 --max-time 30 -sf -u elastic:changeme -X POST http://elasticsearch:9200/_security/user/kibana_system/_password -H 'Content-Type: application/json' -d '{\"password\":\"changeme\"}' && echo ' kibana_system password set'"]
     networks:
       - labnet
 
