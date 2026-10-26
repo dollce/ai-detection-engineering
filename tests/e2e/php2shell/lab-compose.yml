@@ -1,0 +1,42 @@
+services:
+  php:
+    image: php:8.4.26-fpm-alpine3.23@sha256:b2a757dc9d3c05a6a97c05cacd26b981b6225e65cc78da6ccb2ea0a8b4b6196b
+    platform: linux/amd64
+    command: ["php", "-S", "0.0.0.0:8000", "-t", "/app"]
+    environment:
+      PHP_CLI_SERVER_WORKERS: "4"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,size=32m,mode=1777
+    mem_limit: 1g
+    pids_limit: 128
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    volumes:
+      - ./public:/app:ro
+      - ./print-flag:/usr/local/bin/print-flag:ro
+    networks: [backend]
+
+  nginx:
+    image: nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10
+    platform: linux/amd64
+    user: "101:101"
+    ports:
+      - "127.0.0.1:${PHP2SHELL_LAB_PORT:-18167}:80"
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx:rw,size=16m,uid=101,gid=101
+      - /var/run:rw,size=1m,uid=101,gid=101
+    mem_limit: 256m
+    pids_limit: 64
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on: [php]
+    networks: [backend, frontend]
+
+networks:
+  backend:
+    internal: true
+  frontend: {}

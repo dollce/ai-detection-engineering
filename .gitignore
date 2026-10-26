@@ -46,3 +46,6 @@ autonomous/security/audit-log.jsonl
 
 # Codex local MCP configuration and authentication/state
 .codex/
+
+# Local E2E reports, synthetic fixtures, and model output
+artifacts/e2e/

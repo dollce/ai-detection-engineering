@@ -5,7 +5,7 @@
 .PHONY: help setup setup-elastic setup-splunk setup-both setup-full start stop \
         down logs sim-logs status clean agent transpile-elastic transpile-splunk \
         dashboard-update sla pipeline-stats health-check feedback \
-        share-check
+        share-check e2e e2e-fixture e2e-php2shell
 
 # Default SIEM (override with: make setup SIEM=splunk)
 SIEM ?= elastic
@@ -118,3 +118,13 @@ share-check: ## Verify the project is ready to share (clean, documented)
 	@echo ""
 	@echo "To share: push to GitHub and others just run:"
 	@echo "  git clone <repo> && cd ai-detection-engineering && make setup"
+
+# ─── Isolated E2E smoke ──────────────────────────────────────────
+e2e: ## Run optional live-LLM Elastic smoke in a disposable local lab
+	bash pipeline/e2e-elastic.sh
+
+e2e-fixture: ## Run fixed-fixture Elastic smoke without model calls
+	bash pipeline/e2e-elastic.sh --fixture-only
+
+e2e-php2shell: ## Run live Daybreak PHP2Shell detection E2E in disposable local labs
+	bash pipeline/e2e-php2shell.sh

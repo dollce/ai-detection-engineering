@@ -109,6 +109,15 @@ def resolve_platforms(technique_id: str) -> list[str]:
     return TECHNIQUE_PLATFORM_MAP.get(technique_id, ["windows"])
 
 
+def normalize_lucene_output(output: str) -> str:
+    """Remove sigma-cli's preamble and the lab's unsupported channel prefix."""
+    query = "\n".join(
+        line for line in output.strip().splitlines()
+        if not line.startswith("Parsing Sigma")
+    )
+    return re.sub(r"^winlog\.channel:\S+ AND ", "", query.strip())
+
+
 def transpile_sigma(rule_path: Path) -> tuple[str, str]:
     """
     Transpile a Sigma rule to Lucene (Elasticsearch) and SPL (Splunk).
@@ -128,16 +137,10 @@ def transpile_sigma(rule_path: Path) -> tuple[str, str]:
             ["sigma", "convert", "-t", "lucene", "-p", "ecs_windows", str(rule_path)],
             capture_output=True, text=True, cwd=str(REPO_ROOT),
         )
-        lucene = result.stdout.strip()
-        if result.returncode != 0:
-            print(f"    [constants] Lucene transpile warning: {result.stderr.strip()[:200]}")
-        # Strip sigma-cli preamble lines ("Parsing Sigma rules...")
-        lucene = "\n".join(
-            line for line in lucene.splitlines()
-            if not line.startswith("Parsing Sigma")
-        )
-        # Strip winlog.channel prefix added by ecs_windows pipeline
-        lucene = re.sub(r"^winlog\.channel:\S+ AND ", "", lucene.strip())
+        if result.returncode == 0:
+            lucene = normalize_lucene_output(result.stdout)
+        else:
+            print(f"    [constants] Lucene transpile failed: {result.stderr.strip()[:200]}")
     except Exception as exc:
         print(f"    [constants] Lucene transpile failed: {exc}")
 
@@ -146,9 +149,10 @@ def transpile_sigma(rule_path: Path) -> tuple[str, str]:
             ["sigma", "convert", "-t", "splunk", "--without-pipeline", str(rule_path)],
             capture_output=True, text=True, cwd=str(REPO_ROOT),
         )
-        spl = result.stdout.strip()
-        if result.returncode != 0:
-            print(f"    [constants] SPL transpile warning: {result.stderr.strip()[:200]}")
+        if result.returncode == 0:
+            spl = result.stdout.strip()
+        else:
+            print(f"    [constants] SPL transpile failed: {result.stderr.strip()[:200]}")
     except Exception as exc:
         print(f"    [constants] SPL transpile failed: {exc}")
 
