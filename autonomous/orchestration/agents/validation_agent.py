@@ -14,6 +14,7 @@ Called by agent_runner.py. Implements run(state_manager) interface.
 
 import datetime
 import json
+import os
 import re
 from pathlib import Path
 
@@ -25,7 +26,7 @@ from orchestration.siem import check_elastic
 from orchestration.validation import validate_against_elasticsearch
 from orchestration.validation_eql import validate_eql_against_elasticsearch
 from orchestration.validation_threshold import validate_threshold_against_elasticsearch
-from orchestration import claude_llm
+from orchestration import codex_llm
 
 # Re-use authoring utilities for transpilation and scenario loading
 from orchestration.agents.author_agent import (
@@ -47,7 +48,7 @@ SIGMA_REQUIRED_KEYS = {"title", "logsource", "detection"}
 
 
 def extract_yaml_from_response(raw: str) -> str:
-    """Extract YAML from Claude response, handling markdown fences and surrounding text."""
+    """Extract YAML from Codex response, handling markdown fences and surrounding text."""
     # Try to find fenced block first (handles ```yaml, ```yml, or plain ```)
     match = re.search(r'```(?:ya?ml)?\s*\n(.*?)```', raw, re.DOTALL)
     if match:
@@ -76,8 +77,8 @@ def _now_iso() -> str:
 
 def _load_agent_model() -> str:
     """Get the model name configured for this agent."""
-    cfg = claude_llm._load_agent_config(AGENT_NAME)
-    return cfg.get("model", "opus")
+    cfg = codex_llm._load_agent_config(AGENT_NAME)
+    return os.environ.get("CODEX_MODEL") or cfg.get("model") or "CLI default"
 
 
 # ---------------------------------------------------------------------------
@@ -169,7 +170,7 @@ def validate_detection(sigma_rule_path: str, scenario: dict) -> dict:
         rule = yaml.safe_load(f)
 
     if not isinstance(rule, dict):
-        # Rule file is not valid Sigma YAML (e.g. plain string from bad Claude output)
+        # Rule file is not valid Sigma YAML (e.g. plain string from bad Codex output)
         return {
             "tp": 0, "fp": 0, "fn": len(attack_events), "tn": len(benign_events),
             "precision": 0.0, "recall": 0.0, "f1_score": 0.0,
@@ -516,13 +517,13 @@ def validate_single(request: dict, state_manager: StateManager, run_id: str,
           f"F1={metrics['f1_score']}, FP_rate={metrics['fp_rate']}")
     print(f"    [validation] Quality: {quality_tier}")
 
-    # --- RETRY-WITH-FEEDBACK (if F1 < threshold and Claude available) ---
-    if metrics["f1_score"] < AUTO_DEPLOY_THRESHOLD and claude_llm.is_available():
+    # --- RETRY-WITH-FEEDBACK (if F1 < threshold and Codex available) ---
+    if metrics["f1_score"] < AUTO_DEPLOY_THRESHOLD and codex_llm.is_available():
         attack_events = scenario.get("events", {}).get("attack_sequence", [])
         benign_events = scenario.get("events", {}).get("benign_similar", [])
 
         # Load configurable timeout (default 300s)
-        agent_cfg = claude_llm._load_agent_config(AGENT_NAME)
+        agent_cfg = codex_llm._load_agent_config(AGENT_NAME)
         refinement_timeout = agent_cfg.get("refinement_timeout_seconds", 300)
 
         # Save original rule for quality gate revert
@@ -531,7 +532,7 @@ def validate_single(request: dict, state_manager: StateManager, run_id: str,
 
         for attempt in range(1, MAX_TUNE_RETRIES + 1):
             print(f"    [validation] Retry {attempt}/{MAX_TUNE_RETRIES}: "
-                  f"F1={metrics['f1_score']} < {AUTO_DEPLOY_THRESHOLD}, asking Claude to refine")
+                  f"F1={metrics['f1_score']} < {AUTO_DEPLOY_THRESHOLD}, asking Codex to refine")
 
             current_rule_yaml = rule_path.read_text(encoding="utf-8")
 
@@ -596,7 +597,7 @@ Diagnose why the false negatives don't match the Lucene query. Common causes:
 
 Return ONLY the corrected Sigma YAML. No markdown fences, no explanation."""
 
-            refine_result = claude_llm.ask(
+            refine_result = codex_llm.ask(
                 prompt=refine_prompt,
                 agent_name=AGENT_NAME,
                 system_prompt=(
@@ -623,7 +624,7 @@ Return ONLY the corrected Sigma YAML. No markdown fences, no explanation."""
                         continue
 
                     rule_path.write_text(refined_yaml, encoding="utf-8")
-                    print(f"    [validation] Claude refined rule ({len(refined_yaml)} chars)")
+                    print(f"    [validation] Codex refined rule ({len(refined_yaml)} chars)")
 
                     # Re-transpile
                     new_lucene, new_spl = transpile_sigma(rule_path)
@@ -691,10 +692,10 @@ Return ONLY the corrected Sigma YAML. No markdown fences, no explanation."""
                         print(f"    [validation] F1 target met after {attempt} retry(ies)")
                         break
                 except yaml.YAMLError:
-                    print(f"    [validation] Retry {attempt}: Claude output was not valid YAML")
+                    print(f"    [validation] Retry {attempt}: Codex output was not valid YAML")
             else:
-                print(f"    [validation] Retry {attempt}: Claude error: {refine_result.get('error')}")
-                break  # Don't retry if Claude itself is failing
+                print(f"    [validation] Retry {attempt}: Codex error: {refine_result.get('error')}")
+                break  # Don't retry if Codex itself is failing
 
     # Save test results (required by schema for DEPLOYED transition)
     results_dir = REPO_ROOT / "tests" / "results"

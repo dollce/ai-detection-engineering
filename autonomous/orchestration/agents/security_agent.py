@@ -18,7 +18,7 @@ import yaml
 
 from orchestration.state import StateManager
 from orchestration import learnings
-from orchestration import claude_llm
+from orchestration import codex_llm
 
 AUTONOMOUS_DIR = Path(__file__).resolve().parent.parent.parent
 REPO_ROOT = AUTONOMOUS_DIR.parent
@@ -493,20 +493,20 @@ def log_findings(pr_number: int, agent: str, findings: list[dict]):
             f.write(json.dumps(entry) + "\n")
 
 
-# ─── Claude Quality Review (ISSUE-022) ──────────────────────────
+# ─── Codex Quality Review (ISSUE-022) ──────────────────────────
 
-def claude_quality_review(changed_rules: list[dict]) -> list[dict]:
-    """Ask Claude to review detection rule quality for PRs touching detections/.
+def codex_quality_review(changed_rules: list[dict]) -> list[dict]:
+    """Ask Codex to review detection rule quality for PRs touching detections/.
 
     Returns a list of finding dicts compatible with the existing findings format.
     """
-    if not claude_llm.is_available():
+    if not codex_llm.is_available():
         return []
 
     if not changed_rules:
         return []
 
-    # Build a compact summary of the rules for Claude
+    # Build a compact summary of the rules for Codex
     rules_summary = []
     for rule in changed_rules[:5]:  # Cap at 5 rules to stay within token budget
         rules_summary.append({
@@ -530,7 +530,7 @@ Return ONLY a JSON array of findings. Each finding must have:
 
 If no issues found, return an empty array: []"""
 
-    result = claude_llm.ask(
+    result = codex_llm.ask(
         prompt=prompt,
         agent_name="security",
         allowed_tools=[],
@@ -539,7 +539,7 @@ If no issues found, return an empty array: []"""
     )
 
     if not result["success"]:
-        print(f"  [security] Claude quality review skipped: {result.get('error', 'unknown')}")
+        print(f"  [security] Codex quality review skipped: {result.get('error', 'unknown')}")
         return []
 
     response = result["response"].strip()
@@ -553,26 +553,30 @@ If no issues found, return an empty array: []"""
         response = "\n".join(lines)
 
     try:
-        claude_findings = json.loads(response)
-        if not isinstance(claude_findings, list):
+        codex_findings = json.loads(response)
+        if not isinstance(codex_findings, list):
             return []
 
         # Convert to standard finding format
         findings = []
-        for cf in claude_findings:
+        for cf in codex_findings:
             findings.append({
                 "severity": cf.get("severity", "INFO"),
-                "category": "ClaudeQualityReview",
+                "category": "CodexQualityReview",
                 "file": cf.get("file", ""),
                 "line": 0,
                 "finding": cf.get("description", ""),
                 "snippet": "",
             })
-        print(f"  [security] Claude quality review: {len(findings)} finding(s)")
+        print(f"  [security] Codex quality review: {len(findings)} finding(s)")
         return findings
     except (json.JSONDecodeError, TypeError):
-        print(f"  [security] Could not parse Claude quality review response")
+        print(f"  [security] Could not parse Codex quality review response")
         return []
+
+
+# Compatibility for scripts importing the previous provider-specific helper.
+claude_quality_review = codex_quality_review
 
 
 # ─── Main Entry Point ────────────────────────────────────────────
@@ -645,7 +649,7 @@ def run(state_manager: StateManager, pr_number: int = None) -> dict:
     # Pipeline integrity check (uses file list, not content)
     all_findings.extend(scan_pipeline_integrity(filenames, pr_agent))
 
-    # 3b. Claude quality review for detection rule PRs (ISSUE-022)
+    # 3b. Codex quality review for detection rule PRs (ISSUE-022)
     detection_files = [
         pf for pf in pr_files
         if pf.get("filename", "").startswith("detections/")
@@ -653,14 +657,14 @@ def run(state_manager: StateManager, pr_number: int = None) -> dict:
         and (pf.get("filename", "").endswith(".yml") or pf.get("filename", "").endswith(".yaml"))
     ]
     if detection_files:
-        print(f"  [security] PR touches {len(detection_files)} detection rule(s) — running Claude review")
+        print(f"  [security] PR touches {len(detection_files)} detection rule(s) — running Codex review")
         rules_for_review = []
         for pf in detection_files:
             content = get_file_content_from_pr(pf)
             if content:
                 rules_for_review.append({"file": pf["filename"], "content": content})
-        claude_findings = claude_quality_review(rules_for_review)
-        all_findings.extend(claude_findings)
+        codex_findings = codex_quality_review(rules_for_review)
+        all_findings.extend(codex_findings)
 
     # 4. Determine verdict
     verdict, verdict_reason = determine_verdict(all_findings)

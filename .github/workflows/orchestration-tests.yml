@@ -1,0 +1,43 @@
+name: Orchestration Unit Tests
+
+on:
+  pull_request:
+    paths:
+      - 'autonomous/orchestration/**'
+      - 'tests/unit/**'
+      - 'tests/cli_integration/**'
+      - 'pipeline/configure_codex.py'
+      - 'setup.sh'
+      - 'Makefile'
+      - 'AGENTS.md'
+      - '.github/workflows/orchestration-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'autonomous/orchestration/**'
+      - 'tests/unit/**'
+      - 'tests/cli_integration/**'
+      - 'pipeline/configure_codex.py'
+      - 'setup.sh'
+      - 'Makefile'
+      - 'AGENTS.md'
+      - '.github/workflows/orchestration-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-regressions:
+    name: Codex adapter and consumer regressions
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install pyyaml
+      - name: Run offline regression suite
+        run: python -m unittest discover -s tests/unit -v

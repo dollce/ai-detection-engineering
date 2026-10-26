@@ -1,13 +1,14 @@
 """
 Token Budget Tracker — Estimates, logs, and throttles token usage
-across the Patronus pipeline to stay within Pro plan limits.
+across the Patronus pipeline using a local, provider-neutral planning budget.
 
 Rough estimation is fine. The goal is preventing surprise limit hits,
-not precise accounting.
+not precise accounting of Codex quotas, tokens, or billing.
 """
 
 import datetime
 import json
+import os
 from pathlib import Path
 
 import yaml
@@ -48,18 +49,21 @@ def _load_config() -> dict:
 
 
 def _get_model_multiplier(agent_name: str) -> float:
-    """Get cost multiplier based on agent's assigned model."""
+    """Get a local estimate multiplier; this is not model pricing or quota usage."""
+    cfg = {}
     if CONFIG_PATH.exists():
         with open(CONFIG_PATH) as f:
             cfg = yaml.safe_load(f) or {}
 
     agents_cfg = cfg.get("agents", {})
-    agent_cfg = agents_cfg.get(agent_name, {})
-    model = agent_cfg.get("model", "sonnet")
+    aliases = {"blue-team": "author", "quality": "tuning"}
+    canonical_name = aliases.get(agent_name, agent_name)
+    agent_cfg = agents_cfg.get(canonical_name, agents_cfg.get(agent_name, {})) or {}
+    model = os.environ.get("CODEX_MODEL") or agent_cfg.get("model") or "default"
 
     budget_cfg = cfg.get("budget", {})
-    models = budget_cfg.get("models", {"opus": 1.0, "sonnet": 0.2})
-    return models.get(model, 0.5)
+    models = budget_cfg.get("models", {})
+    return models.get(model, budget_cfg.get("default_model_multiplier", 1.0))
 
 
 # ─── Logging ──────────────────────────────────────────────────────

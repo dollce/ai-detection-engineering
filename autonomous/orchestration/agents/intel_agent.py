@@ -4,9 +4,9 @@ and creates structured detection requests.
 
 Called by agent_runner.py. Implements run(state_manager) interface.
 
-When Claude CLI is available (local terminal or Claude Code session):
+When Codex CLI is available (local terminal or Codex session):
   1. Fetches threat intel index pages via Python urllib
-  2. Uses Claude to select and analyze relevant reports
+  2. Uses Codex to select and analyze relevant reports
   3. Extracts MITRE ATT&CK techniques and creates detection requests
 
 Fallback (CI / GitHub Actions where no OAuth session exists):
@@ -30,7 +30,7 @@ import yaml
 
 from orchestration.state import StateManager
 from orchestration import learnings
-from orchestration import claude_llm
+from orchestration import codex_llm
 
 AUTONOMOUS_DIR = Path(__file__).resolve().parent.parent.parent
 REPO_ROOT = AUTONOMOUS_DIR.parent
@@ -137,7 +137,7 @@ def _fetch_page(url: str, max_bytes: int = 300_000, timeout: int = 30) -> dict |
 
 
 def _strip_markdown_fences(text: str) -> str:
-    """Extract JSON content from Claude responses, handling fences and trailing text."""
+    """Extract JSON content from Codex responses, handling fences and trailing text."""
     text = text.strip()
     # If wrapped in markdown fences, extract just the fenced block
     if text.startswith("```"):
@@ -527,17 +527,17 @@ def search_web_for_intel(
     max_reports: int = 3,
 ) -> list[dict]:
     """
-    Fetch threat intel from the web using Python urllib + Claude analysis.
+    Fetch threat intel from the web using Python urllib + Codex analysis.
 
-    Two-phase approach (replaces single Claude CLI + curl call):
-      Phase 1: Python fetches index page, extracts text + links (no Claude)
-      Phase 2: Claude picks best report URLs from links (pure reasoning)
-      Phase 3: Python fetches each report page (no Claude)
-      Phase 4: Claude extracts MITRE techniques from report text (pure reasoning)
+    Fetch pages in Python and analyze their contents through the CLI:
+      Phase 1: Python fetches index page, extracts text + links (no Codex)
+      Phase 2: Codex picks best report URLs from links (pure reasoning)
+      Phase 3: Python fetches each report page (no Codex)
+      Phase 4: Codex extracts MITRE techniques from report text (pure reasoning)
 
     This is much more reliable than the old approach because:
       - No Bash(curl:*) tool restriction or max-turns issues
-      - Claude only does analysis (what it's good at), not web fetching
+      - Codex only does analysis (what it's good at), not web fetching
       - Python urllib handles redirects, encoding, timeouts natively
     """
     # Phase 1: Fetch an index page with Python
@@ -556,12 +556,12 @@ def search_web_for_intel(
         print("  [intel] Could not fetch any index pages — skipping web search")
         return []
 
-    # Phase 2: Ask Claude to pick the best report links (pure reasoning)
-    if not claude_llm.is_available():
-        print("  [intel] Claude CLI not available — skipping link analysis")
+    # Phase 2: Ask Codex to pick the best report links (pure reasoning)
+    if not codex_llm.is_available():
+        print("  [intel] Codex CLI not available — skipping link analysis")
         return []
 
-    # Try each fetched index page until Claude selects at least one report
+    # Try each fetched index page until Codex selects at least one report
     picked = []
     for url in INTEL_INDEX_URLS:
         if picked:
@@ -583,7 +583,7 @@ def search_web_for_intel(
             continue
 
         queries_str = ", ".join(queries[:3])
-        pick_result = claude_llm.ask_for_analysis(
+        pick_result = codex_llm.ask_for_analysis(
             question=(
                 f"Pick up to {max_reports} threat intelligence report links from this list. "
                 f"Topics of interest: {queries_str}. "
@@ -596,7 +596,7 @@ def search_web_for_intel(
         )
 
         if not pick_result["success"]:
-            print(f"  [intel] Claude failed to pick links from {url}: {pick_result.get('error')}")
+            print(f"  [intel] Codex failed to pick links from {url}: {pick_result.get('error')}")
             continue
 
         try:
@@ -610,13 +610,13 @@ def search_web_for_intel(
             continue
 
         if not picked:
-            print(f"  [intel] Claude found no useful reports on {url} — trying next source")
+            print(f"  [intel] Codex found no useful reports on {url} — trying next source")
 
     if not picked:
         print("  [intel] No reports selected from any index source")
         return []
 
-    print(f"  [intel] Claude selected {len(picked)} reports to fetch")
+    print(f"  [intel] Codex selected {len(picked)} reports to fetch")
 
     # Phase 3 + 4: Fetch each report and extract techniques
     already_covered = ", ".join(sorted(existing_techniques)[:20])
@@ -634,7 +634,7 @@ def search_web_for_intel(
             continue
 
         print(f"    [intel] Analyzing report ({len(page['text'])} chars)...")
-        extract_result = claude_llm.ask_for_analysis(
+        extract_result = codex_llm.ask_for_analysis(
             question=(
                 "Extract all MITRE ATT&CK techniques from this threat report. "
                 f"Skip already-covered techniques: {already_covered}. "
@@ -749,7 +749,7 @@ def run(state_manager: StateManager) -> dict:
     Flow:
     1. Load briefing, lessons, Fawkes mappings, existing coverage
     2. Generate search queries for current month
-    3. If Claude CLI available: search web for new threat reports
+    3. If Codex CLI available: search web for new threat reports
     4. Save web reports as YAML files in threat-intel/reports/
     5. Process all reports (existing + new) — create detection requests
     6. Update digest
@@ -784,7 +784,7 @@ def run(state_manager: StateManager) -> dict:
     for q in queries:
         print(f"    - {q}")
 
-    # 5. Web search for new intel (if Claude CLI available)
+    # 5. Web search for new intel (if Codex CLI available)
     reports_processed = []
     total_stats = {
         "total_new": 0,
@@ -836,11 +836,11 @@ def run(state_manager: StateManager) -> dict:
 
             print(f"\n  [intel] Processing: {report.get('title', report_path.name)}")
 
-            # If report has raw_summary but few techniques, ask Claude to extract more
+            # If report has raw_summary but few techniques, ask Codex to extract more
             raw_summary = report.get("raw_summary", "")
-            if claude_llm.is_available() and raw_summary and len(report.get("techniques", [])) < 3:
-                print(f"    [intel] Asking Claude (sonnet) to extract techniques from report...")
-                llm_result = claude_llm.ask_for_analysis(
+            if codex_llm.is_available() and raw_summary and len(report.get("techniques", [])) < 3:
+                print(f"    [intel] Asking Codex to extract techniques from report...")
+                llm_result = codex_llm.ask_for_analysis(
                     question=(
                         "Extract MITRE ATT&CK technique IDs from this threat report summary. "
                         "Return ONLY a JSON array of objects with keys: id, name, description, priority. "
@@ -859,9 +859,9 @@ def run(state_manager: StateManager) -> dict:
                             new_techs = [t for t in extracted if t.get("id") and t["id"] not in existing_ids]
                             report["techniques"].extend(new_techs)
                             if new_techs:
-                                print(f"    [intel] Claude extracted {len(new_techs)} additional techniques")
+                                print(f"    [intel] Codex extracted {len(new_techs)} additional techniques")
                     except (json.JSONDecodeError, TypeError):
-                        print(f"    [intel] Claude response was not valid JSON, skipping")
+                        print(f"    [intel] Codex response was not valid JSON, skipping")
 
             stats = process_techniques(
                 state_manager,

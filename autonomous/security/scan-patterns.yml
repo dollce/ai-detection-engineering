@@ -14,6 +14,7 @@ secret_patterns: []
 skip_files:
   - "*.md"
   - "*.txt"
+  - "AGENTS.md"
   - "CLAUDE.md"
   - "AUTONOMOUS.md"
   - "coverage/*"

@@ -1,13 +1,13 @@
 # AI Detection Engineering Lab
 
-A template for building an **AI-powered detection engineering pipeline** using Claude Code
+A template for building an **AI-powered detection engineering pipeline** using Codex CLI
 as an autonomous blue team agent. Deploy a full SIEM lab, generate simulated attack
 telemetry, and let an AI agent build, validate, tune, and deploy security detections —
 all mapped to the MITRE ATT&CK framework.
 
 ## What This Does
 
-An AI agent (Claude Code) acts as a senior detection engineer, executing the full lifecycle:
+An AI agent (Codex CLI) acts as a senior detection engineer, executing the full lifecycle:
 
 ```
 INTEL → DISCOVER → AUTHOR → VALIDATE → DEPLOY → TUNE → REPORT
@@ -38,7 +38,7 @@ For each detection the agent:
 │         │             └────────┬────────┘───▶│ Splunk          │  │
 │         └───────────────────────────────────▶│ :8000 (optional)│  │
 │                      ┌───────────────┐       └─────────────────┘  │
-│                      │  Claude Code  │                            │
+│                      │  Codex CLI  │                            │
 │                      │  (AI Agent)   │ ◀── MCP: Elasticsearch     │
 │                      └───────────────┘                            │
 └──────────────────────────────────────────────────────────────────┘
@@ -54,8 +54,10 @@ cd ai-detection-engineering
 # 2. Run setup (interactive — picks your SIEM, installs tooling)
 ./setup.sh
 
-# 3. Launch the AI agent
-claude
+# 3. Install/authenticate Codex CLI >= 0.163.0, then launch the AI agent
+npm install -g @openai/codex
+codex login
+codex
 # Paste the first-run prompt from PROMPTS.md
 ```
 
@@ -132,7 +134,7 @@ Full TTP mapping: [threat-intel/fawkes/fawkes-ttp-mapping.md](threat-intel/fawke
 
 ```
 ai-detection-engineering/
-├── CLAUDE.md                    # AI agent instructions (role, workflow, guardrails)
+├── AGENTS.md                    # AI agent instructions (role, workflow, guardrails)
 ├── PROMPTS.md                   # Starter prompts for the agent
 ├── QUICKSTART.md                # New user walkthrough
 ├── docker-compose.yml           # Lab infrastructure (Elastic, Splunk, Cribl, Simulator)
@@ -155,7 +157,7 @@ ai-detection-engineering/
 ├── coverage/                    # ATT&CK coverage matrix & detection backlog
 ├── gaps/                        # Data source and detection gaps
 ├── tuning/                      # Exclusion lists & tuning changelog
-└── mcp-config.example.json      # MCP server config template
+└── pipeline/configure_codex.py # Generate project-local Codex MCP config
 ```
 
 ## Autonomous Agent Pipeline (Patronus)
@@ -177,22 +179,44 @@ Ten specialized AI agents + a coordinator run the detection lifecycle end-to-end
 
 Each agent creates a feature branch, commits its work, pushes, and opens a PR for human review. See [STATUS.md](STATUS.md) for current pipeline state.
 
-### Claude LLM Integration
+### Codex CLI Integration
 
-Agents invoke Claude Code CLI (`claude -p`) for reasoning tasks at key decision points:
+Agents invoke `codex exec` for reasoning tasks at key decision points:
 
-| Agent | Claude Task | Model | Fallback |
-|-------|------------|-------|----------|
-| Author | Author Sigma/EQL/threshold rules from attack/benign event data | Opus | Deterministic field extraction |
-| Validation | Suggest rule improvements when F1 < 0.90 (retry loop) | Sonnet | Skip refinement |
-| Red Team | Generate attack scenarios dynamically | Sonnet | Hardcoded scenario generators |
-| Tuning | Analyze fleet health, recommend tuning actions | Sonnet | Fixed threshold scoring |
-| Intel | Extract MITRE techniques from raw report text | Sonnet | Regex table parsing |
+| Agent | Reasoning task | Fallback |
+|-------|----------------|----------|
+| Author | Author Sigma rules from attack/benign event data | Deterministic field extraction |
+| Validation | Refine rules when F1 < 0.90, up to two retries | Skip refinement |
+| Red Team | Generate scenarios for techniques without hardcoded generators | Hardcoded generators where available |
+| Tuning / Quality | Analyze fleet health and recommend actions | Fixed threshold scoring |
+| Intel | Select reports and extract MITRE techniques from fetched text | Local reports and regex parsing |
+| Security | Review rule quality | Deterministic security checks |
 
-- **Locally**: Uses your Claude Pro subscription (OAuth session in `~/.claude/`)
-- **In CI**: Falls back to deterministic Python logic automatically (no credentials needed)
-- **Security**: Invocations use `--allowed-tools "Bash(curl:*)"` for web search or `--tools ""` for pure reasoning
-- **Validation**: Blue-team validates against Elasticsearch when available, falls back to local JSON in CI
+- **Install/authenticate**: Codex CLI **0.163.0 or later** (`npm install -g @openai/codex`), then `codex login`. Check authentication with `codex login status`.
+- **Models**: `model: null` in `autonomous/orchestration/config.yml` uses the Codex CLI built-in default. Set a per-agent Codex model ID, or set `CODEX_MODEL` to override all agents. User/project model settings are not inherited by isolated reasoning calls.
+- **In CI**: Model calls remain disabled; existing deterministic fallbacks require no Codex credentials.
+- **Isolation**: Reasoning calls run from a temporary directory, ignore user/project configuration, and disable shell execution, local image reads, MCP, and app integrations. The read-only sandbox rejects file edits; harmless built-in interaction tools may still be advertised. Authentication still uses the Codex login session. Interactive `codex` reads `AGENTS.md` and the project's MCP config.
+- **Intel fetching**: Python fetches report pages and passes text to Codex for analysis. The optional web helper uses native web search without shell access.
+- **Responses**: Only the final assistant message enters JSON/YAML validation. CLI failures, empty responses, and timeouts trigger the existing fallback paths.
+- **Runtime limits**: Subprocess timeouts bound requests. The legacy `max_turns` argument remains accepted for callers; Codex has no equivalent hard turn limit.
+- **Budget**: `budget.py` tracks local estimates, not actual Codex subscription usage or billing.
+- **Validation/deployment**: Elasticsearch validation and local CI validation are unchanged; deployment remains post-merge. `--dry-run` on the existing agent runner skips Git operations only and still executes agents.
+
+The old `orchestration.claude_llm` import remains a compatibility shim; it invokes Codex.
+
+Run migration checks from the repository root (Python 3.11+ for the test suite):
+
+```bash
+python3 -m unittest discover -s tests/unit -v
+CODEX_CLI_INTEGRATION=1 python3 -m unittest discover -s tests/cli_integration -v
+```
+
+The first suite mocks model and SIEM calls. The opt-in suite requires the installed
+Codex CLI and a loopback socket; it uses an isolated credential directory and a
+localhost mock API to check actual tool exposure and read-only enforcement. It does
+not contact a live model or SIEM. These checks do not establish live detection F1.
+See the official [Codex CLI](https://learn.chatgpt.com/docs/codex/cli) and
+[MCP configuration](https://learn.chatgpt.com/docs/extend/mcp?surface=cli) documentation.
 
 ### Current Detection Coverage
 
@@ -202,17 +226,26 @@ Improvement roadmap (Phases 1-8): [ROADMAP.md](ROADMAP.md).
 
 ## MCP Configuration
 
-The AI agent uses MCP (Model Context Protocol) for direct Elasticsearch access and
-optionally GitHub/GitLab for PR workflows:
+`setup.sh` creates the interactive Codex CLI's project-scoped `.codex/config.toml`.
+To generate it separately, without starting or changing lab services:
 
 ```bash
-# Copy the template to the project root
-cp mcp-config.example.json .mcp.json
-
-# Edit .mcp.json and optionally add your GitHub/GitLab PAT
+python3 pipeline/configure_codex.py --siem-mode both --cribl
+# Export GITHUB_PERSONAL_ACCESS_TOKEN in your shell for the optional GitHub server.
+codex mcp list
 ```
 
-The Elasticsearch MCP server runs as a Docker container on the `blue-team-lab` network.
+Codex loads project configuration only after the project is trusted. Existing
+`.codex/config.toml` files are preserved. Cribl is included with `--cribl` when
+Node.js is installed; GitHub is included when `npx` is installed. The generated
+Cribl working directory points at the current checkout/worktree. The Elasticsearch
+MCP container uses the `blue-team-lab` network. Select `--siem-mode elastic`,
+`both`, or `splunk` to match the lab. Splunk-only mode omits Elasticsearch MCP;
+Splunk access continues through the Python REST integration.
+
+Legacy `.mcp.json` files are preserved but are not read by Codex. Port any custom
+server entries into `.codex/config.toml`; the generator creates the standard lab
+servers. Local `.codex/` files are ignored by Git.
 
 ## Cribl Stream (Phase 3 — Completed 2026-03-14)
 
@@ -233,8 +266,8 @@ Configure Cribl: `./pipeline/configure-cribl.sh`
 - **Docker Desktop** (macOS/Windows) or Docker Engine + Compose (Linux)
 - **Git**
 - **~8 GB RAM**, ~20 GB free disk
-- **Claude Pro subscription** (includes Claude Code)
-- **Python + pip** (optional — for sigma-cli transpilation)
+- **Codex CLI >= 0.163.0**, authenticated with `codex login`
+- **Python 3.10+ + pip** (orchestration, MCP configuration, and sigma-cli transpilation)
 
 ## Using as a Template
 
@@ -242,7 +275,7 @@ This project is designed to be forked/cloned and customized:
 
 1. **Fork or clone** this repo
 2. **Run `./setup.sh`** to start the lab
-3. **Launch Claude Code** and paste a prompt from `PROMPTS.md`
+3. **Launch Codex CLI** and paste a prompt from `PROMPTS.md`
 4. **Watch** the agent discover data, review threat intel, and build detections
 5. **Customize**: swap Fawkes for your own threat model, add data sources, etc.
 
@@ -251,7 +284,7 @@ This project is designed to be forked/cloned and customized:
 To target a different adversary:
 1. Replace `threat-intel/fawkes/` with your own TTP mapping
 2. Update `coverage/detection-backlog.md` with your priority techniques
-3. Update `CLAUDE.md` to reference your threat actor
+3. Update `AGENTS.md` to reference your threat actor
 4. Modify `simulator/simulator.py` to generate matching attack telemetry
 
 ## Useful Commands

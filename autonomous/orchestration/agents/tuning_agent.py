@@ -17,7 +17,7 @@ from pathlib import Path
 
 from orchestration.state import StateManager
 from orchestration import learnings
-from orchestration import claude_llm
+from orchestration import codex_llm
 from orchestration.siem import check_elastic, _load_infra_config, _basic_auth
 
 AUTONOMOUS_DIR = Path(__file__).resolve().parent.parent.parent
@@ -475,16 +475,16 @@ def run(state_manager: StateManager) -> dict:
             except ValueError:
                 pass  # May lack required artifacts, skip silently
 
-    # 5. Ask Claude for fleet analysis (if available)
+    # 5. Ask Codex for fleet analysis (if available)
     llm_insights = []
-    if claude_llm.is_available() and results:
-        print(f"  [tuning] Asking Claude (sonnet) for fleet analysis...")
+    if codex_llm.is_available() and results:
+        print(f"  [tuning] Asking Codex for fleet analysis...")
         health_summary = "\n".join(
             f"- {r['technique_id']}: health={r['health']['health_score']}, "
             f"action={r['action']}, FP={r['health']['fp_rate']}, TP={r['health']['tp_rate']}"
             for r in results
         )
-        llm_result = claude_llm.ask_for_analysis(
+        llm_result = codex_llm.ask_for_analysis(
             question=(
                 "Based on this detection fleet health data, provide 2-3 brief, "
                 "actionable recommendations. Focus on: detections that need tuning, "
@@ -495,10 +495,10 @@ def run(state_manager: StateManager) -> dict:
             agent_name=AGENT_NAME,
         )
         if llm_result["success"]:
-            llm_insights = [f"[Claude] {llm_result['response']}"]
-            print(f"  [tuning] Claude analysis received")
+            llm_insights = [f"[Codex] {llm_result['response']}"]
+            print(f"  [tuning] Codex analysis received")
         else:
-            print(f"  [tuning] Claude analysis skipped: {llm_result.get('error', 'unknown')}")
+            print(f"  [tuning] Codex analysis skipped: {llm_result.get('error', 'unknown')}")
 
     all_insights = cross_agent_insights + llm_insights
 

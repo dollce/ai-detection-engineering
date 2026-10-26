@@ -13,6 +13,7 @@ Called by agent_runner.py. Implements run(state_manager) interface.
 
 import datetime
 import json
+import os
 from pathlib import Path
 from uuid import uuid4
 
@@ -21,7 +22,7 @@ import yaml
 from orchestration.state import StateManager
 from orchestration import learnings
 from orchestration.siem import TACTIC_MAP, SEVERITY_MAP
-from orchestration import claude_llm
+from orchestration import codex_llm
 from orchestration.constants import (
     TECHNIQUE_TACTIC_MAP,
     transpile_sigma,
@@ -55,8 +56,8 @@ SYSMON_CATEGORIES = {
 
 def _load_agent_model() -> str:
     """Get the model name configured for this agent."""
-    cfg = claude_llm._load_agent_config(AGENT_NAME)
-    return cfg.get("model", "opus")
+    cfg = codex_llm._load_agent_config(AGENT_NAME)
+    return os.environ.get("CODEX_MODEL") or cfg.get("model") or "CLI default"
 
 
 def _now_iso() -> str:
@@ -105,7 +106,7 @@ def generate_sigma_rule(request: dict, scenario: dict) -> str:
     Generate a Sigma rule YAML string from a detection request and scenario.
 
     This creates a reasonable detection based on the scenario's key_fields
-    and attack event patterns. For complex logic, Claude should enhance
+    and attack event patterns. For complex logic, Codex should enhance
     this in interactive mode.
     """
     tid = request["technique_id"]
@@ -279,17 +280,17 @@ def author_detection(request: dict, state_manager: StateManager, run_id: str) ->
     # --- AUTHOR ---
     print(f"    [author] Authoring Sigma rule for {tid}")
 
-    # Try Claude for rule generation (falls back to deterministic if unavailable)
+    # Try Codex for rule generation (falls back to deterministic if unavailable)
     sigma_yaml = None
-    if claude_llm.is_available():
-        print(f"    [author] Using Claude ({_load_agent_model()}) for rule authoring")
+    if codex_llm.is_available():
+        print(f"    [author] Using Codex ({_load_agent_model()}) for rule authoring")
         attack_events = scenario.get("events", {}).get("attack_sequence", [])
         benign_events = scenario.get("events", {}).get("benign_similar", [])
         detection_lessons = [
             e["description"] for e in
             learnings.get_relevant_lessons(AGENT_NAME, "detection", max_entries=5)
         ]
-        llm_result = claude_llm.ask_for_sigma_rule(
+        llm_result = codex_llm.ask_for_sigma_rule(
             technique_id=tid,
             technique_name=request.get("title", tid),
             attack_events=attack_events,
@@ -302,14 +303,14 @@ def author_detection(request: dict, state_manager: StateManager, run_id: str) ->
                 parsed = yaml.safe_load(llm_result["sigma_yaml"])
                 if isinstance(parsed, dict) and "detection" in parsed:
                     sigma_yaml = llm_result["sigma_yaml"]
-                    print(f"    [author] Claude authored rule ({len(sigma_yaml)} chars)")
+                    print(f"    [author] Codex authored rule ({len(sigma_yaml)} chars)")
                 else:
-                    print(f"    [author] Claude output is not a valid Sigma rule (missing detection block), falling back")
+                    print(f"    [author] Codex output is not a valid Sigma rule (missing detection block), falling back")
             except yaml.YAMLError:
-                print(f"    [author] Claude output was not valid YAML, falling back")
+                print(f"    [author] Codex output was not valid YAML, falling back")
                 sigma_yaml = None
         else:
-            print(f"    [author] Claude unavailable: {llm_result.get('error', '?')}, using deterministic")
+            print(f"    [author] Codex unavailable: {llm_result.get('error', '?')}, using deterministic")
 
     if sigma_yaml is None:
         sigma_yaml = generate_sigma_rule(request, scenario)

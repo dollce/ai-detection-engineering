@@ -35,7 +35,7 @@ PATH_FIELDS = (
 )
 
 # Markdown files to scan for broken plan references
-MD_GLOB_ROOTS = ("README.md", "ROADMAP.md", "CLAUDE.md", "STATUS.md", "PROMPTS.md", "QUICKSTART.md")
+MD_GLOB_ROOTS = ("README.md", "ROADMAP.md", "AGENTS.md", "CLAUDE.md", "STATUS.md", "PROMPTS.md", "QUICKSTART.md")
 
 
 def validate_detection_requests() -> list[str]:

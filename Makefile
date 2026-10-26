@@ -63,10 +63,10 @@ sim-logs: ## Tail only the log simulator output
 	docker compose logs -f log-simulator --tail=50
 
 # ─── Detection Engineering ───────────────────────────────────────
-agent: ## Launch Claude Code in this directory
-	@echo "Starting Claude Code..."
+agent: ## Launch Codex CLI in this directory
+	@echo "Starting Codex CLI..."
 	@echo "Tip: paste the first-run prompt from PROMPTS.md"
-	claude
+	codex
 
 transpile-elastic: ## Transpile all Sigma rules to Elasticsearch
 	@find detections -name "*.yml" -not -path "*/compiled/*" | while read rule; do \
@@ -112,7 +112,7 @@ share-check: ## Verify the project is ready to share (clean, documented)
 	@test -f README.md && echo "  OK: README.md" || echo "  MISSING: README.md"
 	@test -f setup.sh && echo "  OK: setup.sh" || echo "  MISSING: setup.sh"
 	@test -f docker-compose.yml && echo "  OK: docker-compose.yml" || echo "  MISSING: docker-compose.yml"
-	@test -f CLAUDE.md && echo "  OK: CLAUDE.md" || echo "  MISSING: CLAUDE.md"
+	@test -f AGENTS.md && echo "  OK: AGENTS.md" || echo "  MISSING: AGENTS.md"
 	@test -f PROMPTS.md && echo "  OK: PROMPTS.md" || echo "  MISSING: PROMPTS.md"
 	@test ! -f .env && echo "  OK: No .env file" || echo "  WARN: .env exists — don't commit secrets!"
 	@echo ""
