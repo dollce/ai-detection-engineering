@@ -79,9 +79,9 @@ Follow this cycle for every detection you build:
 - **Critical**: `process.command_line` must be mapped as `keyword` (not `text`) for wildcard queries to work
 
 ### 5. DEPLOY — Push to Elastic Security (Post-Merge Only)
-- **Do NOT auto-deploy from feature branches.** Deployment happens after PR merge to main.
+- **Do NOT auto-deploy from feature branches.** Deployment happens after PR merge to master.
 - **Post-merge deploy** (automated via `.github/workflows/deploy-rules.yml`):
-  - Detects changed files in `detections/**` on push to main
+  - Detects changed files in `detections/**` on push to master
   - Deploys VALIDATED rules to Elastic + Splunk via `autonomous/orchestration/siem.py`
 - **Manual deploy** (local lab):
   ```bash
@@ -285,7 +285,7 @@ ai-detection-engineering/
 ## Git Workflow & Branch Strategy
 
 ### Branch Rules
-- **NEVER commit directly to `main`.** All work goes on feature branches.
+- **NEVER commit directly to `master`.** All work goes on feature branches.
 - Branch naming convention: `detection/<technique-id>-<short-name>`
   - Example: `detection/t1055-001-create-remote-thread`
   - Example: `detection/t1547-001-registry-run-key`
@@ -375,7 +375,7 @@ Five AI agents currently run the detection lifecycle:
 | Red Team | Generate attack + benign scenarios per technique | On intel merge | `autonomous/orchestration/agents/red_team_agent.py` |
 | Blue Team | Author Sigma rules, validate against ES, transpile | On red-team merge | `autonomous/orchestration/agents/blue_team_agent.py` |
 | Quality | Health scoring, daily monitoring reports | Daily | `autonomous/orchestration/agents/quality_agent.py` |
-| Security | PR gate — secrets, code security, rule quality | Every PR to main | `autonomous/orchestration/agents/security_agent.py` |
+| Security | PR gate — secrets, code security, rule quality | Every PR to master | `autonomous/orchestration/agents/security_agent.py` |
 
 ### Target Architecture (10 Agents — Phase 4+)
 

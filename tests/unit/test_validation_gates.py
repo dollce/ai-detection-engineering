@@ -386,9 +386,9 @@ class WorkflowGateTests(unittest.TestCase):
                     "GITHUB_OUTPUT": str(self.temp / "outputs"),
                     "GITHUB_STEP_SUMMARY": str(self.temp / "summary")}
 
-    def run_step(self, name, **env):
+    def run_step(self, name, cwd=REPO_ROOT, **env):
         script = next(s["run"] for s in self.steps if s.get("name") == name)
-        return subprocess.run(["bash", "-e", "-o", "pipefail", "-c", script], cwd=REPO_ROOT,
+        return subprocess.run(["bash", "-e", "-o", "pipefail", "-c", script], cwd=cwd,
                               env={**self.env, **env}, capture_output=True, text=True)
 
     def test_diff_failure_cannot_be_reported_as_no_changed_rules(self):
@@ -407,6 +407,37 @@ class WorkflowGateTests(unittest.TestCase):
         result = self.run_step("Publish current-run summary")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("NOT_RUN", (self.temp / "summary").read_text())
+
+    def test_initial_master_import_requires_unchanged_reviewed_rule_and_data_trees(self):
+        clone = self.reviewed_clone()
+        result = self.run_step("Find changed rule sources and prepare trusted base", cwd=clone,
+                               BASE_SHA="bd3ce8a2435af2da93990804f3acc129112e2821")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("verified import preserves", (self.temp / "regression/regression-report.md").read_text())
+
+    def reviewed_clone(self):
+        clone = self.temp / "clone"
+        subprocess.run(["git", "clone", "--quiet", "--no-hardlinks", str(REPO_ROOT), str(clone)], check=True)
+        subprocess.run(["git", "checkout", "--quiet", "--detach", "0df199533e3077839986d058928374046b0a215a"], cwd=clone, check=True)
+        return clone
+
+    def test_initial_import_cannot_hide_a_rule_or_fixture_change(self):
+        clone = self.reviewed_clone()
+        env = {**os.environ, "GIT_AUTHOR_NAME": "Gate test", "GIT_AUTHOR_EMAIL": "test@example.com",
+               "GIT_COMMITTER_NAME": "Gate test", "GIT_COMMITTER_EMAIL": "test@example.com"}
+        for path in ("detections/discovery/t1016.yml", "tests/true_positives/t1016_tp.json"):
+            with self.subTest(path=path):
+                original = (clone / path).read_text()
+                (clone / path).write_text(original + "\n")
+                subprocess.run(["git", "add", path], cwd=clone, check=True)
+                subprocess.run(["git", "commit", "--quiet", "-m", "test changed import input"], cwd=clone, env=env, check=True)
+                result = self.run_step("Find changed rule sources and prepare trusted base", cwd=clone,
+                                      BASE_SHA="bd3ce8a2435af2da93990804f3acc129112e2821")
+                self.assertNotEqual(result.returncode, 0)
+                self.assertFalse((self.temp / "regression/regression-report.md").exists())
+                (clone / path).write_text(original)
+                subprocess.run(["git", "add", path], cwd=clone, check=True)
+                subprocess.run(["git", "commit", "--quiet", "-m", "restore import input"], cwd=clone, env=env, check=True)
 
 
 if __name__ == "__main__":

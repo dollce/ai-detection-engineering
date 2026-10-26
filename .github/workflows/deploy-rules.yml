@@ -5,7 +5,7 @@ name: Deploy Detection Rules
 
 on:
   push:
-    branches: [main]
+    branches: [master]
     paths: ['detections/**']
 
 concurrency:
@@ -17,6 +17,10 @@ permissions:
 
 jobs:
   deploy:
+    # Importing the reviewed code into the LICENSE-only master changes Git paths,
+    # not detection behavior. Do not redeploy the entire catalog on that import.
+    # Later detection changes merged into master use the normal deployment path.
+    if: github.event.before != 'bd3ce8a2435af2da93990804f3acc129112e2821'
     runs-on: ubuntu-latest
     timeout-minutes: 10
 

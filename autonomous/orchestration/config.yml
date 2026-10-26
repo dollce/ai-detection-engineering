@@ -96,7 +96,7 @@ infrastructure:
 # GitHub
 github:
   repo: "dollce/ai-detection-engineering"
-  base_branch: "main"
+  base_branch: "master"
 
 # Local budget heuristics (not Codex subscription quota or API pricing)
 budget:

@@ -14,7 +14,7 @@ on:
       - '.github/workflows/regression-test.yml'
       - '.github/workflows/continuous-validation.yml'
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - 'autonomous/orchestration/**'
       - 'tests/unit/**'

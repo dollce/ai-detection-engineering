@@ -3,7 +3,7 @@ name: Blue Team Agent
 on:
   pull_request:
     types: [closed]
-    branches: [main]
+    branches: [master]
   workflow_dispatch:
 
 concurrency:

@@ -151,14 +151,14 @@ def _create_branch(agent_name: str, run_id: str) -> tuple[str, bool]:
     except RuntimeError:
         pass  # Non-fatal — fetch may fail offline
 
-    _run_git(["checkout", "main"])
-    _run_git(["pull", "origin", "main"])
+    _run_git(["checkout", "master"])
+    _run_git(["pull", "origin", "master"])
     _run_git(["checkout", "-b", branch])
     return branch, had_stash
 
 
-def _cleanup_branch(original_branch: str = "main", had_stash: bool = False):
-    """Return to main and restore stash if we saved one."""
+def _cleanup_branch(original_branch: str = "master", had_stash: bool = False):
+    """Return to master and restore stash if we saved one."""
     try:
         _run_git(["checkout", original_branch])
         if had_stash:
@@ -182,7 +182,7 @@ BOOKKEEPING_FILES = {
 def _has_substantive_changes(branch: str) -> bool:
     """Check if the branch has changes beyond bookkeeping files."""
     try:
-        diff = _run_git(["diff", "--name-only", f"main...{branch}"])
+        diff = _run_git(["diff", "--name-only", f"master...{branch}"])
     except RuntimeError:
         return True  # Assume substantive if we can't check
     changed = {f.strip() for f in diff.strip().split('\n') if f.strip()}
@@ -286,7 +286,7 @@ def _create_pr(branch: str, agent_name: str, title: str, body: str):
         "title": title,
         "body": body,
         "head": branch,
-        "base": "main",
+        "base": "master",
     }).encode()
 
     req = urllib.request.Request(url, data=payload, method="POST", headers={
@@ -473,7 +473,7 @@ def run_agent(agent_name: str, pr_number: int = None, dry_run: bool = False):
     finally:
         # Restore stashed changes if we had any (ISSUE-007)
         if had_stash and not dry_run:
-            _cleanup_branch("main", had_stash=True)
+            _cleanup_branch("master", had_stash=True)
 
     print(f"\n  [{agent_name}] Run {run_id} complete.")
 
@@ -517,8 +517,8 @@ def run_pipeline(pipeline_agents: list[str], dry_run: bool = False):
             _run_git(["fetch", "--prune"])
         except RuntimeError:
             pass
-        _run_git(["checkout", "main"])
-        _run_git(["pull", "origin", "main"])
+        _run_git(["checkout", "master"])
+        _run_git(["pull", "origin", "master"])
         _run_git(["checkout", "-b", branch])
         print(f"  [pipeline] Created branch: {branch}")
 
@@ -594,7 +594,7 @@ def run_pipeline(pipeline_agents: list[str], dry_run: bool = False):
 
     # Restore stashed changes if we had any (ISSUE-007)
     if had_stash and not dry_run:
-        _cleanup_branch("main", had_stash=True)
+        _cleanup_branch("master", had_stash=True)
 
     print(f"\n  [pipeline] Pipeline {run_id} complete.")
 

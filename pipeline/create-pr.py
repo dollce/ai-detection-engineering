@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create a GitHub PR from the current branch to main.
+"""Create a GitHub PR from the current branch to master.
 
 Usage:
   GITHUB_PAT=<token> GITHUB_REPO=<owner/repo> python3 pipeline/create-pr.py [title] [head-branch] [base-branch]
@@ -54,7 +54,7 @@ def get_current_branch():
 # Parse arguments
 title = sys.argv[2] if len(sys.argv) > 2 else None
 head = sys.argv[3] if len(sys.argv) > 3 else get_current_branch()
-base = sys.argv[4] if len(sys.argv) > 4 else "main"
+base = sys.argv[4] if len(sys.argv) > 4 else "master"
 
 if not title:
     title = f"[Detection] {head}"

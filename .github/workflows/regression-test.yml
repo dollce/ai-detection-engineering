@@ -32,7 +32,21 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/regression" "$RUNNER_TEMP/regression-base"
-          git diff --name-only -z "$BASE_SHA" HEAD -- detections/ > "$RUNNER_TEMP/regression/changed-paths"
+          comparison_base="$BASE_SHA"
+          export IMPORT_VERIFIED=false
+          # One-time import from the reviewed branch into the LICENSE-only master.
+          # Pin both commits; later PRs always use their actual base. Any rule or
+          # validation-data change blocks this import path instead of skipping it.
+          if [ "$BASE_SHA" = "bd3ce8a2435af2da93990804f3acc129112e2821" ]; then
+            reviewed_source="0df199533e3077839986d058928374046b0a215a"
+            git merge-base --is-ancestor "$reviewed_source" HEAD
+            git diff --exit-code "$reviewed_source" HEAD -- \
+              detections/ tests/true_positives/ tests/true_negatives/ tests/results/ \
+              simulator/scenarios/ autonomous/detection-requests/
+            comparison_base="$reviewed_source"
+            export IMPORT_VERIFIED=true
+          fi
+          git diff --name-only -z "$comparison_base" HEAD -- detections/ > "$RUNNER_TEMP/regression/changed-paths"
           python - <<'PY'
           import os
           from pathlib import Path
@@ -44,12 +58,15 @@ jobs:
           with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
               f.write(f"count={len(rules)}\n")
           if not rules:
+              reason = ('verified import preserves the reviewed rule and validation-data trees'
+                        if os.environ['IMPORT_VERIFIED'] == 'true'
+                        else 'verified diff contains no rule source changes')
               (output / 'regression-report.md').write_text(
                   '## Detection Regression Test Results\n\n'
-                  '**Overall: NOT_APPLICABLE** — verified diff contains no rule source changes.\n'
+                  f'**Overall: NOT_APPLICABLE** — {reason}.\n'
                   'No regression validation was executed.\n')
           PY
-          git archive "$BASE_SHA" detections | tar -x -C "$RUNNER_TEMP/regression-base"
+          git archive "$comparison_base" detections | tar -x -C "$RUNNER_TEMP/regression-base"
 
       - name: Compare every changed rule with the base revision
         if: steps.changes.outputs.count != '0'

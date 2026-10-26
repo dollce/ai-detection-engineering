@@ -174,7 +174,7 @@ Ten specialized AI agents + a coordinator run the detection lifecycle end-to-end
 | Tuning | Monitors alert health, auto-tunes FP exclusions | Daily |
 | Coverage | Gap analysis, technique prioritization, GitHub Issues | Daily |
 | Quality | Fleet health scoring, monthly reports | Daily |
-| Security | PR gate — secrets scanning, rule quality checks | Every PR to main |
+| Security | PR gate — secrets scanning, rule quality checks | Every PR to master |
 | Coordinator | Routes work by priority + state across agents | Always on |
 
 Each agent creates a feature branch, commits its work, pushes, and opens a PR for human review. See [STATUS.md](STATUS.md) for current pipeline state.
@@ -262,6 +262,24 @@ Existing invalid evidence must be repaired and revalidated, not relabeled as pas
 For live detection counts and pipeline state, see [STATUS.md](STATUS.md).
 Full ATT&CK coverage matrix: [coverage/attack-matrix.md](coverage/attack-matrix.md).
 Improvement roadmap (Phases 1-8): [ROADMAP.md](ROADMAP.md).
+
+### Repository branch
+
+`master` is the default integration branch. Open feature PRs against `master`;
+the agent runner, CI filters, post-merge deployment and cleanup commands use it.
+`baseline/claude-cli` retains the reviewed migration history and is no longer the
+target for new work. The initial import preserves both Git histories and both MIT
+copyright notices. Scheduled agents run from the default branch; SIEM deployment
+still requires the configured service credentials and a reviewed merge.
+
+For the initial import only, the regression workflow pins the old LICENSE-only
+`master` commit and the reviewed PR #2 merge. It verifies ancestry and identical
+rule, fixture, scenario, request and stored-result trees before reporting the
+import as `NOT_APPLICABLE`. Any difference blocks that path. Subsequent PRs compare
+against their actual `master` base; this does not accept the outstanding SIEM
+validation gaps as passing. Deployment also skips this exact initial import so
+moving the repository does not redeploy the catalog; later detection merges use
+the normal deployment workflow.
 
 ## MCP Configuration
 

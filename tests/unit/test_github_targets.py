@@ -72,7 +72,7 @@ class GithubRepositoryTargetTests(unittest.TestCase):
     def test_config_and_security_default_target_the_fork(self):
         config = yaml.safe_load((REPO_ROOT / "autonomous/orchestration/config.yml").read_text(encoding="utf-8"))
         self.assertEqual(config["github"]["repo"], TARGET_REPO)
-        self.assertEqual(config["github"]["base_branch"], "main")
+        self.assertEqual(config["github"]["base_branch"], "master")
         token, repo = security_agent._load_github_config()
         self.assertEqual(token, TOKEN_FIXTURE)
         self.assertEqual(repo, TARGET_REPO)
@@ -86,7 +86,7 @@ class GithubRepositoryTargetTests(unittest.TestCase):
         self.assertEqual(self.http.call_count, 1)
         payload = self.assert_request(0, "POST", "/pulls")
         self.assertEqual(payload, {"title": "Fixture title", "body": "Fixture body",
-                                   "head": "detection/test-fixture", "base": "main"})
+                                   "head": "detection/test-fixture", "base": "master"})
 
     def test_security_pr_file_lookup_targets_fork(self):
         files = [{"filename": "detections/execution/fixture.yml", "status": "modified"}]

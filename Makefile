@@ -103,7 +103,7 @@ feedback: ## Record analyst feedback (set TECHNIQUE, VERDICT, REASON)
 # ─── Maintenance ─────────────────────────────────────────────
 clean-branches: ## Delete merged agent branches and prune remotes
 	git fetch --prune
-	git branch --merged main | grep "agent/" | xargs -r git branch -d
+	git branch --merged master | grep "agent/" | xargs -r git branch -d
 	@echo "Cleaned merged agent branches"
 
 # ─── Sharing ─────────────────────────────────────────────────────
