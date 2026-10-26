@@ -1,42 +1,66 @@
 {
   "technique_id": "T1059.001_T1547.001_EQL",
-  "date": "2026-04-12T14:44:22Z",
-  "sigma_rule": "detections\\execution\\t1059_001_t1547_001_persistence_after_exec_eql.yml",
+  "date": "2026-10-26T07:50:51Z",
+  "status": "PASS",
+  "sigma_rule": "detections/execution/t1059_001_t1547_001_persistence_after_exec_eql.yml",
+  "scenario_path": "simulator/scenarios/windows/t1059_001_t1547_001_eql.json",
+  "compiled_artifact": "detections/execution/compiled/t1059_001_t1547_001_persistence_after_exec_eql_elastic.json",
+  "validation_method": "elasticsearch_eql",
+  "validated_by": "revalidate-evidence",
+  "quality_tier": "validated",
+  "validation_scope": "Scenario validation on Elasticsearch temporary indices only; no Splunk, Cribl, production telemetry, or scheduled-alert validation.",
+  "siem_targets": [
+    "elasticsearch"
+  ],
+  "elasticsearch_version": "8.17.0",
+  "attack_event_count": 2,
+  "benign_event_count": 2,
+  "scoring_unit": "scenario",
   "metrics": {
-    "tp": 2,
+    "tp": 1,
     "fp": 0,
     "fn": 0,
-    "tn": 2,
+    "tn": 1,
     "precision": 1.0,
     "recall": 1.0,
     "f1_score": 1.0,
     "fp_rate": 0.0,
     "tp_rate": 1.0,
-    "total_attack": 2,
-    "total_benign": 2
+    "total_attack": 1,
+    "total_benign": 1,
+    "scoring_unit": "scenario"
   },
-  "quality_tier": "auto_deploy",
-  "validation_method": "elasticsearch",
-  "validated_by": "validation-agent",
-  "siem_targets": [
-    "elasticsearch",
-    "splunk"
-  ],
-  "sigma_rule_path": "detections\\execution\\t1059_001_t1547_001_persistence_after_exec_eql.yml",
-  "scenario_path": "simulator/scenarios/t1059_001_t1547_001_eql.json",
-  "attack_event_count": 2,
-  "benign_event_count": 2,
-  "quality_tier_criteria": {
-    "auto_deploy": "F1 >= 0.90 AND FP_rate <= 0.05",
-    "validated": "F1 >= 0.75",
-    "needs_rework": "F1 < 0.75"
+  "query": "sequence by host.name with maxspan=300s\n  [process where event.code == \"1\" and\n    process.name : (\"powershell.exe\", \"pwsh.exe\") and\n    process.command_line : (\"*-ExecutionPolicy*Bypass*\", \"*-ep*bypass*\",\n                            \"*-enc*\", \"*-EncodedCommand*\", \"*-e *\",\n                            \"*-NonInteractive*\", \"*-NoProfile*-WindowStyle*Hidden*\")]\n  [registry where event.code == \"13\" and\n    registry.path : (\"*\\\\CurrentVersion\\\\Run\\\\*\",\n                     \"*\\\\CurrentVersion\\\\RunOnce\\\\*\",\n                     \"*\\\\CurrentVersion\\\\RunServices\\\\*\")]",
+  "query_parameters": {
+    "expected_sequences": 1
+  },
+  "input_hashes": {
+    "autonomous/detection-requests/t1059_001_t1547_001_eql.yml": "0606bfd208b55b60d1fe9221c119dda01ff67689f8df23ec58ab697e874c2936",
+    "detections/execution/t1059_001_t1547_001_persistence_after_exec_eql.yml": "10de28487ae457e3903faa62d90d8904fb46686c9044453b3c1ec34be8f1c4b2",
+    "simulator/scenarios/windows/t1059_001_t1547_001_eql.json": "3e846c005c6d0e0469a00e5edf96e5f1b1e31492f4ce7167278c4a88d54e14ac",
+    "detections/execution/compiled/t1059_001_t1547_001_persistence_after_exec_eql_elastic.json": "42e058e308fc587535e7536fac9c01762f625dfb10cf7b85babd2f6fdec87418"
   },
   "validation_details": {
-    "index": "sim-validation-f04502c6",
-    "query": "((event.code:1 AND (process.name:(powershell.exe OR pwsh.exe)) AND (process.command_line:(*\\-ExecutionPolicy\\ Bypass* OR *\\-ExecutionPolicy\\ bypass* OR *\\-ep\\ Bypass* OR *\\-ep\\ bypass* OR *\\-EncodedCo",
+    "validation_method": "elasticsearch_eql",
+    "scoring_unit": "scenario",
+    "eql_query": "sequence by host.name with maxspan=300s\n  [process where event.code == \"1\" and\n    process.name : (\"powershell.exe\", \"pwsh.exe\") and\n    process.command_line : (\"*-ExecutionPolicy*Bypass*\", \"*-ep*bypass*\",\n                            \"*-enc*\", \"*-EncodedCommand*\", \"*-e *\",\n                            \"*-NonInteractive*\", \"*-NoProfile*-WindowStyle*Hidden*\")]\n  [registry where event.code == \"13\" and\n    registry.path : (\"*\\\\CurrentVersion\\\\Run\\\\*\",\n                     \"*\\\\CurrentVersion\\\\RunOnce\\\\*\",\n                     \"*\\\\CurrentVersion\\\\RunServices\\\\*\")]",
+    "expected_sequences": 1,
+    "sequences_found": 1,
+    "attack_sequences_found": 1,
+    "benign_sequences_found": 0,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "tn": 1,
+    "total_attack": 1,
+    "total_benign": 1,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "fp_rate": 0.0,
+    "tp_rate": 1.0,
     "events_ingested": 4,
-    "query_hits": 2,
-    "query_time_ms": 20,
+    "index_used": "sim-validation-b6a7edcf",
     "errors": []
   }
 }

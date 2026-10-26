@@ -344,6 +344,27 @@ class AgentQualityGateTests(GateFixture):
         self.assertTrue(result["auto_deploy_eligible"])
         self.state.transition.assert_called_once()
 
+    def test_correlation_projection_preserves_scenario_counts_and_false_positive_rate(self):
+        artifact = self.rule.with_suffix(".json")
+        write_json(artifact, {"query": "test query", "threshold": {"field": ["host.name"], "value": 3}})
+        request = {**self.request, "compiled_artifact": artifact.relative_to(self.root).as_posix()}
+        response = {**self.metrics, "tp": 1, "fp": 1, "tn": 0, "precision": .5,
+                    "f1_score": .6667, "fp_rate": 1.0, "scoring_unit": "scenario", "errors": []}
+        for rule_type in ("eql", "threshold"):
+            with self.subTest(rule_type=rule_type), \
+                    patch.object(validation_agent, "load_scenario", return_value={"events": {
+                        "attack_sequence": [self.attack] * 3, "benign_similar": [self.benign] * 2}}), \
+                    patch.object(validation_agent, f"validate_{rule_type}_against_elasticsearch", return_value=response):
+                result = validation_agent.validate_single({**request, "rule_type": rule_type}, self.state, "test", use_siem=True)
+                self.assertEqual(result["status"], "needs_rework")
+                self.assertEqual(result["metrics"]["total_attack"], 1)
+                self.assertEqual(result["metrics"]["total_benign"], 1)
+                self.assertEqual(result["metrics"]["scoring_unit"], "scenario")
+                self.assertEqual(result["metrics"]["fp_rate"], 1.0)
+                stored = json.loads((self.root / "tests/results/t1000.json").read_text())
+                self.assertEqual(stored["attack_event_count"], 3)
+                self.assertEqual(stored["benign_event_count"], 2)
+
     def test_requested_siem_check_cannot_pass_from_local_fallback(self):
         self.siem.return_value = None
         result = validation_agent.validate_single(self.request, self.state, "test", use_siem=True)

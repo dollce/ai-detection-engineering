@@ -422,8 +422,9 @@ def validate_single(request: dict, state_manager: StateManager, run_id: str,
                     "f1_score": eql_metrics["f1_score"],
                     "fp_rate": eql_metrics.get("fp_rate", 0.0),
                     "tp_rate": eql_metrics.get("recall", 0.0),
-                    "total_attack": len(attack_events),
-                    "total_benign": len(benign_events),
+                    "scoring_unit": eql_metrics.get("scoring_unit", "scenario"),
+                    "total_attack": eql_metrics.get("total_attack", int(bool(attack_events))),
+                    "total_benign": eql_metrics.get("total_benign", int(bool(benign_events))),
                 }
                 if siem_errors:
                     print(f"    [validation] EQL validation warnings: {'; '.join(siem_errors[:2])}")
@@ -480,8 +481,9 @@ def validate_single(request: dict, state_manager: StateManager, run_id: str,
                     "f1_score": threshold_metrics["f1_score"],
                     "fp_rate": threshold_metrics.get("fp_rate", 0.0),
                     "tp_rate": threshold_metrics.get("recall", 0.0),
-                    "total_attack": len(attack_events),
-                    "total_benign": len(benign_events),
+                    "scoring_unit": threshold_metrics.get("scoring_unit", "scenario"),
+                    "total_attack": threshold_metrics.get("total_attack", int(bool(attack_events))),
+                    "total_benign": threshold_metrics.get("total_benign", int(bool(benign_events))),
                 }
                 if siem_errors:
                     print(f"    [validation] Threshold validation warnings: {'; '.join(siem_errors[:2])}")

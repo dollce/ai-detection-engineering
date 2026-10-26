@@ -9,9 +9,7 @@ Phase 6 deliverable — Task 6.2: EQL Rule Support.
 """
 
 import json
-import time
 import urllib.error
-from pathlib import Path
 from uuid import uuid4
 
 from orchestration.validation import (
@@ -21,6 +19,59 @@ from orchestration.validation import (
     _cleanup_index,
 )
 from orchestration.siem import _load_infra_config
+
+
+def _checked_response(status: int, response: dict, operation: str,
+                      require_shards: bool = False) -> dict:
+    """Reject errors and incomplete ES responses before computing any metric."""
+    if not 200 <= status < 300 or not isinstance(response, dict):
+        raise ValueError(f"{operation}: invalid HTTP response ({status})")
+    if response.get("error"):
+        raise ValueError(f"{operation}: {response['error']}")
+    for flag in ("timed_out", "is_partial", "is_running", "terminated_early"):
+        if response.get(flag):
+            raise ValueError(f"{operation}: {flag}")
+    shards = response.get("_shards")
+    if require_shards or shards is not None:
+        if (not isinstance(shards, dict) or type(shards.get("total")) is not int
+                or shards["total"] <= 0 or type(shards.get("failed")) is not int
+                or shards["failed"] != 0 or type(shards.get("successful")) is not int
+                or shards["successful"] != shards["total"]):
+            raise ValueError(f"{operation}: incomplete or failed shard response")
+    return response
+
+
+def _count_matches(response: dict, expected_ids: set[str], index_name: str,
+                   limit: int) -> int:
+    """Count complete EQL matches and verify their corpus provenance."""
+    hits = response.get("hits")
+    if not isinstance(hits, dict):
+        raise ValueError("EQL query: missing hits")
+    if "sequences" in hits:
+        matches = hits["sequences"]
+        if not isinstance(matches, list) or any(not isinstance(x, dict) for x in matches):
+            raise ValueError("EQL query: malformed sequences")
+        event_groups = [match.get("events") for match in matches]
+    elif "events" in hits:
+        matches = hits["events"]
+        if not isinstance(matches, list):
+            raise ValueError("EQL query: malformed events")
+        event_groups = [[event] for event in matches]
+    else:
+        raise ValueError("EQL query: missing sequences/events")
+    total = hits.get("total")
+    if (not isinstance(total, dict) or total.get("relation") != "eq"
+            or type(total.get("value")) is not int or total["value"] != len(matches)
+            or len(matches) >= limit):
+        raise ValueError("EQL query: truncated or inconsistent match count")
+    for events in event_groups:
+        if not isinstance(events, list) or not events:
+            raise ValueError("EQL query: missing sequence events")
+        for event in events:
+            if (not isinstance(event, dict) or event.get("_id") not in expected_ids
+                    or event.get("_index") != index_name):
+                raise ValueError("EQL query: match does not belong to the queried corpus")
+    return len(matches)
 
 
 def validate_eql_against_elasticsearch(
@@ -34,211 +85,117 @@ def validate_eql_against_elasticsearch(
     expected_sequences: int = 1,
     cleanup: bool = True,
 ) -> dict:
+    """Execute EQL independently against attack and benign scenario corpora.
+
+    Events retain their timestamps and ordering. Deterministic document IDs
+    isolate each population, and returned IDs are checked before scoring.
+    TP/FN describe whether the attack scenario meets ``expected_sequences``;
+    FP/TN describe whether the independently queried benign scenario matches.
+    This is scenario-level evidence, not an event-level confusion matrix.
+    None means ES was unreachable; every later failure carries explicit errors.
     """
-    Validate an EQL sequence query against ingested events in Elasticsearch.
-
-    Flow:
-    1. Create ephemeral index (sim-validation-{uuid})
-    2. Bulk ingest all scenario events (attack + benign)
-    3. Run EQL query via POST /{index}/_eql/search
-    4. Count matched sequences / events
-    5. Score TP/FP/FN/TN
-    6. Cleanup index
-
-    Args:
-        eql_query: EQL sequence string (e.g., "sequence by host.name with maxspan=60s ...")
-        attack_events: Events that SHOULD trigger the detection
-        benign_events: Events that should NOT trigger
-        technique_id: MITRE technique ID for tagging
-        es_url: Elasticsearch URL (reads from config.yml if None)
-        es_auth: (user, password) tuple (reads from config.yml if None)
-        index_prefix: Index name prefix for ephemeral validation indices
-        expected_sequences: Minimum sequences to count as TP (default 1)
-        cleanup: Delete ephemeral index after test (default True)
-
-    Returns:
-        dict with validation metrics, or None if ES unreachable.
-    """
-    # Resolve config
     if es_url is None or es_auth is None:
-        infra = _load_infra_config()
-        es = infra.get("elasticsearch", {})
-        if es_url is None:
-            es_url = es.get("url", "http://localhost:9200")
-        if es_auth is None:
-            es_auth = (es.get("user", "elastic"), es.get("pass", "changeme"))
-
-    # Pre-flight: is ES reachable?
+        es = _load_infra_config().get("elasticsearch", {})
+        es_url = es_url or es.get("url", "http://localhost:9200")
+        es_auth = es_auth or (es.get("user", "elastic"), es.get("pass", "changeme"))
     if not _check_es_reachable(es_url, es_auth):
         return None
 
-    if not eql_query or not eql_query.strip():
-        return {
-            "validation_method": "elasticsearch_eql",
-            "f1_score": 0.0,
-            "tp": 0, "fp": 0, "fn": len(attack_events), "tn": len(benign_events),
-            "precision": 0.0, "recall": 0.0,
-            "sequences_found": 0,
-            "expected_sequences": expected_sequences,
-            "errors": ["Empty EQL query"],
-        }
-
     index_name = f"{index_prefix}-{uuid4().hex[:8]}"
-    errors = []
-
+    result = {
+        "validation_method": "elasticsearch_eql", "scoring_unit": "scenario",
+        "eql_query": eql_query, "expected_sequences": expected_sequences,
+        "sequences_found": 0, "attack_sequences_found": 0, "benign_sequences_found": 0,
+        "tp": 0, "fp": 0, "fn": int(bool(attack_events)), "tn": 0,
+        "total_attack": int(bool(attack_events)), "total_benign": int(bool(benign_events)),
+        "precision": 0.0, "recall": 0.0, "f1_score": 0.0,
+        "fp_rate": 0.0, "tp_rate": 0.0, "events_ingested": 0,
+        "index_used": index_name, "errors": [],
+    }
+    created = False
     try:
-        # ─── 0. Create ephemeral index with ILM settings ─────────────
-        try:
-            _es_request(
-                f"{es_url}/{index_name}",
-                method="PUT",
-                data={"settings": {
-                    "number_of_shards": 1,
-                    "number_of_replicas": 0,
-                    "index.lifecycle.name": "validation-cleanup",
-                }},
-                auth=es_auth,
-            )
-        except Exception:
-            pass  # Non-fatal — ILM policy may not exist
+        if not isinstance(eql_query, str) or not eql_query.strip():
+            raise ValueError("Empty EQL query")
+        if type(expected_sequences) is not int or expected_sequences < 1:
+            raise ValueError("expected_sequences must be a positive integer")
+        if not attack_events and not benign_events:
+            raise ValueError("No events supplied")
+        for event in [*attack_events, *benign_events]:
+            if not isinstance(event, dict) or not event:
+                raise ValueError("Scenario events must be nonempty objects")
+            if not event.get("@timestamp"):
+                raise ValueError("EQL scenario events require explicit timestamps")
 
-        # ─── 1. Bulk ingest events ────────────────────────────────────
-        bulk_body = _build_bulk_body(index_name, attack_events, benign_events, technique_id)
-
-        try:
-            status, resp = _es_request(
-                f"{es_url}/{index_name}/_bulk",
-                method="POST",
-                data=bulk_body,
-                auth=es_auth,
-                content_type="application/x-ndjson",
-                timeout=15,
-            )
-        except Exception as e:
-            errors.append(f"Bulk ingest failed: {e}")
-            return {
-                "validation_method": "elasticsearch_eql",
-                "f1_score": 0.0,
-                "tp": 0, "fp": 0, "fn": len(attack_events), "tn": len(benign_events),
-                "precision": 0.0, "recall": 0.0,
-                "sequences_found": 0,
-                "expected_sequences": expected_sequences,
-                "errors": errors,
-            }
-
-        if isinstance(resp, dict) and resp.get("errors"):
-            error_items = [
-                item for item in resp.get("items", [])
-                if "error" in item.get("index", {})
-            ]
-            if error_items:
-                errors.append(
-                    f"Bulk ingest had {len(error_items)} errors: "
-                    f"{error_items[0]['index']['error'].get('reason', '?')}"
-                )
-
-        # ─── 2. Refresh index ──────────────────────────────────────────
-        try:
-            _es_request(f"{es_url}/{index_name}/_refresh", method="POST", auth=es_auth)
-        except Exception:
-            time.sleep(1)
-
-        # ─── 3. Run EQL sequence query ─────────────────────────────────
-        eql_body = {
-            "query": eql_query,
-            "tiebreaker_field": "@timestamp",
-            "size": 100,
-        }
-
-        try:
-            status, response = _es_request(
-                f"{es_url}/{index_name}/_eql/search",
-                method="POST",
-                data=eql_body,
-                auth=es_auth,
-                timeout=30,
-            )
-        except urllib.error.HTTPError as e:
-            error_body = e.read().decode("utf-8")[:500]
-            try:
-                error_detail = json.loads(error_body)
-                reason = (
-                    error_detail.get("error", {})
-                    .get("root_cause", [{}])[0]
-                    .get("reason", error_body[:200])
-                )
-            except Exception:
-                reason = error_body[:200]
-            errors.append(f"EQL query error: {reason}")
-            return {
-                "validation_method": "elasticsearch_eql",
-                "f1_score": 0.0,
-                "tp": 0, "fp": 0, "fn": len(attack_events), "tn": len(benign_events),
-                "precision": 0.0, "recall": 0.0,
-                "sequences_found": 0,
-                "expected_sequences": expected_sequences,
-                "errors": errors,
-            }
-
-        # ─── 4. Parse EQL results ─────────────────────────────────────
-        hits = response.get("hits", {})
-        sequences = hits.get("sequences", [])
-        events_matched = hits.get("events", [])
-
-        # Count sequences found. For non-sequence EQL (just event matching),
-        # fall back to counting matched events.
-        sequences_found = len(sequences) if sequences else (1 if events_matched else 0)
-
-        # ─── 5. Score results ─────────────────────────────────────────
-        # For EQL, we score at the sequence level:
-        # - If attack events present and sequences found >= expected: TP=1
-        # - If attack events present but no sequences: FN=1
-        # - If sequences found on benign-only data: FP=1
-        if attack_events:
-            if sequences_found >= expected_sequences:
-                tp, fn = 1, 0
-            else:
-                tp, fn = 0, 1
-        else:
-            tp, fn = 0, 0
-
-        # FP: sequences found when there should be none, or excess sequences
-        if attack_events:
-            fp = max(0, sequences_found - expected_sequences)
-        else:
-            fp = 1 if sequences_found > 0 else 0
-
-        tn = 1 if (benign_events and fp == 0) else 0
-
-        precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
-        recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
-        f1 = (
-            2 * precision * recall / (precision + recall)
-            if (precision + recall) > 0
-            else 0.0
+        status, response = _es_request(
+            f"{es_url}/{index_name}", method="PUT", auth=es_auth,
+            data={"settings": {"number_of_shards": 1, "number_of_replicas": 0,
+                               "index.lifecycle.name": "validation-cleanup"}},
         )
+        _checked_response(status, response, "Create index")
+        created = True
+        if response.get("acknowledged") is not True:
+            raise ValueError("Create index: not acknowledged")
 
-        return {
-            "validation_method": "elasticsearch_eql",
-            "eql_query": eql_query[:300] + "..." if len(eql_query) > 300 else eql_query,
-            "sequences_found": sequences_found,
-            "expected_sequences": expected_sequences,
-            "tp": tp, "fp": fp, "fn": fn, "tn": tn,
-            "precision": round(precision, 4),
-            "recall": round(recall, 4),
-            "f1_score": round(f1, 4),
-            "events_ingested": len(attack_events) + len(benign_events),
-            "index_used": index_name,
-            "errors": errors,
-        }
+        status, response = _es_request(
+            f"{es_url}/{index_name}/_bulk", method="POST", auth=es_auth,
+            data=_build_bulk_body(index_name, attack_events, benign_events, technique_id),
+            content_type="application/x-ndjson", timeout=15,
+        )
+        _checked_response(status, response, "Bulk ingest")
+        count = len(attack_events) + len(benign_events)
+        items = response.get("items")
+        if response.get("errors") is not False or not isinstance(items, list) or len(items) != count:
+            raise ValueError("Bulk ingest: errors or incomplete item responses")
+        expected_ids = ([f"atk-{i}" for i in range(len(attack_events))]
+                        + [f"ben-{i}" for i in range(len(attack_events), count)])
+        for item, expected_id in zip(items, expected_ids):
+            indexed = item.get("index", {}) if isinstance(item, dict) else {}
+            if (type(indexed.get("status")) is not int or not 200 <= indexed["status"] < 300
+                    or indexed.get("error") or indexed.get("_id") != expected_id):
+                raise ValueError(f"Bulk ingest: failed item: {indexed}")
+        result["events_ingested"] = count
+        status, response = _es_request(f"{es_url}/{index_name}/_refresh", method="POST", auth=es_auth)
+        _checked_response(status, response, "Refresh index", require_shards=True)
 
-    except Exception as e:
-        errors.append(f"Unexpected error: {e}")
-        return None
+        attack_ids = {f"atk-{i}" for i in range(len(attack_events))}
+        benign_ids = {f"ben-{i}" for i in range(len(attack_events), count)}
+        counts = {}
+        for population, ids in (("attack", attack_ids), ("benign", benign_ids)):
+            if not ids:
+                continue
+            limit = 1000
+            status, response = _es_request(
+                f"{es_url}/{index_name}/_eql/search", method="POST", auth=es_auth,
+                data={"query": eql_query, "filter": {"ids": {"values": sorted(ids)}},
+                      "size": limit}, timeout=30,
+            )
+            _checked_response(status, response, f"EQL {population} query")
+            counts[population] = _count_matches(response, ids, index_name, limit)
 
+        attack_count, benign_count = counts.get("attack", 0), counts.get("benign", 0)
+        tp = int(bool(attack_ids) and attack_count >= expected_sequences)
+        fn = int(bool(attack_ids) and not tp)
+        fp = int(bool(benign_ids) and benign_count > 0)
+        tn = int(bool(benign_ids) and benign_count == 0)
+        precision = tp / (tp + fp) if tp + fp else 0.0
+        recall = tp / (tp + fn) if tp + fn else 0.0
+        f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
+        result.update(
+            sequences_found=attack_count + benign_count,
+            attack_sequences_found=attack_count, benign_sequences_found=benign_count,
+            tp=tp, fp=fp, fn=fn, tn=tn,
+            precision=round(precision, 4), recall=round(recall, 4), f1_score=round(f1, 4),
+            fp_rate=float(fp), tp_rate=float(tp),
+        )
+    except Exception as exc:
+        detail = str(exc)
+        if isinstance(exc, urllib.error.HTTPError):
+            detail += ": " + exc.read().decode("utf-8", errors="replace")[:1000]
+        result["errors"].append(f"EQL validation failed: {detail}")
     finally:
-        if cleanup:
+        if cleanup and created:
             _cleanup_index(es_url, index_name, es_auth)
+    return result
 
 
 def validate_eql_rule_file(

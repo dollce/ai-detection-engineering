@@ -1,9 +1,23 @@
 {
   "technique_id": "T1055_EQL",
-  "date": "2026-04-12T14:43:06Z",
-  "sigma_rule": "detections\\privilege_escalation\\t1055_sequence_eql.yml",
+  "date": "2026-10-26T07:50:51Z",
+  "status": "PASS",
+  "sigma_rule": "detections/privilege_escalation/t1055_sequence_eql.yml",
+  "scenario_path": "simulator/scenarios/windows/t1055_eql.json",
+  "compiled_artifact": "detections/privilege_escalation/compiled/t1055_sequence_eql_elastic.json",
+  "validation_method": "elasticsearch_eql",
+  "validated_by": "revalidate-evidence",
+  "quality_tier": "validated",
+  "validation_scope": "Scenario validation on Elasticsearch temporary indices only; no Splunk, Cribl, production telemetry, or scheduled-alert validation.",
+  "siem_targets": [
+    "elasticsearch"
+  ],
+  "elasticsearch_version": "8.17.0",
+  "attack_event_count": 2,
+  "benign_event_count": 1,
+  "scoring_unit": "scenario",
   "metrics": {
-    "tp": 2,
+    "tp": 1,
     "fp": 0,
     "fn": 0,
     "tn": 1,
@@ -12,31 +26,41 @@
     "f1_score": 1.0,
     "fp_rate": 0.0,
     "tp_rate": 1.0,
-    "total_attack": 2,
-    "total_benign": 1
+    "total_attack": 1,
+    "total_benign": 1,
+    "scoring_unit": "scenario"
   },
-  "quality_tier": "auto_deploy",
-  "validation_method": "elasticsearch",
-  "validated_by": "validation-agent",
-  "siem_targets": [
-    "elasticsearch",
-    "splunk"
-  ],
-  "sigma_rule_path": "detections\\privilege_escalation\\t1055_sequence_eql.yml",
-  "scenario_path": "simulator/scenarios/t1055_eql.json",
-  "attack_event_count": 2,
-  "benign_event_count": 1,
-  "quality_tier_criteria": {
-    "auto_deploy": "F1 >= 0.90 AND FP_rate <= 0.05",
-    "validated": "F1 >= 0.75",
-    "needs_rework": "F1 < 0.75"
+  "query": "sequence by host.name with maxspan=10s\n  [process where event.code == \"10\" and\n    winlog.event_data.GrantedAccess in\n      (\"0x1F0FFF\", \"0x1F3FFF\", \"0x001F0FFF\", \"0x143A\", \"0x40\", \"0x1410\") and\n    not process.executable : (\"*\\\\MsMpEng.exe\", \"*\\\\csrss.exe\",\n                               \"*\\\\svchost.exe\", \"*\\\\lsass.exe\",\n                               \"*\\\\WerFault.exe\", \"*\\\\SearchIndexer.exe\")]\n  [process where event.code == \"8\" and\n    not process.executable : (\"*\\\\MsMpEng.exe\", \"*\\\\csrss.exe\",\n                               \"*\\\\svchost.exe\", \"*\\\\WUDFHost.exe\")]",
+  "query_parameters": {
+    "expected_sequences": 1
+  },
+  "input_hashes": {
+    "autonomous/detection-requests/t1055_eql.yml": "20ae93662f3d6b926871713096bd306e25c45e99c5dc3e9f87f9fcebae7c33bf",
+    "detections/privilege_escalation/t1055_sequence_eql.yml": "814530e710b808b580f7ad17339beb436a43b2bb1ed4de1cd0f5aec24c855812",
+    "simulator/scenarios/windows/t1055_eql.json": "baedcf9d583e06a504d50882c61a60ac7d9545bbe9f14e65fc8f283fc2821461",
+    "detections/privilege_escalation/compiled/t1055_sequence_eql_elastic.json": "ccfdbd3e1cedec4260a0375962959ef57a786abc8e3e5dac0f9dddfce7839723"
   },
   "validation_details": {
-    "index": "sim-validation-51ab2b70",
-    "query": "(((event.code:10 AND (winlog.event_data.GrantedAccess:(0x1F0FFF OR 0x1F3FFF OR 0x001F0FFF OR 0x143A OR 0x40 OR 0x1410))) OR event.code:8) AND (NOT (process.executable:(*\\\\MsMpEng.exe OR *\\\\csrss.exe O",
+    "validation_method": "elasticsearch_eql",
+    "scoring_unit": "scenario",
+    "eql_query": "sequence by host.name with maxspan=10s\n  [process where event.code == \"10\" and\n    winlog.event_data.GrantedAccess in\n      (\"0x1F0FFF\", \"0x1F3FFF\", \"0x001F0FFF\", \"0x143A\", \"0x40\", \"0x1410\") and\n    not process.executable : (\"*\\\\MsMpEng.exe\", \"*\\\\csrss.exe\",\n                               \"*\\\\svchost.exe\", \"*\\\\lsass.exe\",\n                               \"*\\\\WerFault.exe\", \"*\\\\SearchIndexer.exe\")]\n  [process where event.code == \"8\" and\n    not process.executable : (\"*\\\\MsMpEng.exe\", \"*\\\\csrss.exe\",\n                               \"*\\\\svchost.exe\", \"*\\\\WUDFHost.exe\")]",
+    "expected_sequences": 1,
+    "sequences_found": 1,
+    "attack_sequences_found": 1,
+    "benign_sequences_found": 0,
+    "tp": 1,
+    "fp": 0,
+    "fn": 0,
+    "tn": 1,
+    "total_attack": 1,
+    "total_benign": 1,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "fp_rate": 0.0,
+    "tp_rate": 1.0,
     "events_ingested": 3,
-    "query_hits": 2,
-    "query_time_ms": 22,
+    "index_used": "sim-validation-9660ba6e",
     "errors": []
   }
 }
