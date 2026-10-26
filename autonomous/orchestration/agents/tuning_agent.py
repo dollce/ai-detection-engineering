@@ -130,7 +130,7 @@ def _create_investigate_issue(request: dict, health: dict, days_inactive: int):
     }).encode()
 
     req = urllib.request.Request(
-        "https://api.github.com/repos/lsmithg12/ai-detection-engineering/issues",
+        "https://api.github.com/repos/dollce/ai-detection-engineering/issues",
         data=payload, method="POST",
         headers={
             "Authorization": f"Bearer {token}",

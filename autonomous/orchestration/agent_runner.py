@@ -281,7 +281,7 @@ def _create_pr(branch: str, agent_name: str, title: str, body: str):
     import urllib.error
     import urllib.request
 
-    url = "https://api.github.com/repos/lsmithg12/ai-detection-engineering/pulls"
+    url = "https://api.github.com/repos/dollce/ai-detection-engineering/pulls"
     payload = json.dumps({
         "title": title,
         "body": body,
