@@ -1,0 +1,1 @@
+(process.executable:*\\sc.exe AND process.command_line:*start*) AND (NOT (process.parent.executable:(C\:\\Windows\\System32\\* OR C\:\\Windows\\SysWOW64\\* OR C\:\\Program\ Files\\* OR C\:\\Program\ Files\ \(x86\)\\*))) AND (NOT user.name:SYSTEM)

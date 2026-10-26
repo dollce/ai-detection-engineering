@@ -1,0 +1,106 @@
+{
+  "technique_id": "T1055.004",
+  "technique_name": "APC Injection",
+  "description": "Sysmon EID 8 CreateRemoteThread from non-standard process indicating APC injection",
+  "mitre_tactic": "privilege_escalation",
+  "events": {
+    "attack_sequence": [
+      {
+        "@timestamp": "2026-04-12T10:00:00.000Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "code": "8",
+          "action": "CreateRemoteThread detected (rule: CreateRemoteThread)"
+        },
+        "process": {
+          "pid": 4416,
+          "name": "update_helper.exe",
+          "executable": "C:\\ProgramData\\WindowsUpdate\\update_helper.exe"
+        },
+        "winlog": {
+          "event_data": {
+            "TargetImage": "C:\\Windows\\System32\\notepad.exe",
+            "TargetProcessId": "7788",
+            "StartAddress": "0x7ff8a1234000",
+            "StartFunction": "LoadLibraryW"
+          }
+        },
+        "user": {"name": "mjones", "domain": "CORP"},
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1055.004",
+          "sequence_order": 1,
+          "sequence_total": 1,
+          "description": "Fawkes apc-injection: update_helper.exe uses QueueUserAPC early-bird technique; Sysmon captures the resulting thread creation as EID 8"
+        }
+      }
+    ],
+    "benign_similar": [
+      {
+        "@timestamp": "2026-04-12T09:00:00.000Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "code": "8",
+          "action": "CreateRemoteThread detected (rule: CreateRemoteThread)"
+        },
+        "process": {
+          "pid": 1800,
+          "name": "MsMpEng.exe",
+          "executable": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2311.5-0\\MsMpEng.exe"
+        },
+        "winlog": {
+          "event_data": {
+            "TargetImage": "C:\\Windows\\System32\\svchost.exe",
+            "TargetProcessId": "880"
+          }
+        },
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1055.004",
+          "description": "Windows Defender (MsMpEng.exe) EID 8 -- filtered by filter_legitimate exclusion list"
+        }
+      },
+      {
+        "@timestamp": "2026-04-12T09:10:00.000Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "code": "8",
+          "action": "CreateRemoteThread detected (rule: CreateRemoteThread)"
+        },
+        "process": {
+          "pid": 900,
+          "name": "svchost.exe",
+          "executable": "C:\\Windows\\System32\\svchost.exe"
+        },
+        "winlog": {
+          "event_data": {
+            "TargetImage": "C:\\Windows\\System32\\spoolsv.exe",
+            "TargetProcessId": "1024"
+          }
+        },
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "sysmon"},
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1055.004",
+          "description": "svchost.exe (trusted Windows service host) EID 8 -- filtered by filter_legitimate exclusion"
+        }
+      }
+    ]
+  },
+  "expected_detection": {
+    "should_alert_on": "attack_sequence",
+    "should_not_alert_on": "benign_similar",
+    "key_fields": ["process.executable", "event.code"],
+    "notes": "Sigma rule: EID 8 from non-standard process (not in filter_legitimate list). Attack: update_helper.exe from ProgramData (not in list). Benign: MsMpEng.exe and svchost.exe (both in filter_legitimate)."
+  },
+  "log_sources_used": ["sysmon_8"],
+  "platforms": ["windows"]
+}

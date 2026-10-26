@@ -1,0 +1,42 @@
+[
+  {
+    "@timestamp": "2026-03-10T09:14:32.441Z",
+    "event": {
+      "category": "process",
+      "type": "start",
+      "action": "Process Create (rule: ProcessCreate)",
+      "code": "1"
+    },
+    "process": {
+      "pid": 5872,
+      "name": "auditpol.exe",
+      "executable": "C:\\Windows\\System32\\auditpol.exe",
+      "command_line": "auditpol.exe /set /subcategory:\"Process Creation\" /success:disable /failure:disable",
+      "parent": {
+        "pid": 4416,
+        "name": "update_helper.exe",
+        "executable": "C:\\Users\\jsmith\\AppData\\Roaming\\Microsoft\\update_helper.exe"
+      }
+    },
+    "user": {
+      "name": "jsmith",
+      "domain": "CORP"
+    },
+    "host": {
+      "name": "SRV-FILE-01",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "attack",
+      "technique": "T1562.006",
+      "sequence_order": 1,
+      "sequence_total": 3,
+      "description": "Malicious process disables Windows process creation auditing via auditpol.exe to suppress Security event log indicators"
+    }
+  }
+]

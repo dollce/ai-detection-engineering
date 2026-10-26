@@ -1,0 +1,78 @@
+[
+  {
+    "@timestamp": "2026-04-11T14:18:44.201Z",
+    "event": {
+      "category": "process",
+      "type": "start",
+      "action": "Process Create (rule: ProcessCreate)",
+      "code": "1"
+    },
+    "process": {
+      "pid": 3856,
+      "name": "MicrosoftEdgeUpdate.exe",
+      "executable": "C:\\Program Files (x86)\\Microsoft\\EdgeUpdate\\MicrosoftEdgeUpdate.exe",
+      "command_line": "\"C:\\Program Files (x86)\\Microsoft\\EdgeUpdate\\MicrosoftEdgeUpdate.exe\" /svc",
+      "parent": {
+        "pid": 860,
+        "name": "services.exe",
+        "executable": "C:\\Windows\\System32\\services.exe"
+      }
+    },
+    "user": {
+      "name": "SYSTEM",
+      "domain": "NT AUTHORITY"
+    },
+    "host": {
+      "name": "WS-EXEC-01",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "benign_similar",
+      "technique": "T1036.005",
+      "description": "Legitimate Microsoft Edge updater service launched by services.exe from vendor-signed Program Files path under SYSTEM \u2014 similar update-related naming but canonical location, expected parent, and privileged service account"
+    }
+  },
+  {
+    "@timestamp": "2026-04-11T14:21:02.887Z",
+    "event": {
+      "category": "process",
+      "type": "start",
+      "action": "Process Create (rule: ProcessCreate)",
+      "code": "1"
+    },
+    "process": {
+      "pid": 5124,
+      "name": "wuauclt.exe",
+      "executable": "C:\\Windows\\System32\\wuauclt.exe",
+      "command_line": "wuauclt.exe /RunHandlerComServer",
+      "parent": {
+        "pid": 1072,
+        "name": "svchost.exe",
+        "executable": "C:\\Windows\\System32\\svchost.exe"
+      }
+    },
+    "user": {
+      "name": "SYSTEM",
+      "domain": "NT AUTHORITY"
+    },
+    "host": {
+      "name": "WS-EXEC-01",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "benign_similar",
+      "technique": "T1036.005",
+      "description": "Legitimate Windows Update client wuauclt.exe running from System32 under SYSTEM account, spawned by svchost.exe \u2014 update-related binary with update-related name but from canonical Windows path with expected parent chain"
+    }
+  }
+]

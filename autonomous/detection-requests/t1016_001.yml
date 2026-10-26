@@ -1,0 +1,79 @@
+technique_id: T1016.001
+title: "Detection for T1016.001 \u2014 ARP table (host discovery)"
+status: DEPLOYED
+priority: high
+requested_by: intel
+requested_date: '2026-03-21T13:04:56Z'
+intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
+scenario_file: simulator/scenarios/windows/t1016_001.json
+sigma_rule: detections/discovery/t1016_001.yml
+deployed_date: '2026-04-12T21:34:18Z'
+last_quality_review: ''
+quality_score: 0.8
+fp_rate: 0.0
+tp_rate: 0.667
+alert_volume_24h: 0
+cost_estimate: low
+auto_deploy_eligible: true
+changelog:
+- date: '2026-03-21T13:04:56Z'
+  agent: intel
+  action: created
+  details: 'Detection request created from intel: threat-intel/fawkes/fawkes-ttp-mapping.md'
+- date: '2026-03-21T13:04:56Z'
+  agent: intel
+  action: update
+  details: 'Updated fields: threat_actors, fawkes_commands'
+- date: '2026-03-21T13:12:22Z'
+  agent: red-team
+  action: update
+  details: 'Updated fields: scenario_file'
+- date: '2026-03-21T13:12:22Z'
+  agent: red-team
+  action: transition:REQUESTED->SCENARIO_BUILT
+  details: 'Scenario generated: 3 attack, 2 benign events'
+- date: '2026-03-21T13:30:42Z'
+  agent: author
+  action: update
+  details: 'Updated fields: sigma_rule, compiled_lucene, compiled_spl, mitre_tactic'
+- date: '2026-03-21T13:30:42Z'
+  agent: author
+  action: transition:SCENARIO_BUILT->AUTHORED
+  details: Sigma rule authored, transpiled to Lucene + SPL
+- date: '2026-03-22T15:48:57Z'
+  agent: validation
+  action: update
+  details: 'Updated fields: quality_score, fp_rate, tp_rate'
+- date: '2026-03-22T15:48:57Z'
+  agent: validation
+  action: transition:AUTHORED->VALIDATED
+  details: F1=0.8, FP_rate=0.0, tier=human_review
+- date: '2026-04-12T21:34:09Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:34:18Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:34:18Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:34:18Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:34:18Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
+threat_actors:
+- Fawkes C2 Agent
+fawkes_commands:
+- arp
+compiled_lucene: detections/discovery/compiled/t1016_001.lucene
+compiled_spl: detections/discovery/compiled/t1016_001.spl
+mitre_tactic: discovery
+elastic_rule_id: ae5af605-4935-4278-ab80-53bf1fe5dd02
+splunk_saved_search: "Detection for T1016.001 \u2014 ARP table (host discovery) T1016.001"

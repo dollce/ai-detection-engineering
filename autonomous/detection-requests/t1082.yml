@@ -1,0 +1,78 @@
+technique_id: T1082
+title: System Information Discovery
+status: DEPLOYED
+priority: critical
+requested_by: intel
+requested_date: '2026-03-08T14:12:14Z'
+intel_report: ''
+scenario_file: simulator/scenarios/windows/t1082.json
+sigma_rule: detections/discovery/t1082.yml
+deployed_date: '2026-04-12T21:34:28Z'
+last_quality_review: ''
+quality_score: 0.75
+fp_rate: 1.0
+tp_rate: 1.0
+alert_volume_24h: 0
+cost_estimate: low
+auto_deploy_eligible: true
+changelog:
+- date: '2026-03-08T14:12:14Z'
+  agent: intel
+  action: created
+  details: 'Detection request created from intel: threat-intel\reports\2026-03-08-cat-s-got-your-files-lynx-ransomware.yml'
+- date: '2026-03-08T14:12:14Z'
+  agent: intel
+  action: update
+  details: 'Updated fields: fawkes_commands'
+- date: '2026-03-08T14:24:59Z'
+  agent: red-team
+  action: update
+  details: 'Updated fields: scenario_file'
+- date: '2026-03-08T14:24:59Z'
+  agent: red-team
+  action: transition:REQUESTED->SCENARIO_BUILT
+  details: 'Scenario generated: 3 attack, 2 benign events'
+- date: '2026-03-08T14:31:12Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: sigma_rule, compiled_lucene, compiled_spl, mitre_tactic'
+- date: '2026-03-08T14:31:12Z'
+  agent: blue-team
+  action: transition:SCENARIO_BUILT->AUTHORED
+  details: Sigma rule authored, transpiled to Lucene + SPL
+- date: '2026-03-08T14:31:12Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: quality_score, fp_rate, tp_rate'
+- date: '2026-03-08T14:31:12Z'
+  agent: blue-team
+  action: transition:AUTHORED->VALIDATED
+  details: F1=0.75, FP_rate=1.0, tier=human_review
+- date: '2026-04-12T21:34:10Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:34:28Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:34:28Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:34:28Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:34:28Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
+fawkes_commands:
+- drives
+- env
+compiled_lucene: detections/discovery/compiled/t1082.lucene
+compiled_spl: detections/discovery/compiled/t1082.spl
+mitre_tactic: discovery
+elastic_rule_id: f053159c-1f7d-49a9-8375-af6dc4442ca7
+splunk_saved_search: System Information Discovery T1082

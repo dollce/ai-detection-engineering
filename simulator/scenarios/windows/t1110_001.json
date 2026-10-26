@@ -1,0 +1,163 @@
+{
+  "technique_id": "T1110.001",
+  "technique_name": "Brute Force: Password Guessing",
+  "description": "6 EID 4625 failed logon events from same source IP within 10 minutes, triggering threshold rule",
+  "mitre_tactic": "credential_access",
+  "events": {
+    "attack_sequence": [
+      {
+        "@timestamp": "2026-04-12T10:00:00.000Z",
+        "event": {
+          "category": "authentication",
+          "type": "start",
+          "code": "4625",
+          "action": "An account failed to log on"
+        },
+        "winlog": {
+          "event_data": {
+            "SubStatus": "0xC000006A",
+            "TargetUserName": "administrator",
+            "LogonType": "3"
+          }
+        },
+        "source": {"ip": "192.168.100.50"},
+        "host": {"name": "SRV-DC-01", "os": {"platform": "windows"}},
+        "user": {"name": "administrator", "domain": "CORP"},
+        "agent": {"type": "winlogbeat"},
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1110.001",
+          "sequence_order": 1,
+          "sequence_total": 6,
+          "description": "Brute force attempt 1/6 against administrator from attacker IP 192.168.100.50"
+        }
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:30.000Z",
+        "event": {
+          "category": "authentication",
+          "type": "start",
+          "code": "4625",
+          "action": "An account failed to log on"
+        },
+        "winlog": {
+          "event_data": {
+            "SubStatus": "0xC000006A",
+            "TargetUserName": "administrator",
+            "LogonType": "3"
+          }
+        },
+        "source": {"ip": "192.168.100.50"},
+        "host": {"name": "SRV-DC-01", "os": {"platform": "windows"}},
+        "user": {"name": "administrator", "domain": "CORP"},
+        "agent": {"type": "winlogbeat"},
+        "_simulation": {"type": "attack", "technique": "T1110.001", "sequence_order": 2, "sequence_total": 6,
+                         "description": "Brute force attempt 2/6"}
+      },
+      {
+        "@timestamp": "2026-04-12T10:01:00.000Z",
+        "event": {"category": "authentication", "type": "start", "code": "4625", "action": "An account failed to log on"},
+        "winlog": {"event_data": {"SubStatus": "0xC000006A", "TargetUserName": "administrator", "LogonType": "3"}},
+        "source": {"ip": "192.168.100.50"},
+        "host": {"name": "SRV-DC-01", "os": {"platform": "windows"}},
+        "user": {"name": "administrator", "domain": "CORP"},
+        "agent": {"type": "winlogbeat"},
+        "_simulation": {"type": "attack", "technique": "T1110.001", "sequence_order": 3, "sequence_total": 6,
+                         "description": "Brute force attempt 3/6"}
+      },
+      {
+        "@timestamp": "2026-04-12T10:01:30.000Z",
+        "event": {"category": "authentication", "type": "start", "code": "4625", "action": "An account failed to log on"},
+        "winlog": {"event_data": {"SubStatus": "0xC000006A", "TargetUserName": "administrator", "LogonType": "3"}},
+        "source": {"ip": "192.168.100.50"},
+        "host": {"name": "SRV-DC-01", "os": {"platform": "windows"}},
+        "user": {"name": "administrator", "domain": "CORP"},
+        "agent": {"type": "winlogbeat"},
+        "_simulation": {"type": "attack", "technique": "T1110.001", "sequence_order": 4, "sequence_total": 6,
+                         "description": "Brute force attempt 4/6"}
+      },
+      {
+        "@timestamp": "2026-04-12T10:02:00.000Z",
+        "event": {"category": "authentication", "type": "start", "code": "4625", "action": "An account failed to log on"},
+        "winlog": {"event_data": {"SubStatus": "0xC000006A", "TargetUserName": "administrator", "LogonType": "3"}},
+        "source": {"ip": "192.168.100.50"},
+        "host": {"name": "SRV-DC-01", "os": {"platform": "windows"}},
+        "user": {"name": "administrator", "domain": "CORP"},
+        "agent": {"type": "winlogbeat"},
+        "_simulation": {"type": "attack", "technique": "T1110.001", "sequence_order": 5, "sequence_total": 6,
+                         "description": "Brute force attempt 5/6"}
+      },
+      {
+        "@timestamp": "2026-04-12T10:02:30.000Z",
+        "event": {"category": "authentication", "type": "start", "code": "4625", "action": "An account failed to log on"},
+        "winlog": {"event_data": {"SubStatus": "0xC000006A", "TargetUserName": "administrator", "LogonType": "3"}},
+        "source": {"ip": "192.168.100.50"},
+        "host": {"name": "SRV-DC-01", "os": {"platform": "windows"}},
+        "user": {"name": "administrator", "domain": "CORP"},
+        "agent": {"type": "winlogbeat"},
+        "_simulation": {"type": "attack", "technique": "T1110.001", "sequence_order": 6, "sequence_total": 6,
+                         "description": "Brute force attempt 6/6 -- exceeds threshold of 5 from same source IP"}
+      }
+    ],
+    "benign_similar": [
+      {
+        "@timestamp": "2026-04-12T09:00:00.000Z",
+        "event": {
+          "category": "authentication",
+          "type": "start",
+          "code": "4625",
+          "action": "An account failed to log on"
+        },
+        "winlog": {
+          "event_data": {
+            "SubStatus": "0xC000006A",
+            "TargetUserName": "jsmith",
+            "LogonType": "2"
+          }
+        },
+        "source": {"ip": "10.10.5.12"},
+        "host": {"name": "SRV-DC-01", "os": {"platform": "windows"}},
+        "user": {"name": "jsmith", "domain": "CORP"},
+        "agent": {"type": "winlogbeat"},
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1110.001",
+          "description": "Single failed logon from user jsmith who mistyped their password -- only 1 failure, well below threshold of 5"
+        }
+      },
+      {
+        "@timestamp": "2026-04-12T09:30:00.000Z",
+        "event": {
+          "category": "authentication",
+          "type": "start",
+          "code": "4625",
+          "action": "An account failed to log on"
+        },
+        "winlog": {
+          "event_data": {
+            "SubStatus": "0xC000006A",
+            "TargetUserName": "jsmith",
+            "LogonType": "2"
+          }
+        },
+        "source": {"ip": "10.10.5.12"},
+        "host": {"name": "SRV-DC-01", "os": {"platform": "windows"}},
+        "user": {"name": "jsmith", "domain": "CORP"},
+        "agent": {"type": "winlogbeat"},
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1110.001",
+          "description": "2nd failed logon from jsmith 30 min later -- different source IP than attack, spread far apart in time"
+        }
+      }
+    ]
+  },
+  "expected_detection": {
+    "should_alert_on": "attack_sequence",
+    "should_not_alert_on": "benign_similar",
+    "key_fields": ["source.ip", "event.code", "winlog.event_data.SubStatus"],
+    "notes": "Threshold: 5+ EID 4625 events grouped by source.ip within 10 minutes. Attack: 6 events from 192.168.100.50. Benign: 2 events from different IP, only 2 total (below threshold)."
+  },
+  "log_sources_used": ["windows_security_4625"],
+  "platforms": ["windows"]
+}

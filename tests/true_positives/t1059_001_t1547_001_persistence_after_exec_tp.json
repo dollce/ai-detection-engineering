@@ -1,0 +1,45 @@
+{
+  "_simulation": {
+    "description": "PowerShell bypass execution followed by registry Run key persistence within 5 minutes — Fawkes powershell + persist chain",
+    "technique": "T1059.001+T1547.001",
+    "fawkes_command": "powershell + persist (registry)",
+    "expected_result": "ALERT",
+    "rule_type": "eql",
+    "sequence_window": "300s"
+  },
+  "attack_events": [
+    {
+      "@timestamp": "2026-04-01T10:00:00.000Z",
+      "event": {"code": "1", "category": "process"},
+      "host": {"name": "WORKSTATION-05"},
+      "process": {
+        "name": "powershell.exe",
+        "executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "command_line": "powershell.exe -ExecutionPolicy Bypass -NoProfile -WindowStyle Hidden -File C:\\Users\\victim\\payload.ps1",
+        "pid": 4892
+      },
+      "process.parent": {
+        "name": "cmd.exe",
+        "executable": "C:\\Windows\\System32\\cmd.exe",
+        "pid": 3100
+      },
+      "user": {"name": "victim_user"}
+    },
+    {
+      "@timestamp": "2026-04-01T10:02:30.000Z",
+      "event": {"code": "13", "category": "registry"},
+      "host": {"name": "WORKSTATION-05"},
+      "registry": {
+        "path": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\MalwareUpdate",
+        "value": "C:\\Users\\victim\\AppData\\Local\\Temp\\backdoor.exe",
+        "data": {"type": "REG_SZ"}
+      },
+      "process": {
+        "name": "powershell.exe",
+        "executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "pid": 4892
+      },
+      "user": {"name": "victim_user"}
+    }
+  ]
+}

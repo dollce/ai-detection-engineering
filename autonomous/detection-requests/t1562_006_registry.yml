@@ -1,0 +1,55 @@
+technique_id: T1562.006_REGISTRY
+title: Indicator Blocking via Sysmon/ETW Registry Tampering
+status: DEPLOYED
+priority: high
+mitre_tactic: defense_evasion
+rule_type: sigma
+requested_by: blue-team
+requested_date: '2026-04-01T00:00:00Z'
+intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
+scenario_file: simulator/scenarios/windows/t1562_006_registry.json
+sigma_rule: detections/defense_evasion/t1562_006_registry.yml
+compiled_lucene: detections/defense_evasion/compiled/t1562_006_registry.lucene
+compiled_spl: detections/defense_evasion/compiled/t1562_006_registry.spl
+compiled_artifact: ''
+secondary_techniques: []
+deployed_date: '2026-04-12T21:34:02Z'
+elastic_rule_id: e1cd873b-58f1-4dce-be54-e0ba266101b2
+splunk_saved_search: Indicator Blocking via Sysmon/ETW Registry Tampering T1562.006_REGISTRY
+last_quality_review: ''
+quality_score: 1.0
+fp_rate: 0.0
+tp_rate: 1.0
+alert_volume_24h: 0
+cost_estimate: low
+auto_deploy_eligible: true
+fawkes_commands:
+- autopatch
+- start-clr
+changelog:
+- date: '2026-04-01T00:00:00Z'
+  agent: blue-team
+  action: created
+  details: Registry variant of T1562.006 -- detects Sysmon driver and ETW Security log registry tampering. Companion to process-based
+    T1562.006 rule.
+- date: '2026-04-12T21:28:51Z'
+  agent: validation
+  action: validated
+  details: 'ES-based validation: TP=2/2, FP=0/2, F1=1.0. Auto-deploy eligible. technique_id renamed from T1562.006 to T1562.006_REGISTRY
+    to avoid state machine collision with process-based T1562.006 rule (MONITORING).'
+- date: '2026-04-12T21:34:02Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:34:02Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:34:02Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:34:02Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'

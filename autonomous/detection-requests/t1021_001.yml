@@ -1,0 +1,75 @@
+technique_id: T1021.001
+title: 'Remote Services: Remote Desktop Protocol'
+status: DEPLOYED
+priority: high
+requested_by: intel
+requested_date: '2026-03-08T14:12:14Z'
+intel_report: threat-intel/reports/2026-03-22-apache-activemq-exploit-leads-to-lockbit-ransomwar.yml
+scenario_file: simulator/scenarios/windows/t1021_001.json
+sigma_rule: detections/lateral_movement/t1021_001.yml
+deployed_date: '2026-04-12T21:34:20Z'
+last_quality_review: ''
+quality_score: 0.857
+fp_rate: 0.5
+tp_rate: 1.0
+alert_volume_24h: 0
+cost_estimate: low
+auto_deploy_eligible: true
+changelog:
+- date: '2026-03-08T14:12:14Z'
+  agent: intel
+  action: created
+  details: 'Detection request created from intel: threat-intel\reports\2026-03-08-apache-activemq-exploit-leads-to-lockbit-ransomwar.yml'
+- date: '2026-03-08T22:22:30Z'
+  agent: red-team
+  action: update
+  details: 'Updated fields: scenario_file'
+- date: '2026-03-08T22:22:30Z'
+  agent: red-team
+  action: transition:REQUESTED->SCENARIO_BUILT
+  details: 'Scenario generated: 3 attack, 2 benign events'
+- date: '2026-03-08T22:29:49Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: sigma_rule, compiled_lucene, compiled_spl, mitre_tactic'
+- date: '2026-03-08T22:29:49Z'
+  agent: blue-team
+  action: transition:SCENARIO_BUILT->AUTHORED
+  details: Sigma rule authored, transpiled to Lucene + SPL
+- date: '2026-03-08T22:29:49Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: quality_score, fp_rate, tp_rate'
+- date: '2026-03-22T15:53:16Z'
+  agent: validation
+  action: update
+  details: 'Updated fields: quality_score, fp_rate, tp_rate'
+- date: '2026-03-22T15:53:16Z'
+  agent: validation
+  action: transition:AUTHORED->VALIDATED
+  details: F1=0.857, FP_rate=0.5, tier=human_review
+- date: '2026-04-12T21:34:09Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:34:20Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:34:20Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:34:20Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:34:20Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
+compiled_lucene: detections/lateral_movement/compiled/t1021_001.lucene
+compiled_spl: detections/lateral_movement/compiled/t1021_001.spl
+mitre_tactic: lateral_movement
+elastic_rule_id: 18c91ee2-c9da-4817-bce8-9b0a93898730
+splunk_saved_search: 'Remote Services: Remote Desktop Protocol T1021.001'

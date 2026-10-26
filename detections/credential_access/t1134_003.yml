@@ -1,0 +1,35 @@
+title: Suspicious NewCredentials Logon (Make Token) [T1134.003]
+id: fbe772fc-44af-4be8-859c-3c34657fe3c7
+status: experimental
+description: |
+  Detects Windows Security Event 4624 with Logon Type 9 (NewCredentials) from
+  non-service processes. Fawkes C2 make-token command creates new tokens using
+  LogonUser API which produces this event. Logon Type 9 is rarely seen in normal
+  operations outside of runas /netonly scenarios.
+author: Blue Team Detection Engineering Agent
+date: 2026/03/29
+modified: 2026/04/11
+references:
+  - https://attack.mitre.org/techniques/T1134/003/
+  - https://github.com/galoryber/fawkes
+tags:
+  - attack.credential_access
+  - attack.privilege_escalation
+  - attack.t1134.003
+  - detection.fawkes
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    event.code: '4624'
+    winlog.event_data.LogonType: '9'
+  filter_system:
+    winlog.event_data.TargetUserName|endswith: '$'
+  filter_runas:
+    process.executable|endswith: '\runas.exe'
+  condition: selection and not 1 of filter_*
+falsepositives:
+  - runas /netonly for legitimate administrative tasks
+  - Some backup/replication software using NewCredentials logon
+level: high

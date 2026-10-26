@@ -1,0 +1,42 @@
+[
+  {
+    "@timestamp": "2026-03-22T09:14:35.104Z",
+    "event": {
+      "category": "process",
+      "type": "start",
+      "action": "Process Create (rule: ProcessCreate)",
+      "code": "1"
+    },
+    "process": {
+      "pid": 9104,
+      "name": "netstat.exe",
+      "executable": "C:\\Windows\\System32\\netstat.exe",
+      "command_line": "netstat.exe -ano",
+      "parent": {
+        "pid": 7832,
+        "name": "runtime_host.exe",
+        "executable": "C:\\Users\\jsmith\\AppData\\Roaming\\Microsoft\\runtime_host.exe"
+      }
+    },
+    "user": {
+      "name": "jsmith",
+      "domain": "CORP"
+    },
+    "host": {
+      "name": "WS-FINANCE-01",
+      "os": {
+        "platform": "windows"
+      }
+    },
+    "agent": {
+      "type": "sysmon"
+    },
+    "_simulation": {
+      "type": "attack",
+      "technique": "T1049",
+      "sequence_order": 2,
+      "sequence_total": 3,
+      "description": "Fawkes net-stat command executed \u00e2\u20ac\u201d netstat.exe -ano spawned directly by C2 agent to enumerate all active TCP/UDP connections and listening ports with owning PIDs"
+    }
+  }
+]

@@ -1,0 +1,43 @@
+{
+  "_simulation": {
+    "description": "Legitimate PowerShell usage without bypass flags followed by normal registry access — should not trigger cross-tactic EQL",
+    "technique": "T1059.001+T1547.001",
+    "expected_result": "NO_ALERT",
+    "rule_type": "eql"
+  },
+  "benign_events": [
+    {
+      "@timestamp": "2026-04-01T09:00:00.000Z",
+      "event": {"code": "1", "category": "process"},
+      "host": {"name": "WORKSTATION-05"},
+      "process": {
+        "name": "powershell.exe",
+        "executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "command_line": "powershell.exe -Command Get-Process",
+        "pid": 2100
+      },
+      "process.parent": {
+        "name": "explorer.exe",
+        "executable": "C:\\Windows\\explorer.exe",
+        "pid": 1200
+      },
+      "user": {"name": "admin_user"}
+    },
+    {
+      "@timestamp": "2026-04-01T09:01:00.000Z",
+      "event": {"code": "13", "category": "registry"},
+      "host": {"name": "WORKSTATION-05"},
+      "registry": {
+        "path": "HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\Count",
+        "value": "{some-guid}",
+        "data": {"type": "REG_BINARY"}
+      },
+      "process": {
+        "name": "explorer.exe",
+        "executable": "C:\\Windows\\explorer.exe",
+        "pid": 1200
+      },
+      "user": {"name": "admin_user"}
+    }
+  ]
+}

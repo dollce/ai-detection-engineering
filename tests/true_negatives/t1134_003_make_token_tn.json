@@ -1,0 +1,46 @@
+{
+  "_description": "True negative: Administrator using runas.exe with /netonly flag — should NOT trigger alert because process.executable ends with runas.exe and is filtered",
+  "_technique": "T1134.003",
+  "_expected_result": "NO_ALERT",
+  "_rationale": "runas.exe is explicitly excluded by filter_runas. This is a common legitimate admin workflow (runas /netonly /user:CORP\\admin cmd.exe) that produces LogonType 9 events.",
+  "event": {
+    "category": "authentication",
+    "type": "start",
+    "action": "logged-in",
+    "code": "4624"
+  },
+  "winlog": {
+    "event_data": {
+      "LogonType": "9",
+      "TargetUserName": "svc_backup",
+      "TargetDomainName": "CORP",
+      "LogonProcessName": "seclogo",
+      "AuthenticationPackageName": "Negotiate",
+      "IpAddress": "127.0.0.1",
+      "IpPort": "0"
+    }
+  },
+  "process": {
+    "name": "runas.exe",
+    "executable": "C:\\Windows\\System32\\runas.exe",
+    "pid": 6120
+  },
+  "user": {
+    "name": "jdoe",
+    "domain": "CORP"
+  },
+  "host": {
+    "name": "ADMIN-WS-01",
+    "os": {
+      "platform": "windows"
+    }
+  },
+  "agent": {
+    "type": "winlogbeat"
+  },
+  "_simulation": {
+    "type": "benign_similar",
+    "technique": "T1134.003",
+    "label": "runas_netonly_legitimate"
+  }
+}

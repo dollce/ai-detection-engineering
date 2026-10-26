@@ -1,0 +1,1 @@
+event.code="8" process.executable IN ("*\\AppData\\Local\\Temp\\*", "*\\AppData\\Roaming\\*", "*\\ProgramData\\*", "*\\Users\\Public\\*", "*\\Downloads\\*", "*\\Temp\\*") NOT (process.name IN ("MsMpEng.exe", "csrss.exe", "services.exe", "lsass.exe", "svchost.exe", "WmiPrvSE.exe", "SearchIndexer.exe"))

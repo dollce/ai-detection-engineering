@@ -1,0 +1,121 @@
+name: Detection Regression Test
+
+on:
+  pull_request:
+    paths:
+      - 'detections/**'
+      - '.github/workflows/regression-test.yml'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  regression:
+    name: Regression Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install pyyaml
+
+      - name: Find changed rule sources and prepare trusted base
+        id: changes
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/regression" "$RUNNER_TEMP/regression-base"
+          comparison_base="$BASE_SHA"
+          export IMPORT_VERIFIED=false
+          # One-time import from the reviewed branch into the LICENSE-only master.
+          # Pin both commits; later PRs always use their actual base. Any rule or
+          # validation-data change blocks this import path instead of skipping it.
+          if [ "$BASE_SHA" = "bd3ce8a2435af2da93990804f3acc129112e2821" ]; then
+            reviewed_source="0df199533e3077839986d058928374046b0a215a"
+            git merge-base --is-ancestor "$reviewed_source" HEAD
+            git diff --exit-code "$reviewed_source" HEAD -- \
+              detections/ tests/true_positives/ tests/true_negatives/ tests/results/ \
+              simulator/scenarios/ autonomous/detection-requests/
+            comparison_base="$reviewed_source"
+            export IMPORT_VERIFIED=true
+          fi
+          git diff --name-only -z "$comparison_base" HEAD -- detections/ > "$RUNNER_TEMP/regression/changed-paths"
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          output = Path(os.environ['RUNNER_TEMP']) / 'regression'
+          paths = (output / 'changed-paths').read_text().split('\0')
+          rules = [p for p in paths if Path(p).suffix in {'.yml', '.yaml'}
+                   and not {'packs', 'compiled'} & set(Path(p).parts)]
+          (output / 'changed-rules').write_text(''.join(p + '\0' for p in rules))
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write(f"count={len(rules)}\n")
+          if not rules:
+              reason = ('verified import preserves the reviewed rule and validation-data trees'
+                        if os.environ['IMPORT_VERIFIED'] == 'true'
+                        else 'verified diff contains no rule source changes')
+              (output / 'regression-report.md').write_text(
+                  '## Detection Regression Test Results\n\n'
+                  f'**Overall: NOT_APPLICABLE** — {reason}.\n'
+                  'No regression validation was executed.\n')
+          PY
+          git archive "$comparison_base" detections | tar -x -C "$RUNNER_TEMP/regression-base"
+
+      - name: Compare every changed rule with the base revision
+        if: steps.changes.outputs.count != '0'
+        run: |
+          python autonomous/orchestration/regression.py \
+            --files-from "$RUNNER_TEMP/regression/changed-rules" \
+            --baseline-root "$RUNNER_TEMP/regression-base" \
+            --output-dir "$RUNNER_TEMP/regression"
+
+      - name: Publish current-run summary
+        if: always()
+        run: |
+          report="$RUNNER_TEMP/regression/regression-report.md"
+          if [ ! -s "$report" ]; then
+            echo '## Detection Regression Test Results' >> "$GITHUB_STEP_SUMMARY"
+            echo 'Overall: NOT_RUN — no report was produced. See failed steps.' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          cat "$report" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: detection-regression
+          path: ${{ runner.temp }}/regression/
+          if-no-files-found: error
+
+      - name: Post current-run report as PR comment
+        if: always() && github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const reportPath = path.join(process.env.RUNNER_TEMP, 'regression', 'regression-report.md');
+            const body = fs.existsSync(reportPath)
+              ? fs.readFileSync(reportPath, 'utf8')
+              : '## Detection Regression Test Results\n\n**Overall: NOT_RUN** — no report was produced. See failed steps.';
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number,
+            });
+            const previous = comments.find(c => c.user.type === 'Bot' &&
+              c.body.includes('## Detection Regression Test Results'));
+            if (previous) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner, repo: context.repo.repo, comment_id: previous.id, body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body,
+              });
+            }

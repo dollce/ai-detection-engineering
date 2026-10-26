@@ -1,0 +1,160 @@
+{
+  "technique_id": "T1489",
+  "technique_name": "Service Stop (Pre-Ransomware Mass Kill)",
+  "description": "4 distinct services stopped on same host within 5 minutes, triggering threshold rule",
+  "mitre_tactic": "impact",
+  "events": {
+    "attack_sequence": [
+      {
+        "@timestamp": "2026-04-12T10:00:00.000Z",
+        "event": {
+          "category": "process",
+          "type": "change",
+          "code": "7036",
+          "action": "The service changed state"
+        },
+        "winlog": {
+          "event_data": {
+            "param1": "SQL Server (MSSQLSERVER)",
+            "param2": "stopped"
+          }
+        },
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "winlogbeat"},
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1489",
+          "sequence_order": 1,
+          "sequence_total": 4,
+          "description": "Pre-ransomware service kill 1/4: SQL Server stopped to release database file locks before encryption"
+        }
+      },
+      {
+        "@timestamp": "2026-04-12T10:00:30.000Z",
+        "event": {
+          "category": "process",
+          "type": "change",
+          "code": "7036",
+          "action": "The service changed state"
+        },
+        "winlog": {
+          "event_data": {
+            "param1": "Veeam Backup Service",
+            "param2": "stopped"
+          }
+        },
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "winlogbeat"},
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1489",
+          "sequence_order": 2,
+          "sequence_total": 4,
+          "description": "Pre-ransomware service kill 2/4: Backup agent stopped to prevent backup interference with encryption"
+        }
+      },
+      {
+        "@timestamp": "2026-04-12T10:01:00.000Z",
+        "event": {
+          "category": "process",
+          "type": "change",
+          "code": "7036",
+          "action": "The service changed state"
+        },
+        "winlog": {
+          "event_data": {
+            "param1": "Symantec Endpoint Protection",
+            "param2": "stopped"
+          }
+        },
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "winlogbeat"},
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1489",
+          "sequence_order": 3,
+          "sequence_total": 4,
+          "description": "Pre-ransomware service kill 3/4: Security product stopped to evade detection during encryption"
+        }
+      },
+      {
+        "@timestamp": "2026-04-12T10:01:30.000Z",
+        "event": {
+          "category": "process",
+          "type": "change",
+          "code": "7036",
+          "action": "The service changed state"
+        },
+        "winlog": {
+          "event_data": {
+            "param1": "Volume Shadow Copy",
+            "param2": "stopped"
+          }
+        },
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "winlogbeat"},
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1489",
+          "sequence_order": 4,
+          "sequence_total": 4,
+          "description": "Pre-ransomware service kill 4/4: VSS stopped so ransomware can delete shadow copies -- 4 distinct services in 90s, far exceeds threshold of 3"
+        }
+      }
+    ],
+    "benign_similar": [
+      {
+        "@timestamp": "2026-04-12T09:00:00.000Z",
+        "event": {
+          "category": "process",
+          "type": "change",
+          "code": "7036",
+          "action": "The service changed state"
+        },
+        "winlog": {
+          "event_data": {
+            "param1": "Windows Update",
+            "param2": "stopped"
+          }
+        },
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "winlogbeat"},
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1489",
+          "description": "Windows Update service stops after patching -- this service is in filter_normal exclusion list"
+        }
+      },
+      {
+        "@timestamp": "2026-04-12T09:01:00.000Z",
+        "event": {
+          "category": "process",
+          "type": "change",
+          "code": "7036",
+          "action": "The service changed state"
+        },
+        "winlog": {
+          "event_data": {
+            "param1": "Background Intelligent Transfer Service",
+            "param2": "stopped"
+          }
+        },
+        "host": {"name": "WS-EXEC-01", "os": {"platform": "windows"}},
+        "agent": {"type": "winlogbeat"},
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1489",
+          "description": "BITS service stops after update download -- also in filter_normal exclusion list. Only 2 events total and both are filtered."
+        }
+      }
+    ]
+  },
+  "expected_detection": {
+    "should_alert_on": "attack_sequence",
+    "should_not_alert_on": "benign_similar",
+    "key_fields": ["winlog.event_data.param1", "winlog.event_data.param2", "host.name"],
+    "notes": "Threshold: 3+ distinct service names (cardinality on winlog.event_data.param1) stopped within 5 min on same host. Attack: 4 distinct services in 90s. Benign: Windows Update + BITS (both in filter_normal exclusion list)."
+  },
+  "log_sources_used": ["windows_system_7036"],
+  "platforms": ["windows"]
+}

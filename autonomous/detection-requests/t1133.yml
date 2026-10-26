@@ -1,0 +1,71 @@
+technique_id: T1133
+title: External Remote Services
+status: DEPLOYED
+priority: high
+requested_by: intel
+requested_date: '2026-03-08T14:12:14Z'
+intel_report: ''
+scenario_file: simulator/scenarios/windows/t1133.json
+sigma_rule: detections/initial_access/t1133.yml
+deployed_date: '2026-04-12T21:34:30Z'
+last_quality_review: ''
+quality_score: 0.857
+fp_rate: 0.5
+tp_rate: 1.0
+alert_volume_24h: 0
+cost_estimate: low
+auto_deploy_eligible: true
+changelog:
+- date: '2026-03-08T14:12:14Z'
+  agent: intel
+  action: created
+  details: 'Detection request created from intel: threat-intel\reports\2026-03-08-from-bing-search-to-ransomware-bumblebee-and-adapt.yml'
+- date: '2026-03-08T22:23:35Z'
+  agent: red-team
+  action: update
+  details: 'Updated fields: scenario_file'
+- date: '2026-03-08T22:23:35Z'
+  agent: red-team
+  action: transition:REQUESTED->SCENARIO_BUILT
+  details: 'Scenario generated: 3 attack, 2 benign events'
+- date: '2026-03-08T22:30:37Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: sigma_rule, compiled_lucene, compiled_spl, mitre_tactic'
+- date: '2026-03-08T22:30:37Z'
+  agent: blue-team
+  action: transition:SCENARIO_BUILT->AUTHORED
+  details: Sigma rule authored, transpiled to Lucene + SPL
+- date: '2026-03-08T22:30:37Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: quality_score, fp_rate, tp_rate'
+- date: '2026-03-08T22:30:37Z'
+  agent: blue-team
+  action: transition:AUTHORED->VALIDATED
+  details: F1=0.857, FP_rate=0.5, tier=human_review
+- date: '2026-04-12T21:34:10Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-12T21:34:30Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-12T21:34:30Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-12T21:34:30Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-12T21:34:30Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
+compiled_lucene: detections/initial_access/compiled/t1133.lucene
+compiled_spl: detections/initial_access/compiled/t1133.spl
+mitre_tactic: initial_access
+elastic_rule_id: 9af1f41d-e904-457e-9104-4038803e00e1
+splunk_saved_search: External Remote Services T1133

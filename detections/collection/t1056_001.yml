@@ -1,0 +1,65 @@
+title: Potential Keylogger - Suspicious Process Execution or user32.dll Load from Writable Path
+id: 6c7d8e9f-0a1b-2c3d-4e5f-6a7b8c9d0e1f
+status: experimental
+description: |
+  Detects processes executing from or loading user32.dll from user-writable directories,
+  matching the Fawkes C2 keylog command pattern. Covers both ImageLoad of user32.dll
+  (EID 7, required for SetWindowsHookEx WH_KEYBOARD_LL keyboard hooks) and process
+  creation from suspicious writable paths (EID 1, catches masquerading binaries dropped
+  by Fawkes before the DLL hook is installed). Legitimate accessibility tools are excluded.
+  Uses file.path|endswith for EID 7 because file.name is not reliably populated in all
+  ECS Sysmon pipeline configurations; file.path is always present for ImageLoad events.
+references:
+  - https://attack.mitre.org/techniques/T1056/001/
+  - https://github.com/galoryber/fawkes
+author: Detection Engineering
+date: 2026/03/25
+modified: 2026/04/11
+tags:
+  - attack.collection
+  - attack.credential_access
+  - attack.t1056.001
+  - detection.fawkes
+logsource:
+  product: windows
+  service: sysmon
+detection:
+  selection_imageload:
+    event.code: '7'
+    file.path|endswith: '\user32.dll'
+  selection_process_create:
+    event.code: '1'
+  selection_suspicious_process:
+    process.executable|contains:
+      - '\AppData\'
+      - '\ProgramData\'
+      - '\Temp\'
+      - '\Users\Public\'
+      - '\Downloads\'
+      - '\Desktop\'
+  filter_accessibility:
+    process.name:
+      - 'osk.exe'
+      - 'narrator.exe'
+      - 'magnify.exe'
+      - 'Utilman.exe'
+  filter_system_paths:
+    process.executable|contains:
+      - '\Windows\System32\'
+      - '\Windows\SysWOW64\'
+      - '\Program Files\'
+      - '\Program Files (x86)\'
+  condition: (selection_imageload or selection_process_create) and selection_suspicious_process and not filter_accessibility and not filter_system_paths
+falsepositives:
+  - Custom applications in ProgramData that legitimately use keyboard hooks
+  - Development tools loading user32.dll from non-standard paths
+  - Legitimate software installers running from Temp or AppData
+level: high
+fields:
+  - process.name
+  - process.executable
+  - file.path
+  - file.name
+  - process.parent.name
+  - user.name
+  - host.name

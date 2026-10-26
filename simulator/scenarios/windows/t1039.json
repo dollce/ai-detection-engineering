@@ -1,0 +1,153 @@
+{
+  "technique_id": "T1039",
+  "technique_name": "Data from Network Shared Drive",
+  "description": "Simulates Data from Network Shared Drive attack sequence",
+  "mitre_tactic": "unknown",
+  "events": {
+    "attack_sequence": [
+      {
+        "@timestamp": "2026-04-11T09:14:22.311Z",
+        "event": {
+          "category": "process",
+          "type": "start",
+          "action": "Process Create (rule: ProcessCreate)",
+          "code": "1"
+        },
+        "process": {
+          "pid": 7832,
+          "name": "sync_agent.exe",
+          "executable": "C:\\ProgramData\\WindowsUpdate\\sync_agent.exe",
+          "command_line": "sync_agent.exe --collect \\\\CORP-FS01\\Finance$\\Reports --out C:\\ProgramData\\WindowsUpdate\\staging\\",
+          "parent": {
+            "pid": 1204,
+            "name": "svchost.exe",
+            "executable": "C:\\Windows\\System32\\svchost.exe"
+          }
+        },
+        "user": {
+          "name": "clee",
+          "domain": "CORP"
+        },
+        "host": {
+          "name": "WS-FINANCE-02",
+          "os": {
+            "platform": "windows"
+          }
+        },
+        "agent": {
+          "type": "sysmon"
+        },
+        "_simulation": {
+          "type": "attack",
+          "technique": "T1039",
+          "sequence_order": 1,
+          "sequence_total": 3,
+          "description": "Malicious sync_agent.exe launched with UNC path argument targeting Finance share \u00e2\u20ac\u201d unusual executable path under ProgramData\\WindowsUpdate"
+        }
+      }
+    ],
+    "benign_similar": [
+      {
+        "@timestamp": "2026-04-11T08:45:10.119Z",
+        "event": {
+          "category": "network",
+          "type": "connection",
+          "action": "Network connection detected (rule: NetworkConnect)",
+          "code": "3"
+        },
+        "process": {
+          "pid": 3312,
+          "name": "robocopy.exe",
+          "executable": "C:\\Windows\\System32\\robocopy.exe"
+        },
+        "destination": {
+          "ip": "10.10.1.45",
+          "port": 445
+        },
+        "source": {
+          "ip": "10.10.2.88",
+          "port": 49620
+        },
+        "network": {
+          "direction": "egress",
+          "transport": "tcp"
+        },
+        "user": {
+          "name": "clee",
+          "domain": "CORP"
+        },
+        "host": {
+          "name": "WS-FINANCE-02",
+          "os": {
+            "platform": "windows"
+          }
+        },
+        "agent": {
+          "type": "sysmon"
+        },
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1039",
+          "description": "Legitimate robocopy.exe SMB connection to file server \u00e2\u20ac\u201d scheduled backup task initiated by the same user copying Finance reports to a local archive folder"
+        }
+      },
+      {
+        "@timestamp": "2026-04-11T08:52:04.773Z",
+        "event": {
+          "category": "file",
+          "type": "creation",
+          "action": "File created (rule: FileCreate)",
+          "code": "11"
+        },
+        "process": {
+          "pid": 3312,
+          "name": "robocopy.exe",
+          "executable": "C:\\Windows\\System32\\robocopy.exe"
+        },
+        "file": {
+          "name": "Q1_2026_Revenue_Projections.xlsx",
+          "path": "C:\\Users\\clee\\Documents\\Finance-Archive\\Q1_2026_Revenue_Projections.xlsx",
+          "extension": "xlsx"
+        },
+        "user": {
+          "name": "clee",
+          "domain": "CORP"
+        },
+        "host": {
+          "name": "WS-FINANCE-02",
+          "os": {
+            "platform": "windows"
+          }
+        },
+        "agent": {
+          "type": "sysmon"
+        },
+        "_simulation": {
+          "type": "benign_similar",
+          "technique": "T1039",
+          "description": "Same Finance file written by robocopy to a user-owned Documents subfolder \u00e2\u20ac\u201d consistent with a scheduled local backup, not staging under ProgramData"
+        }
+      }
+    ]
+  },
+  "expected_detection": {
+    "should_alert_on": "attack_sequence",
+    "should_not_alert_on": "benign_similar",
+    "key_fields": [
+      "process.executable",
+      "process.command_line",
+      "file.path",
+      "destination.port",
+      "network.transport"
+    ],
+    "notes": "Detection should focus on the combination of (1) non-standard process path under C:\\ProgramData\\WindowsUpdate\\ initiating SMB (port 445) connections and (2) file writes to non-standard staging directories under ProgramData. Benign SMB access and file copies by robocopy.exe or Explorer from expected system paths should be excluded. High-value signal: process.executable matching *\\ProgramData\\WindowsUpdate\\* AND destination.port == 445 AND file.path matching *\\ProgramData\\*\\staging\\*."
+  },
+  "log_sources_used": [
+    "sysmon_1",
+    "sysmon_3",
+    "sysmon_11"
+  ],
+  "platforms": [
+    "windows"
+  ]
+}

@@ -1,0 +1,102 @@
+technique_id: T1047
+title: "Detection for T1047 -- Remote/local WMI execution"
+status: DEPLOYED
+priority: high
+requested_by: intel
+requested_date: '2026-03-21T13:04:56Z'
+intel_report: threat-intel/fawkes/fawkes-ttp-mapping.md
+scenario_file: simulator/scenarios/windows/t1047.json
+sigma_rule: detections/execution/t1047.yml
+deployed_date: '2026-04-04T14:18:40Z'
+last_quality_review: ''
+quality_score: 1.0
+fp_rate: 0.0
+tp_rate: 1.0
+alert_volume_24h: 0
+cost_estimate: low
+auto_deploy_eligible: true
+changelog:
+- date: '2026-03-21T13:04:56Z'
+  agent: intel
+  action: created
+  details: 'Detection request created from intel: threat-intel/fawkes/fawkes-ttp-mapping.md'
+- date: '2026-03-21T13:04:56Z'
+  agent: intel
+  action: update
+  details: 'Updated fields: threat_actors, fawkes_commands'
+- date: '2026-03-21T13:04:56Z'
+  agent: intel
+  action: update
+  details: 'Updated fields: data_source_requirements'
+- date: '2026-03-21T13:04:56Z'
+  agent: intel
+  action: update
+  details: 'Updated fields: data_source_gaps'
+- date: '2026-03-22T17:10:53Z'
+  agent: red-team
+  action: update
+  details: 'Updated fields: scenario_file'
+- date: '2026-03-22T17:10:53Z'
+  agent: red-team
+  action: transition:REQUESTED->SCENARIO_BUILT
+  details: 'Scenario generated: 3 attack, 2 benign events'
+- date: '2026-04-01T13:03:37Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: compiled_lucene'
+- date: '2026-04-04T09:00:00Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: compiled_splunk'
+- date: '2026-04-04T14:05:26Z'
+  agent: validation
+  action: update
+  details: 'Updated fields: quality_score, fp_rate, tp_rate'
+- date: '2026-04-04T14:17:12Z'
+  agent: validation
+  action: update
+  details: 'Updated fields: quality_score, fp_rate, tp_rate'
+- date: '2026-04-04T14:17:12Z'
+  agent: validation
+  action: transition:AUTHORED->VALIDATED
+  details: F1=1.0, FP_rate=0.0, tier=auto_deploy
+- date: '2026-04-04T14:17:12Z'
+  agent: validation
+  action: update
+  details: 'Updated fields: auto_deploy_eligible'
+- date: '2026-04-04T14:18:40Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: elastic_rule_id'
+- date: '2026-04-04T14:18:40Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: splunk_saved_search'
+- date: '2026-04-04T14:18:40Z'
+  agent: blue-team
+  action: transition:VALIDATED->DEPLOYED
+  details: Post-merge deploy to Elastic + Splunk
+- date: '2026-04-04T14:18:40Z'
+  agent: blue-team
+  action: update
+  details: 'Updated fields: deployed_date'
+threat_actors:
+- Fawkes C2 Agent
+- LockBit 3.0 (Black)
+fawkes_commands:
+- wmi
+data_source_requirements:
+- source: sysmon
+  event_ids:
+  - 19
+  - 20
+  - 21
+  fields:
+  - wmi.filter.name
+  - wmi.filter.query
+data_source_gaps:
+- GAP-003
+compiled_lucene: detections/execution/compiled/t1047.lucene
+compiled_spl: detections/execution/compiled/t1047.spl
+elastic_rule_id: eac3852f-a72f-438a-b6d7-d4a47181d98e
+splunk_saved_search: "Detection for T1047 -- Remote/local WMI execution T1047"

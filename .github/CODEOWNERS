@@ -1,0 +1,7 @@
+# Human must review all agent PRs
+* @dollce
+
+# Agent-specific ownership
+orchestration/ @dollce
+detections/ @dollce
+autonomous/ @dollce

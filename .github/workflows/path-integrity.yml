@@ -1,0 +1,32 @@
+name: Path Integrity
+
+on:
+  pull_request:
+    paths:
+      - 'autonomous/detection-requests/**/*.yml'
+      - 'plans/**'
+      - 'README.md'
+      - 'ROADMAP.md'
+      - 'AGENTS.md'
+      - 'CLAUDE.md'
+      - 'STATUS.md'
+      - 'PROMPTS.md'
+      - 'QUICKSTART.md'
+      - 'pipeline/validate_paths.py'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-paths:
+    name: Validate detection paths and plan links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install pyyaml
+      - name: Run path integrity validator
+        run: python3 pipeline/validate_paths.py

@@ -1,0 +1,84 @@
+name: Continuous Detection Validation
+
+on:
+  schedule:
+    - cron: '0 3 * * 0'
+  push:
+    branches: [master]
+    paths:
+      - 'detections/**'
+      - 'tests/**/*.json'
+      - 'autonomous/detection-requests/**'
+      - 'autonomous/orchestration/validation_audit.py'
+      - 'autonomous/orchestration/validation_results.py'
+  workflow_dispatch:
+    inputs:
+      technique_filter:
+        description: 'Exact request technique ID, or empty for all rules'
+        required: false
+        default: ''
+      include_evasion:
+        description: 'Require evasion execution (blocks this offline audit as NOT_RUN)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  validate-detections:
+    name: Audit stored validation evidence (offline)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install pyyaml
+
+      - name: Audit every required rule, fixture, artifact, result and pack
+        env:
+          TECHNIQUE_FILTER: ${{ inputs.technique_filter }}
+          INCLUDE_EVASION: ${{ inputs.include_evasion }}
+        run: |
+          args=(--technique "$TECHNIQUE_FILTER" --output-dir "$RUNNER_TEMP/validation-audit")
+          if [ "$INCLUDE_EVASION" = "true" ]; then
+            args+=(--include-evasion)
+          fi
+          python autonomous/orchestration/validation_audit.py "${args[@]}"
+
+      - name: Publish current-run summary
+        if: always()
+        run: |
+          report="$RUNNER_TEMP/validation-audit/validation-audit.md"
+          if [ ! -s "$report" ]; then
+            echo '## Stored Validation Evidence Audit' >> "$GITHUB_STEP_SUMMARY"
+            echo 'Overall: NOT_RUN — the audit did not produce a report. See failed steps.' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          cat "$report" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stored-validation-audit
+          path: ${{ runner.temp }}/validation-audit/
+          if-no-files-found: error
+
+      - name: Create issue on audit failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const date = new Date().toISOString().split('T')[0];
+            await github.rest.issues.create({
+              owner: context.repo.owner, repo: context.repo.repo,
+              title: `[Validation] Stored evidence audit failed — ${date}`,
+              body: `The offline evidence audit failed or did not complete. Review the current-run artifact and failed steps, repair missing evidence, then revalidate affected rules against the SIEM.\n\nRun: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n\nThis job does not execute SIEM detection queries.`,
+              labels: ['detection', 'needs-review'],
+            });
